@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Boy idol icon">
+  <defs>
+    <linearGradient id="boy-bg" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#61a5ff"/>
+      <stop offset="1" stop-color="#6b63ff"/>
+    </linearGradient>
+    <linearGradient id="boy-hair" x1="16" y1="12" x2="48" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2d3342"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#boy-bg)"/>
+  <circle cx="32" cy="31" r="13" fill="#ffe1c7"/>
+  <path fill="url(#boy-hair)" d="M18 29c0-9 6-16 15-16 8 0 14 5 15 13-5-2-10-4-17-3-5 1-9 3-13 6z"/>
+  <path fill="#111827" d="M25 31.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm14 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+  <path fill="#ec7e8e" d="M28 38c2.3 1.5 5.7 1.5 8 0 .7-.5 1.4.5.8 1.1-2.7 2.8-6.9 2.8-9.6 0-.6-.6.1-1.6.8-1.1z"/>
+  <path fill="#ffffff" d="M19 50c2.7-5 7.4-8 13-8s10.3 3 13 8v4H19z"/>
+  <path fill="#2d3342" d="M27 42h10l-2.8 6.5L32 46l-2.2 2.5z"/>
+  <path fill="#ffe66d" d="m50 14 1.8 3.7 4.1.6-3 2.9.7 4-3.6-1.9-3.6 1.9.7-4-3-2.9 4.1-.6z"/>
+</svg>

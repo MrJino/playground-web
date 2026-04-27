@@ -1,5 +1,6 @@
 const FINAL_CARDS_STORAGE_KEY = 'worldcup-final-cards';
-const DEFAULT_CARD_SOURCE = 'res/2020/boysgroup/cards.json';
+const DEFAULT_MENU_VALUE = 'boy-idol';
+const MENU_QUERY_PARAM = 'menu';
 
 let initialCards = [];
 let activePool = [];
@@ -9,6 +10,7 @@ let currentPair = [];
 let isTransitioning = false;
 let hasStoredFinalWinner = false;
 let lastWinnerIndex = 0;
+let activeLoadRequestId = 0;
 
 const poolGrid = document.getElementById('poolGrid');
 const progressText = document.getElementById('progressText');
@@ -36,6 +38,75 @@ const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
 const FINAL_CARD_SELECTION_DURATION = 1400;
 let confirmAction = null;
+
+function getMenuButtonByValue(menuValue) {
+  return Array.from(cardSourceButtons).find((button) => button.dataset.menuValue === menuValue);
+}
+
+function getInitialMenuButton() {
+  const params = new URLSearchParams(window.location.search);
+  const menuValue = params.get(MENU_QUERY_PARAM) || DEFAULT_MENU_VALUE;
+
+  return getMenuButtonByValue(menuValue) || getMenuButtonByValue(DEFAULT_MENU_VALUE) || cardSourceButtons[0];
+}
+
+function setActiveMenuButton(activeButton) {
+  cardSourceButtons.forEach((button) => {
+    const isActive = button === activeButton;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-current', isActive ? 'true' : 'false');
+  });
+
+  const activeSubmenu = activeButton.closest('.submenu');
+  const activeMenuGroup = activeSubmenu ? document.querySelector(`[aria-controls="${activeSubmenu.id}"]`) : null;
+
+  if (activeSubmenu && activeMenuGroup) {
+    activeSubmenu.classList.add('is-open');
+    activeMenuGroup.classList.add('is-open');
+    activeMenuGroup.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function updateMenuQueryParam(menuValue, shouldReplace = false) {
+  if (!menuValue) {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set(MENU_QUERY_PARAM, menuValue);
+
+  if (url.href === window.location.href) {
+    return;
+  }
+
+  const method = shouldReplace ? 'replaceState' : 'pushState';
+  window.history[method]({}, '', url);
+}
+
+async function activateMenuButton(button, options = {}) {
+  if (!button) {
+    return;
+  }
+
+  const cardSource = button.dataset.cardSource;
+
+  if (!cardSource) {
+    return;
+  }
+
+  const loadRequestId = activeLoadRequestId + 1;
+  activeLoadRequestId = loadRequestId;
+
+  try {
+    setActiveMenuButton(button);
+    updateMenuQueryParam(button.dataset.menuValue, options.replace);
+    renderCardsLoadingState();
+    await loadCards(cardSource, loadRequestId);
+  } catch (error) {
+    console.error(error);
+    centerNote.textContent = '카드 데이터를 불러오지 못했습니다.';
+  }
+}
 
 function shuffle(array) {
   const cloned = [...array];
@@ -72,14 +143,23 @@ function normalizeCard(card, index, sourceDirectory) {
   };
 }
 
-async function loadCards(cardSource) {
+async function loadCards(cardSource, loadRequestId = activeLoadRequestId) {
   const response = await window.fetch(cardSource);
+
+  if (loadRequestId !== activeLoadRequestId) {
+    return;
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to load cards from ${cardSource}`);
   }
 
   const payload = await response.json();
+
+  if (loadRequestId !== activeLoadRequestId) {
+    return;
+  }
+
   const items = Array.isArray(payload.items) ? payload.items : [];
   const sourceDirectory = cardSource.split('/').slice(0, -1).join('/');
   const cards = items.map((card, index) => normalizeCard(card, index, sourceDirectory));
@@ -98,6 +178,36 @@ async function loadCards(cardSource) {
 
   renderPool();
   renderBattle();
+}
+
+function setBattleCardLoading(cardEl, imageEl, titleEl, textEl) {
+  cardEl.classList.remove('is-entering', 'is-exiting', 'is-losing', 'is-winning-left', 'is-winning-right', 'is-final-winner', 'is-final-loser', 'is-bye-card');
+  cardEl.classList.add('is-image-loading');
+  imageEl.onload = null;
+  imageEl.onerror = null;
+  imageEl.removeAttribute('src');
+  imageEl.alt = '';
+  titleEl.textContent = 'Loading';
+  textEl.textContent = '';
+}
+
+function renderCardsLoadingState() {
+  isTransitioning = true;
+  initialCards = [];
+  activePool = [];
+  currentRoundCards = [];
+  selectedCards = [];
+  currentPair = [];
+  hasStoredFinalWinner = false;
+
+  poolGrid.innerHTML = Array.from({ length: 16 }, () => '<article class="pool-card pool-card--loading"></article>').join('');
+  battleGrid.hidden = false;
+  battleGrid.classList.remove('is-final-winner-grid', 'is-choosing', 'is-bye-advance');
+  setBattleCardLoading(leftCard, leftImage, leftTitle, leftText);
+  setBattleCardLoading(rightCard, rightImage, rightTitle, rightText);
+  battleTitle.textContent = 'Loading Cards';
+  progressText.textContent = '';
+  centerNote.textContent = '카드 데이터를 불러오는 중입니다.';
 }
 
 function readFinalCards() {
@@ -284,11 +394,28 @@ function renderPool() {
     .join('');
 }
 
-function setBattleCard(card, imageEl, titleEl, textEl) {
-  imageEl.src = card.image || '';
+function setBattleCard(card, cardEl, imageEl, titleEl, textEl) {
+  cardEl.classList.add('is-image-loading');
+  imageEl.onload = null;
+  imageEl.onerror = null;
+  imageEl.removeAttribute('src');
   imageEl.alt = card.name;
   titleEl.textContent = card.name;
   textEl.textContent = card.description;
+
+  imageEl.onload = () => {
+    cardEl.classList.remove('is-image-loading');
+  };
+  imageEl.onerror = () => {
+    cardEl.classList.remove('is-image-loading');
+  };
+
+  if (!card.image) {
+    cardEl.classList.remove('is-image-loading');
+    return;
+  }
+
+  imageEl.src = card.image;
 }
 
 function renderBattle() {
@@ -331,8 +458,8 @@ function renderBattle() {
 
   currentPair = shuffle(activePool).slice(0, 2);
 
-  setBattleCard(currentPair[0], leftImage, leftTitle, leftText);
-  setBattleCard(currentPair[1], rightImage, rightTitle, rightText);
+  setBattleCard(currentPair[0], leftCard, leftImage, leftTitle, leftText);
+  setBattleCard(currentPair[1], rightCard, rightImage, rightTitle, rightText);
 
   battleTitle.textContent = `${currentRoundLabel} Match`;
   centerNote.textContent = '';
@@ -353,7 +480,7 @@ function showByeAdvance(card) {
   leftCard.classList.remove('is-final-loser', 'is-entering', 'is-exiting', 'is-losing', 'is-winning-left', 'is-winning-right');
   leftCard.classList.add('is-bye-card');
 
-  setBattleCard(card, leftImage, leftTitle, leftText);
+  setBattleCard(card, leftCard, leftImage, leftTitle, leftText);
 }
 
 function showRoundTransition() {
@@ -513,20 +640,13 @@ menuToggleButtons.forEach((button) => {
 });
 
 cardSourceButtons.forEach((button) => {
-  button.addEventListener('click', async () => {
-    const cardSource = button.dataset.cardSource;
-
-    if (!cardSource) {
-      return;
-    }
-
-    try {
-      await loadCards(cardSource);
-    } catch (error) {
-      console.error(error);
-      centerNote.textContent = '카드 데이터를 불러오지 못했습니다.';
-    }
+  button.addEventListener('click', () => {
+    activateMenuButton(button);
   });
+});
+
+window.addEventListener('popstate', () => {
+  activateMenuButton(getInitialMenuButton(), { replace: true });
 });
 
 historyList.addEventListener('click', (event) => {
@@ -578,13 +698,7 @@ document.addEventListener('keydown', (event) => {
 
 async function initializeApp() {
   renderFinalCardsHistory();
-
-  try {
-    await loadCards(DEFAULT_CARD_SOURCE);
-  } catch (error) {
-    console.error(error);
-    centerNote.textContent = '기본 카드 데이터를 불러오지 못했습니다.';
-  }
+  await activateMenuButton(getInitialMenuButton(), { replace: true });
 }
 
 initializeApp();

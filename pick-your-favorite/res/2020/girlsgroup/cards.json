@@ -1,0 +1,197 @@
+{
+  "title": "2020 여자아이돌",
+  "items": [
+    {
+      "id": 1,
+      "name": "aespa 카리나",
+      "description": "aespa의 리더로 활동하는 댄서, 래퍼, 보컬 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/KARINA%20-%20AESPA%20-%202025.01.28.jpg?width=480"
+    },
+    {
+      "id": 2,
+      "name": "aespa 지젤",
+      "description": "aespa의 래퍼와 보컬을 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/GISELLE%20-%20AESPA%20-%202025.01.28.jpg?width=480"
+    },
+    {
+      "id": 3,
+      "name": "aespa 윈터",
+      "description": "aespa의 보컬과 댄스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/WINTER%20-%20AESPA%20-%202025.01.28.jpg?width=480"
+    },
+    {
+      "id": 4,
+      "name": "aespa 닝닝",
+      "description": "aespa의 보컬과 댄스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/NINGNING%20-%20AESPA%20-%202025.01.28.jpg?width=480"
+    },
+    {
+      "id": 5,
+      "name": "IVE 가을",
+      "description": "IVE로 활동하는 퍼포먼스와 랩 중심의 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/MMA%202023%20IVE%20Gaeul%201.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "IVE 안유진",
+      "description": "IVE의 리더로 활동하는 보컬과 퍼포먼스 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/IVE%20Yujin%20at%20Music%20Bank.jpg?width=480"
+    },
+    {
+      "id": 7,
+      "name": "IVE 레이",
+      "description": "IVE의 래퍼와 보컬을 맡는 일본 출신 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ive%27s%20Rei%20in%202023.jpg?width=480"
+    },
+    {
+      "id": 8,
+      "name": "IVE 장원영",
+      "description": "IVE의 보컬과 비주얼로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Jang%20Wonyoung%20240513.jpg?width=480"
+    },
+    {
+      "id": 9,
+      "name": "IVE 리즈",
+      "description": "IVE의 보컬을 맡는 멤버",
+      "image": "ive-liz.jpg"
+    },
+    {
+      "id": 10,
+      "name": "IVE 이서",
+      "description": "IVE의 막내 라인으로 활동하는 보컬 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/IVE%20Leeseo%20260215%20%281%29.jpg?width=480"
+    },
+    {
+      "id": 11,
+      "name": "NewJeans 민지",
+      "description": "NewJeans로 데뷔한 보컬 중심의 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230905%20Minji%20%28NewJeans%29.jpg?width=480"
+    },
+    {
+      "id": 12,
+      "name": "NewJeans 하니",
+      "description": "NewJeans의 보컬과 퍼포먼스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230905%20Hanni%20%28NewJeans%29.jpg?width=480"
+    },
+    {
+      "id": 13,
+      "name": "NewJeans 다니엘",
+      "description": "NewJeans의 보컬과 밝은 무대로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Danielle%20%28NewJeans%29%20220813.jpg?width=480"
+    },
+    {
+      "id": 14,
+      "name": "NewJeans 해린",
+      "description": "NewJeans의 보컬과 퍼포먼스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230905%20Haerin%20%28NewJeans%29.jpg?width=480"
+    },
+    {
+      "id": 15,
+      "name": "NewJeans 혜인",
+      "description": "NewJeans의 막내 라인으로 활동하는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hyein%20of%20NewJeans%2C%20July%2026%2C%202024.png?width=480"
+    },
+    {
+      "id": 16,
+      "name": "LE SSERAFIM 사쿠라",
+      "description": "LE SSERAFIM으로 활동하는 일본 출신 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230630%20Sakura%20%28LE%20SSERAFIM%29.jpg?width=480"
+    },
+    {
+      "id": 17,
+      "name": "LE SSERAFIM 김채원",
+      "description": "LE SSERAFIM의 리더로 활동하는 보컬 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/220428%20Le%20Sserafim%20Kim%20Chae-won%20%281%29.jpg?width=480"
+    },
+    {
+      "id": 18,
+      "name": "LE SSERAFIM 허윤진",
+      "description": "LE SSERAFIM의 보컬과 싱어송라이터 감각이 돋보이는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230630%20Huh%20Yun-jin%20%28LE%20SSERAFIM%29.jpg?width=480"
+    },
+    {
+      "id": 19,
+      "name": "LE SSERAFIM 카즈하",
+      "description": "LE SSERAFIM의 퍼포먼스와 발레 기반 움직임으로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20230630%20Nakamura%20Kazuha%20%28LE%20SSERAFIM%29.png?width=480"
+    },
+    {
+      "id": 20,
+      "name": "LE SSERAFIM 홍은채",
+      "description": "LE SSERAFIM의 막내 라인으로 활동하는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hong%20Eunchae%20of%20Le%20Sserafim%2C%20January%2010%2C%202025.png?width=480"
+    },
+    {
+      "id": 21,
+      "name": "NMIXX 릴리",
+      "description": "NMIXX의 보컬 중심 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/NMIXX%27s%20Lily%202023.png?width=480"
+    },
+    {
+      "id": 22,
+      "name": "NMIXX 해원",
+      "description": "NMIXX의 리더이자 보컬 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/221013%20Haewon%20%28NMIXX%29%20Airport%20Departure.jpg?width=480"
+    },
+    {
+      "id": 23,
+      "name": "NMIXX 설윤",
+      "description": "NMIXX의 보컬과 비주얼로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/NMIXX%27s%20Sullyoon%202023.jpg?width=480"
+    },
+    {
+      "id": 24,
+      "name": "NMIXX 배이",
+      "description": "NMIXX의 보컬과 퍼포먼스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/221013%20Bae%20%28NMIXX%29%20Airport%20Departure.jpg?width=480"
+    },
+    {
+      "id": 25,
+      "name": "NMIXX 지우",
+      "description": "NMIXX의 랩, 보컬, 퍼포먼스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Nmixx%27s%20Jiwoo%20in%20April%202023.jpg?width=480"
+    },
+    {
+      "id": 26,
+      "name": "NMIXX 규진",
+      "description": "NMIXX의 막내 라인으로 활동하는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/NMIXX%20Kyujin%20251225%20%281%29.jpg?width=480"
+    },
+    {
+      "id": 27,
+      "name": "STAYC 수민",
+      "description": "STAYC로 활동하는 보컬과 퍼포먼스 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SUMIN%20%28STAYC%29%20220430.jpg?width=480"
+    },
+    {
+      "id": 28,
+      "name": "STAYC 시은",
+      "description": "STAYC의 보컬로 활동하며 배우 경력도 있는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SIEUN%20%28STAYC%29%20220430.jpg?width=480"
+    },
+    {
+      "id": 29,
+      "name": "STAYC 아이사",
+      "description": "STAYC의 보컬과 음색으로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/ISA%20%28STAYC%29%20220430.jpg?width=480"
+    },
+    {
+      "id": 30,
+      "name": "STAYC 세은",
+      "description": "STAYC의 보컬과 퍼포먼스를 맡는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SEEUN%20%28STAYC%29%20220430.jpg?width=480"
+    },
+    {
+      "id": 31,
+      "name": "STAYC 윤",
+      "description": "STAYC의 보컬과 무대 에너지로 알려진 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/YOON%20%28STAYC%29%20220430.jpg?width=480"
+    },
+    {
+      "id": 32,
+      "name": "STAYC 재이",
+      "description": "STAYC의 막내 라인으로 활동하는 멤버",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/J%20%28STAYC%29%20220430.jpg?width=480"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "title": "1990년대 남자가수",
+  "items": [
+    {
+      "id": 1,
+      "name": "김건모",
+      "description": "1992년 데뷔 후 1990년대 한국 대중음악을 대표한 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kim_Kun-Mo.jpg?width=480"
+    },
+    {
+      "id": 2,
+      "name": "신승훈",
+      "description": "1990년 데뷔한 발라드 가수로 '발라드의 황제'라 불린 대표 보컬",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Shin_Seung-hun_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 3,
+      "name": "서태지",
+      "description": "서태지와 아이들로 1990년대 한국 대중음악의 흐름을 바꾼 뮤지션",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Seo_Taiji_on_October_20%2C_2014_%282%29.jpg?width=480"
+    },
+    {
+      "id": 4,
+      "name": "이승환",
+      "description": "1989년 데뷔 후 1990년대 발라드와 록을 넘나든 라이브형 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/LSH_-_2019_No_Enemy_Legend.jpg?width=480"
+    },
+    {
+      "id": 5,
+      "name": "조성모",
+      "description": "1998년 데뷔해 1990년대 말 발라드 열풍을 이끈 가수",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Jo_Sungmo_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "윤종신",
+      "description": "015B 객원 보컬과 솔로 활동으로 1990년대부터 사랑받은 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Yoon_Jong-shin_at_%22Persona%22_press_conference%2C_27_March_2019.jpg?width=480"
+    },
+    {
+      "id": 7,
+      "name": "김종서",
+      "description": "시나위와 솔로 활동을 거친 1990년대 대표 록 보컬",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kim_Jong-seo_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 8,
+      "name": "임창정",
+      "description": "1990년대 후반 가수와 배우 활동을 함께 펼친 발라드 보컬",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lim_Chang-Jung_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 9,
+      "name": "박진영",
+      "description": "1994년 솔로 데뷔 후 댄스, R&B, 프로듀싱으로 영향력을 넓힌 가수",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Park_Jin-young_%28Founder_of_JYP_Entertainment%29_in_February_2011_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 10,
+      "name": "현진영",
+      "description": "1990년 데뷔해 한국 힙합과 댄스 음악의 초기 흐름을 연 가수",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hyunjinyoung2021.png?width=480"
+    },
+    {
+      "id": 11,
+      "name": "김원준",
+      "description": "1992년 데뷔해 1990년대 댄스팝과 청춘 스타 이미지를 대표한 가수",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kim_Won_Joon_from_acrofan.jpg?width=480"
+    },
+    {
+      "id": 12,
+      "name": "이현우",
+      "description": "1990년대 감성적인 팝 발라드로 활동한 가수 겸 배우",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee_Hyun-Woo_%28singer%29.jpg?width=480"
+    },
+    {
+      "id": 13,
+      "name": "이승철",
+      "description": "부활 보컬과 솔로 활동을 거쳐 1990년대에도 사랑받은 록 발라드 보컬",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee%20Seung-cheol%20from%20acrofan.jpg?width=480"
+    },
+    {
+      "id": 14,
+      "name": "김민종",
+      "description": "1990년대 배우와 가수 활동을 병행하며 큰 인기를 얻은 발라드 가수",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kim_Min-jong_2025.png?width=480"
+    },
+    {
+      "id": 15,
+      "name": "이적",
+      "description": "패닉과 카니발, 솔로 활동으로 1990년대 감성 음악을 대표한 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee_Juck_20161109_02.png?width=480"
+    },
+    {
+      "id": 16,
+      "name": "김광석",
+      "description": "1990년대 초중반 깊은 포크 감성으로 사랑받은 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kim_Kwang-seok_performing_live_in_1992.jpg?width=480"
+    }
+  ]
+}

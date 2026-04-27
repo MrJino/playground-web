@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Girl idol icon">
+  <defs>
+    <linearGradient id="girl-bg" x1="9" y1="7" x2="55" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8fc0"/>
+      <stop offset="1" stop-color="#ffb55f"/>
+    </linearGradient>
+    <linearGradient id="girl-hair" x1="17" y1="12" x2="49" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4b2b52"/>
+      <stop offset="1" stop-color="#20132b"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#girl-bg)"/>
+  <path fill="url(#girl-hair)" d="M17 52V30c0-10 6-17 15-17s15 7 15 17v22z"/>
+  <circle cx="32" cy="32" r="13" fill="#ffe0c4"/>
+  <path fill="url(#girl-hair)" d="M19 31c1-11 7-17 15-17 7 0 12 5 13 14-6-3-13-5-20-3-4 1-6 3-8 6z"/>
+  <path fill="#1f1725" d="M25 33a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm14 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+  <path fill="#e85a84" d="M28 39c2.4 1.6 5.6 1.6 8 0 .7-.5 1.4.5.8 1.1-2.5 2.9-7.1 2.9-9.6 0-.6-.6.1-1.6.8-1.1z"/>
+  <path fill="#ffffff" d="M20 54c2.6-6 7-9 12-9s9.4 3 12 9z"/>
+  <path fill="#ff4f9a" d="M25 16c2-5 8-6 11-2-4 0-7 1-11 2z"/>
+  <path fill="#fff176" d="m51 13 1.4 2.9 3.2.5-2.3 2.2.5 3.2-2.8-1.5-2.8 1.5.5-3.2-2.3-2.2 3.2-.5z"/>
+</svg>
