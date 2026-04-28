@@ -17,7 +17,7 @@
       "id": 3,
       "name": "Billie Eilish",
       "description": "섬세한 보컬 톤과 미니멀한 프로덕션으로 독보적인 분위기를 만든 아티스트",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sziget%202024%20main%20stage%20day%206.jpg?width=480"
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Billie%20Eilish%20performing%20in%20Inglewood%20%28Dec%202024%29.png?width=480"
     },
     {
       "id": 4,
@@ -29,7 +29,7 @@
       "id": 5,
       "name": "Sabrina Carpenter",
       "description": "재치 있는 팝 송라이팅과 무대 매력으로 빠르게 존재감을 키운 아티스트",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sabrina%20Carpenter%20en%20Coachella%2001.jpg?width=480"
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SABRINA%20CARPENTER.jpg?width=480"
     },
     {
       "id": 6,
@@ -53,7 +53,7 @@
       "id": 9,
       "name": "SZA",
       "description": "SOS를 통해 얼터너티브 R&B의 결을 대중적으로 확장한 싱어송라이터",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SZA%20-%20Kill%20Bill%20%28SOS%20Tour%2C%20Toronto%29.png?width=480"
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SZA%20in%202024.jpg?width=480"
     },
     {
       "id": 10,
@@ -65,37 +65,37 @@
       "id": 11,
       "name": "Lana Del Rey",
       "description": "시네마틱한 분위기와 독특한 서사 감각을 가진 싱어송라이터",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lana%20del%20rey%20MITA.jpg?width=480"
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lana%20Del%20Rey%20%282024%29%20%28cropped%29.jpg?width=480"
     },
     {
       "id": 12,
       "name": "Lady Gaga",
       "description": "강한 콘셉트와 보컬 실력을 바탕으로 팝, 재즈, 영화 음악까지 넘나드는 아티스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lady%20Gaga-65189.jpg?width=480"
     },
     {
       "id": 13,
       "name": "Chappell Roan",
       "description": "극적인 팝 퍼포먼스와 퀴어 팝 감성으로 주목받은 신흥 스타",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Chappell%20Roan%2008%20%28cropped%29.jpg?width=480"
     },
     {
       "id": 14,
       "name": "Halsey",
       "description": "개인적인 서사와 얼터너티브 팝 감성을 결합해 온 싱어송라이터",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Halsey%20%40%20Amazon%20Music%20Live%2010%2031%202024%20%2854228375097%29.jpg?width=480"
     },
     {
       "id": 15,
       "name": "Demi Lovato",
       "description": "파워풀한 보컬과 팝 록 에너지를 함께 보여주는 보컬리스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Demi%20Lovato%20in%202020.png?width=480"
     },
     {
       "id": 16,
       "name": "Megan Thee Stallion",
       "description": "강렬한 랩 플로우와 에너지 있는 퍼포먼스로 2020년대를 대표하는 아티스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Megan%20Thee%20Stallion%20Adweek%202024%2003%20%28cropped%29.jpg?width=480"
     }
   ]
 }

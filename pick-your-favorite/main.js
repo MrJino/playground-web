@@ -44,12 +44,35 @@ const leftTitle = document.getElementById("leftTitle");
 const rightTitle = document.getElementById("rightTitle");
 const leftText = document.getElementById("leftText");
 const rightText = document.getElementById("rightText");
+const leftSource = document.getElementById("leftSource");
+const rightSource = document.getElementById("rightSource");
 const battleCards = [leftCard, rightCard];
 let menuToggleButtons = [];
 let cardSourceButtons = [];
 const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
 const FINAL_CARD_SELECTION_DURATION = 1400;
+const HANGUL_INITIAL_CONSONANTS = [
+  "ㄱ",
+  "ㄲ",
+  "ㄴ",
+  "ㄷ",
+  "ㄸ",
+  "ㄹ",
+  "ㅁ",
+  "ㅂ",
+  "ㅃ",
+  "ㅅ",
+  "ㅆ",
+  "ㅇ",
+  "ㅈ",
+  "ㅉ",
+  "ㅊ",
+  "ㅋ",
+  "ㅌ",
+  "ㅍ",
+  "ㅎ",
+];
 let confirmAction = null;
 let selectionAudioContext = null;
 
@@ -107,6 +130,51 @@ function getMenuItems(groups = menuGroups) {
   });
 }
 
+function getMenuItemMenuLabel(item) {
+  return item.menuLabel || item.label || "";
+}
+
+function getMenuItemBrowserLabel(item) {
+  return item.browserLabel || item.label || getMenuItemMenuLabel(item);
+}
+
+function getHangulInitialConsonants(value) {
+  return Array.from(String(value ?? ""))
+    .map((character) => {
+      const code = character.charCodeAt(0);
+
+      if (code < 0xac00 || code > 0xd7a3) {
+        return character;
+      }
+
+      const initialIndex = Math.floor((code - 0xac00) / 588);
+      return HANGUL_INITIAL_CONSONANTS[initialIndex] || character;
+    })
+    .join("");
+}
+
+function normalizeSearchText(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function compactSearchText(value) {
+  return normalizeSearchText(value).replace(/\s+/g, "");
+}
+
+function getMenuItemSearchText(item) {
+  const labels = [
+    getMenuItemMenuLabel(item),
+    getMenuItemBrowserLabel(item),
+    item.groupLabel || "",
+  ];
+  const initials = labels.map(getHangulInitialConsonants);
+  const searchableParts = [...labels, ...initials];
+
+  return searchableParts
+    .flatMap((part) => [normalizeSearchText(part), compactSearchText(part)])
+    .join(" ");
+}
+
 function renderMenu(groups) {
   menuList.innerHTML = groups
     .map((group, index) => {
@@ -141,7 +209,7 @@ function renderMenu(groups) {
                         ? `<img class="submenu-item__icon" src="${escapeHtml(item.icon)}" alt="" aria-hidden="true" />`
                         : ""
                     }
-                    <span>${escapeHtml(item.label || "")}</span>
+                    <span>${escapeHtml(getMenuItemMenuLabel(item))}</span>
                   </button>
                 `,
               )
@@ -154,10 +222,16 @@ function renderMenu(groups) {
 }
 
 function renderMenuBrowser(groups = menuGroups, searchTerm = "") {
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const normalizedSearchTerm = normalizeSearchText(searchTerm);
+  const compactSearchTerm = compactSearchText(searchTerm);
   const items = getMenuItems(groups).filter((item) => {
-    const searchText = `${item.label || ""} ${item.groupLabel || ""}`.toLowerCase();
-    return !normalizedSearchTerm || searchText.includes(normalizedSearchTerm);
+    const searchText = getMenuItemSearchText(item);
+
+    return (
+      !normalizedSearchTerm ||
+      searchText.includes(normalizedSearchTerm) ||
+      searchText.includes(compactSearchTerm)
+    );
   });
 
   if (items.length === 0) {
@@ -183,7 +257,7 @@ function renderMenuBrowser(groups = menuGroups, searchTerm = "") {
               : ""
           }
           <span class="menu-browser-card__group">${escapeHtml(item.groupLabel || "")}</span>
-          <strong>${escapeHtml(item.label || "")}</strong>
+          <strong>${escapeHtml(getMenuItemBrowserLabel(item))}</strong>
         </button>
       `,
     )
@@ -360,12 +434,18 @@ function getRoundTarget() {
 function normalizeCard(card, index, sourceDirectory) {
   const image = card.image || "";
   const isRemoteImage = /^https?:\/\//i.test(image);
+  const normalizedImage = image
+    ? isRemoteImage
+      ? image
+      : `${sourceDirectory}/${image}`
+    : "";
 
   return {
     id: card.id ?? index + 1,
     name: card.name ?? `Card ${String(index + 1).padStart(2, "0")}`,
     description: card.description ?? "",
-    image: image ? (isRemoteImage ? image : `${sourceDirectory}/${image}`) : "",
+    image: normalizedImage,
+    imageSource: card.imageSource || card.source || card.credit || "",
   };
 }
 
@@ -408,7 +488,7 @@ async function loadCards(cardSource, loadRequestId = activeLoadRequestId) {
   renderBattle();
 }
 
-function setBattleCardLoading(cardEl, imageEl, titleEl, textEl) {
+function setBattleCardLoading(cardEl, imageEl, titleEl, textEl, sourceEl) {
   cardEl.classList.remove(
     "is-entering",
     "is-exiting",
@@ -426,6 +506,7 @@ function setBattleCardLoading(cardEl, imageEl, titleEl, textEl) {
   imageEl.alt = "";
   titleEl.textContent = "Loading";
   textEl.textContent = "";
+  sourceEl.textContent = "";
 }
 
 function renderCardsLoadingState() {
@@ -449,8 +530,8 @@ function renderCardsLoadingState() {
     "is-choosing",
     "is-bye-advance",
   );
-  setBattleCardLoading(leftCard, leftImage, leftTitle, leftText);
-  setBattleCardLoading(rightCard, rightImage, rightTitle, rightText);
+  setBattleCardLoading(leftCard, leftImage, leftTitle, leftText, leftSource);
+  setBattleCardLoading(rightCard, rightImage, rightTitle, rightText, rightSource);
   battleTitle.textContent = "Loading Cards";
   progressText.textContent = "";
   centerNote.textContent = "카드 데이터를 불러오는 중입니다.";
@@ -684,7 +765,38 @@ function renderPool() {
     .join("");
 }
 
-function setBattleCard(card, cardEl, imageEl, titleEl, textEl) {
+function getImageSourceLabel(card) {
+  if (card.imageSource) {
+    return card.imageSource;
+  }
+
+  if (!card.image) {
+    return "";
+  }
+
+  try {
+    const { hostname } = new URL(card.image);
+    const normalizedHost = hostname.replace(/^www\./, "");
+
+    if (normalizedHost.includes("wikimedia.org")) {
+      return "Wikimedia Commons";
+    }
+
+    if (normalizedHost.includes("assembly.go.kr")) {
+      return "대한민국 국회";
+    }
+
+    if (normalizedHost.includes("amazonaws.com")) {
+      return "누구뽑지";
+    }
+
+    return normalizedHost;
+  } catch (error) {
+    return "Local asset";
+  }
+}
+
+function setBattleCard(card, cardEl, imageEl, titleEl, textEl, sourceEl) {
   cardEl.classList.add("is-image-loading");
   imageEl.onload = null;
   imageEl.onerror = null;
@@ -692,6 +804,8 @@ function setBattleCard(card, cardEl, imageEl, titleEl, textEl) {
   imageEl.alt = card.name;
   titleEl.textContent = card.name;
   textEl.textContent = card.description;
+  const imageSourceLabel = getImageSourceLabel(card);
+  sourceEl.textContent = imageSourceLabel ? `이미지 출처: ${imageSourceLabel}` : "";
 
   imageEl.onload = () => {
     cardEl.classList.remove("is-image-loading");
@@ -760,8 +874,8 @@ function renderBattle() {
 
   currentPair = shuffle(activePool).slice(0, 2);
 
-  setBattleCard(currentPair[0], leftCard, leftImage, leftTitle, leftText);
-  setBattleCard(currentPair[1], rightCard, rightImage, rightTitle, rightText);
+  setBattleCard(currentPair[0], leftCard, leftImage, leftTitle, leftText, leftSource);
+  setBattleCard(currentPair[1], rightCard, rightImage, rightTitle, rightText, rightSource);
 
   battleTitle.textContent = `${currentRoundLabel} Match`;
   centerNote.textContent = "";
@@ -789,7 +903,7 @@ function showByeAdvance(card) {
   );
   leftCard.classList.add("is-bye-card");
 
-  setBattleCard(card, leftCard, leftImage, leftTitle, leftText);
+  setBattleCard(card, leftCard, leftImage, leftTitle, leftText, leftSource);
 }
 
 function showRoundTransition() {

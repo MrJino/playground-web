@@ -7,39 +7,51 @@
       "items": [
         {
           "value": "boy-idol",
-          "label": "2020년대 남자아이돌",
+          "label": "2020년대 K-POP 남자아이돌",
+          "menuLabel": "K-POP 남자아이돌",
+          "browserLabel": "2020년대 K-POP 남자아이돌",
           "cardSource": "res/2020/boysgroup/cards.json",
           "icon": "./assets/icons/boy-idol.svg"
         },
         {
           "value": "girl-idol",
-          "label": "2020년대 여자아이돌",
+          "label": "2020년대 K-POP 여자아이돌",
+          "menuLabel": "K-POP 여자아이돌",
+          "browserLabel": "2020년대 K-POP 여자아이돌",
           "cardSource": "res/2020/girlsgroup/cards.json",
           "icon": "./assets/icons/girl-idol.svg"
         },
         {
           "value": "2020-us-female-singer",
-          "label": "2020년대 미국 여가수",
+          "label": "2020년대 미국 여자가수",
+          "menuLabel": "미국 여자가수",
+          "browserLabel": "2020년대 미국 여자가수",
           "cardSource": "res/2020/us-female-singer/cards.json",
-          "icon": "./assets/icons/girl-idol.svg"
+          "icon": "./assets/icons/female-singer.svg"
         },
         {
           "value": "2020-us-male-singer",
           "label": "2020년대 미국 남자가수",
+          "menuLabel": "미국 남자가수",
+          "browserLabel": "2020년대 미국 남자가수",
           "cardSource": "res/2020/us-male-singer/cards.json",
-          "icon": "./assets/icons/boy-idol.svg"
+          "icon": "./assets/icons/male-singer.svg"
         },
         {
           "value": "2020-progressive-politician",
           "label": "2020년대 진보정치인",
+          "menuLabel": "한국 진보정치인",
+          "browserLabel": "2020년대 한국 진보정치인",
           "cardSource": "res/2020/progressive-politician/cards.json",
-          "icon": "./assets/icons/girl-idol.svg"
+          "icon": "./assets/icons/progressive-politician.svg"
         },
         {
           "value": "2020-conservative-politician",
-          "label": "2020년대 보수정치인",
+          "label": "2020년대 한국보수정치인",
+          "menuLabel": "한국 보수정치인",
+          "browserLabel": "2020년대 한국 보수정치인",
           "cardSource": "res/2020/conservative-politician/cards.json",
-          "icon": "./assets/icons/boy-idol.svg"
+          "icon": "./assets/icons/conservative-politician.svg"
         }
       ]
     },
@@ -51,14 +63,18 @@
         {
           "value": "1990-male-singer",
           "label": "1990년대 남자가수",
+          "menuLabel": "한국 남자가수",
+          "browserLabel": "1990년대 한국 남자가수",
           "cardSource": "res/1990/malesinger/cards.json",
-          "icon": "./assets/icons/boy-idol.svg"
+          "icon": "./assets/icons/male-singer.svg"
         },
         {
           "value": "1990-female-singer",
           "label": "1990년대 여자가수",
+          "menuLabel": "한국 여자가수",
+          "browserLabel": "1990년대 한국 여자가수",
           "cardSource": "res/1990/femalesinger/cards.json",
-          "icon": "./assets/icons/girl-idol.svg"
+          "icon": "./assets/icons/female-singer.svg"
         }
       ]
     }

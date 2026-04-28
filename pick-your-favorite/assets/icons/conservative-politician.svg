@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Conservative politician icon">
+  <defs>
+    <linearGradient id="conservative-suit" x1="21" y1="30" x2="43" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#26364f"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#e61e2b"/>
+  <path fill="#ffffff" d="M17 21h30L32 11z"/>
+  <path fill="#e8eef8" d="M19 22h26v5H19z"/>
+  <path fill="#ffffff" d="M21 28h5v13h-5zm9 0h5v13h-5zm9 0h5v13h-5z"/>
+  <path fill="#dce6f5" d="M18 41h28v4H18zm-3 5h34v5H15z"/>
+  <circle cx="32" cy="26" r="8.5" fill="#ffe0c4"/>
+  <path fill="#2d3342" d="M23.7 25.8c.4-6.4 4.4-10.1 9.8-9.8 4.8.3 7.7 3.8 8 8.5-4-2.2-8.4-2.7-12.6-1.4-2.2.7-3.8 1.6-5.2 2.7z"/>
+  <path fill="#111827" d="M28.1 27.3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7.8 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+  <path fill="#d94f68" d="M29.6 32c1.4.8 3.4.8 4.8 0 .6-.3 1.1.4.6.9-1.7 1.5-4.3 1.5-6 0-.5-.5 0-1.2.6-.9z"/>
+  <path fill="url(#conservative-suit)" d="M19 54c2.5-7.3 7-11 13-11s10.5 3.7 13 11z"/>
+  <path fill="#ffffff" d="m27 44 5 4 5-4-2.2 10h-5.6z"/>
+  <path fill="#ef4444" d="m31 48 1-1 1 1-.6 6h-.8z"/>
+</svg>

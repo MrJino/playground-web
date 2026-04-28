@@ -5,7 +5,7 @@
       "id": 1,
       "name": "Bruno Mars",
       "description": "팝, R&B, 펑크 감각과 라이브 퍼포먼스로 꾸준히 사랑받는 보컬리스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bruno%20Mars%20portrait.jpg?width=480"
     },
     {
       "id": 2,
@@ -17,7 +17,7 @@
       "id": 3,
       "name": "Kendrick Lamar",
       "description": "강한 서사와 랩 테크닉으로 2020년대에도 영향력을 이어간 힙합 아티스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/KendrickSZASPurs230725-46%20-%2054683274355%20%28cropped%29.jpg?width=480"
     },
     {
       "id": 4,
@@ -35,67 +35,67 @@
       "id": 6,
       "name": "Childish Gambino",
       "description": "랩, 소울, 펑크를 오가며 음악과 영상 언어를 함께 다루는 멀티 아티스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Childish%20Gambino%20a.jpg?width=480"
     },
     {
       "id": 7,
       "name": "Frank Ocean",
       "description": "섬세한 보컬과 실험적인 R&B 감성으로 큰 영향력을 가진 싱어송라이터",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Frank%20Ocean%20%282013%29%20%28cropped%29.jpg?width=480"
     },
     {
       "id": 8,
       "name": "Charlie Puth",
       "description": "깔끔한 팝 멜로디와 프로듀싱 감각으로 알려진 싱어송라이터",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Charlie%20Puth.jpg?width=480"
     },
     {
       "id": 9,
       "name": "Khalid",
       "description": "느긋한 보컬 톤과 청춘 감성의 R&B/팝 사운드로 사랑받는 가수",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Khalid%20World%20Pride%20DC%2003%20%28cropped%29.jpg?width=480"
     },
     {
       "id": 10,
       "name": "Giveon",
       "description": "낮고 깊은 보컬 톤으로 현대 R&B의 클래식한 결을 살리는 보컬리스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Photo%20of%20Giveon.jpg?width=480"
     },
     {
       "id": 11,
       "name": "Steve Lacy",
       "description": "기타 기반의 얼터너티브 R&B와 독특한 프로덕션으로 주목받은 아티스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Steve%20Lacy%20%40%20Rialto%20Theatre.jpg?width=480"
     },
     {
       "id": 12,
       "name": "Jack Harlow",
       "description": "부드러운 플로우와 대중적인 훅으로 존재감을 키운 래퍼",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Jack%20Harlow%20%2851915306320%29.jpg?width=480"
     },
     {
       "id": 13,
       "name": "Zach Bryan",
       "description": "담백한 가사와 거친 보컬 톤으로 컨트리와 포크 팬층을 넓힌 싱어송라이터",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Zach%20Bryan%20Melbourne.jpg?width=480"
     },
     {
       "id": 14,
       "name": "Morgan Wallen",
       "description": "컨트리 팝 사운드로 2020년대 미국 차트에서 강한 성과를 낸 가수",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Morgan%20Wallen.jpg?width=480"
     },
     {
       "id": 15,
       "name": "Benson Boone",
       "description": "감정적인 보컬과 드라마틱한 팝 발라드로 빠르게 주목받은 신예",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Benson%20Boone.jpg?width=480"
     },
     {
       "id": 16,
       "name": "Teddy Swims",
       "description": "소울풀한 보컬과 팝, R&B, 컨트리 감성을 함께 보여주는 보컬리스트",
-      "image": ""
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Teddy%20Swims%20Warner%20Records.jpg?width=480"
     }
   ]
 }
