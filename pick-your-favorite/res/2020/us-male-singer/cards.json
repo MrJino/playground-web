@@ -1,0 +1,101 @@
+{
+  "title": "2020년대 미국 남자가수",
+  "items": [
+    {
+      "id": 1,
+      "name": "Bruno Mars",
+      "description": "팝, R&B, 펑크 감각과 라이브 퍼포먼스로 꾸준히 사랑받는 보컬리스트",
+      "image": ""
+    },
+    {
+      "id": 2,
+      "name": "Post Malone",
+      "description": "힙합, 팝, 록, 컨트리를 넘나드는 멜로디 중심의 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Post%20Malone%20%2828734295876%29.jpg?width=480"
+    },
+    {
+      "id": 3,
+      "name": "Kendrick Lamar",
+      "description": "강한 서사와 랩 테크닉으로 2020년대에도 영향력을 이어간 힙합 아티스트",
+      "image": ""
+    },
+    {
+      "id": 4,
+      "name": "Tyler, the Creator",
+      "description": "프로듀싱, 랩, 비주얼 콘셉트를 직접 구축하는 창작자형 아티스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Tyler%2C%20the%20Creator%20performing%20at%20Primavera%20Sound%2C%202022.png?width=480"
+    },
+    {
+      "id": 5,
+      "name": "Lil Nas X",
+      "description": "장르와 이미지를 과감하게 섞으며 팝 컬처에서 강한 존재감을 만든 아티스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lil%20Nas%20X.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "Childish Gambino",
+      "description": "랩, 소울, 펑크를 오가며 음악과 영상 언어를 함께 다루는 멀티 아티스트",
+      "image": ""
+    },
+    {
+      "id": 7,
+      "name": "Frank Ocean",
+      "description": "섬세한 보컬과 실험적인 R&B 감성으로 큰 영향력을 가진 싱어송라이터",
+      "image": ""
+    },
+    {
+      "id": 8,
+      "name": "Charlie Puth",
+      "description": "깔끔한 팝 멜로디와 프로듀싱 감각으로 알려진 싱어송라이터",
+      "image": ""
+    },
+    {
+      "id": 9,
+      "name": "Khalid",
+      "description": "느긋한 보컬 톤과 청춘 감성의 R&B/팝 사운드로 사랑받는 가수",
+      "image": ""
+    },
+    {
+      "id": 10,
+      "name": "Giveon",
+      "description": "낮고 깊은 보컬 톤으로 현대 R&B의 클래식한 결을 살리는 보컬리스트",
+      "image": ""
+    },
+    {
+      "id": 11,
+      "name": "Steve Lacy",
+      "description": "기타 기반의 얼터너티브 R&B와 독특한 프로덕션으로 주목받은 아티스트",
+      "image": ""
+    },
+    {
+      "id": 12,
+      "name": "Jack Harlow",
+      "description": "부드러운 플로우와 대중적인 훅으로 존재감을 키운 래퍼",
+      "image": ""
+    },
+    {
+      "id": 13,
+      "name": "Zach Bryan",
+      "description": "담백한 가사와 거친 보컬 톤으로 컨트리와 포크 팬층을 넓힌 싱어송라이터",
+      "image": ""
+    },
+    {
+      "id": 14,
+      "name": "Morgan Wallen",
+      "description": "컨트리 팝 사운드로 2020년대 미국 차트에서 강한 성과를 낸 가수",
+      "image": ""
+    },
+    {
+      "id": 15,
+      "name": "Benson Boone",
+      "description": "감정적인 보컬과 드라마틱한 팝 발라드로 빠르게 주목받은 신예",
+      "image": ""
+    },
+    {
+      "id": 16,
+      "name": "Teddy Swims",
+      "description": "소울풀한 보컬과 팝, R&B, 컨트리 감성을 함께 보여주는 보컬리스트",
+      "image": ""
+    }
+  ]
+}

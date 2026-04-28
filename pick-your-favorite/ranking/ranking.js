@@ -1,26 +1,20 @@
-const MENU_QUERY_PARAM = "menu";
-const DEFAULT_MENU_VALUE = "boy-idol";
-const CLOUDFLARE_API_BASE_URL = "https://playground-api.for1self.workers.dev";
+const MENU_QUERY_PARAM = 'menu';
+const DEFAULT_MENU_VALUE = 'boy-idol';
+const MENU_CONFIG_SOURCE = '../res/menu.json';
+const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
 
-const MENU_LABELS = {
-  "boy-idol": "2020년대 남자아이돌",
-  "girl-idol": "2020년대 여자아이돌",
-  "1990-male-singer": "1990년대 남자가수",
-  "1990-female-singer": "1990년대 여자가수",
-};
-
-const rankingTitle = document.getElementById("rankingTitle");
-const rankingSummary = document.getElementById("rankingSummary");
-const rankingList = document.getElementById("rankingList");
-const backToGameLink = document.getElementById("backToGameLink");
+const rankingTitle = document.getElementById('rankingTitle');
+const rankingSummary = document.getElementById('rankingSummary');
+const rankingList = document.getElementById('rankingList');
+const backToGameLink = document.getElementById('backToGameLink');
 
 function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 function getMenuValue() {
@@ -28,23 +22,46 @@ function getMenuValue() {
   return params.get(MENU_QUERY_PARAM) || DEFAULT_MENU_VALUE;
 }
 
-function formatServerStoredAt(storedAt) {
-  if (!storedAt) {
-    return "";
+async function loadMenuLabels() {
+  const response = await window.fetch(MENU_CONFIG_SOURCE);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load menu config: ${response.status}`);
   }
 
-  const normalizedDate = new Date(String(storedAt).replace(" ", "T"));
+  const payload = await response.json();
+  const groups = Array.isArray(payload.groups) ? payload.groups : [];
+  const labels = new Map();
+
+  groups.forEach((group) => {
+    const items = Array.isArray(group.items) ? group.items : [];
+    items.forEach((item) => {
+      if (item.value && item.label) {
+        labels.set(item.value, item.label);
+      }
+    });
+  });
+
+  return labels;
+}
+
+function formatServerStoredAt(storedAt) {
+  if (!storedAt) {
+    return '';
+  }
+
+  const normalizedDate = new Date(String(storedAt).replace(' ', 'T'));
 
   if (Number.isNaN(normalizedDate.getTime())) {
     return storedAt;
   }
 
-  return new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(normalizedDate);
 }
 
@@ -56,8 +73,8 @@ function renderLoading() {
   `;
 }
 
-function renderEmpty(message = "아직 집계된 우승 기록이 없습니다.") {
-  rankingSummary.textContent = "총 0개의 우승 기록";
+function renderEmpty(message = '아직 집계된 우승 기록이 없습니다.') {
+  rankingSummary.textContent = '총 0개의 우승 기록';
   rankingList.innerHTML = `
     <div class="ranking-empty">
       ${escapeHtml(message)}
@@ -71,10 +88,7 @@ function renderRanking(summary) {
     return;
   }
 
-  const totalWins = summary.reduce(
-    (total, item) => total + Number(item.wins || 0),
-    0,
-  );
+  const totalWins = summary.reduce((total, item) => total + Number(item.wins || 0), 0);
   rankingSummary.textContent = `총 ${totalWins}개의 우승 기록`;
   rankingList.innerHTML = summary
     .map((item, index) => {
@@ -90,7 +104,7 @@ function renderRanking(summary) {
           }
           <div class="ranking-card__content">
             <h2>${escapeHtml(item.card_name)}</h2>
-            <p>${escapeHtml(item.description || "")}</p>
+            <p>${escapeHtml(item.description || '')}</p>
             <time datetime="${escapeHtml(item.latest_win_at)}">${escapeHtml(latestWinAt)}</time>
           </div>
           <div class="ranking-card__wins">
@@ -100,19 +114,27 @@ function renderRanking(summary) {
         </article>
       `;
     })
-    .join("");
+    .join('');
 }
 
 async function loadRanking() {
   const menuValue = getMenuValue();
-  const menuLabel = MENU_LABELS[menuValue] || "선택한 메뉴";
+  let menuLabel = '선택한 메뉴';
+
+  try {
+    const menuLabels = await loadMenuLabels();
+    menuLabel = menuLabels.get(menuValue) || menuLabel;
+  } catch (error) {
+    console.error(error);
+  }
+
   rankingTitle.textContent = `${menuLabel} 랭킹`;
-  backToGameLink.href = `../index.html?${MENU_QUERY_PARAM}=${encodeURIComponent(menuValue)}`;
+  backToGameLink.href = `../?${MENU_QUERY_PARAM}=${encodeURIComponent(menuValue)}`;
   renderLoading();
 
   try {
-    const url = new URL("/api/winners/summary", CLOUDFLARE_API_BASE_URL);
-    url.searchParams.set("menu", menuValue);
+    const url = new URL('/api/winners/summary', CLOUDFLARE_API_BASE_URL);
+    url.searchParams.set('menu', menuValue);
 
     const response = await window.fetch(url);
 
@@ -124,7 +146,7 @@ async function loadRanking() {
     renderRanking(payload.summary);
   } catch (error) {
     console.error(error);
-    renderEmpty("랭킹을 불러오지 못했습니다.");
+    renderEmpty('랭킹을 불러오지 못했습니다.');
   }
 }
 

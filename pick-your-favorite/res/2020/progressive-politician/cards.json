@@ -1,0 +1,101 @@
+{
+  "title": "2020년대 진보정치인",
+  "items": [
+    {
+      "id": 1,
+      "name": "심상정",
+      "description": "정의당을 대표하는 진보 정치인으로 노동, 복지, 정치개혁 의제를 다뤄온 인물",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sim%20Sang-jung%20taking%20a%20commemorative%20photo%20with%20the%20Speaker%20of%20the%20National%20Assembly.jpg?width=480"
+    },
+    {
+      "id": 2,
+      "name": "이정미",
+      "description": "정의당 대표와 국회의원을 지내며 노동, 젠더, 생태 의제를 중심으로 활동한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee%20Jeong-mi%20taking%20a%20commemorative%20photo%20at%20the%20National%20Assembly.jpg?width=480"
+    },
+    {
+      "id": 3,
+      "name": "권영국",
+      "description": "노동 인권 변호사 출신으로 진보정당 활동과 노동 의제를 이어온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kwon%20Yeong-guk.png?width=480"
+    },
+    {
+      "id": 4,
+      "name": "용혜인",
+      "description": "기본소득당을 중심으로 기본소득, 재난지원, 청년 정치 의제를 제기해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Yong%20Hyein.jpg?width=480"
+    },
+    {
+      "id": 5,
+      "name": "장혜영",
+      "description": "정의당 국회의원으로 장애, 차별금지, 재정 정책 등 사회권 의제를 다뤄온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%EC%9E%A5%ED%98%9C%EC%98%81%20%EC%9D%98%EC%9B%90.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "류호정",
+      "description": "청년 정치와 노동, 산업 정책 이슈를 중심으로 2020년대 국회에서 활동한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%EB%A5%98%ED%98%B8%EC%A0%95%20%EC%9D%98%EC%9B%90.jpg?width=480"
+    },
+    {
+      "id": 7,
+      "name": "배진교",
+      "description": "정의당 원내대표 등을 맡으며 진보정당의 원내 활동을 이끌었던 정치인",
+      "image": "https://www.assembly.go.kr/static/portal/img/openassm/A2V51235.jpg"
+    },
+    {
+      "id": 8,
+      "name": "여영국",
+      "description": "정의당 대표와 국회의원을 지내며 노동자 정치와 지역 진보정치 의제를 다룬 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Yeo%20Yeong-gug%20in%202021.jpg?width=480"
+    },
+    {
+      "id": 9,
+      "name": "김재연",
+      "description": "진보당에서 활동하며 노동, 청년, 평화 의제를 중심으로 목소리를 내 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%9A%D0%B8%D0%BC%20%D0%94%D0%B6%D1%8D%20%D0%81%D0%BD.png?width=480"
+    },
+    {
+      "id": 10,
+      "name": "강은미",
+      "description": "정의당 원내대표를 지내며 노동, 안전, 복지 의제를 다뤄온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%EA%B5%AD%ED%9A%8C%EC%9D%98%EC%9B%90%20%EA%B0%95%EC%9D%80%EB%AF%B8.jpg?width=480"
+    },
+    {
+      "id": 11,
+      "name": "이재명",
+      "description": "더불어민주당 대표로 민생, 복지, 기본사회 등 진보·개혁 성향 의제를 제시해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee%20Jae-myung%2C%202021%20%28cropped%201%29.jpg?width=480"
+    },
+    {
+      "id": 12,
+      "name": "조국",
+      "description": "조국혁신당을 통해 검찰개혁과 권력기관 개혁 의제를 중심으로 활동한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Cho%20Kuk%27s%20Portrait%20%282024.3%29.png?width=480"
+    },
+    {
+      "id": 13,
+      "name": "추미애",
+      "description": "더불어민주당 계열에서 사법개혁과 권력기관 개혁 이슈로 주목받은 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Choo%20Mi-ae%20ministerial%20portrait.png?width=480"
+    },
+    {
+      "id": 14,
+      "name": "박주민",
+      "description": "더불어민주당 국회의원으로 인권, 사법개혁, 사회 안전 의제를 다뤄온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Park%20Ju-Min%20%EB%B2%99%EC%BB%A41%20%ED%8A%B9%EA%B0%95%20%EB%8B%88%EA%B0%80%20%EA%B0%80%EB%9D%BC%20%EC%97%AC%EC%9D%98%EB%8F%84%2001.png?width=480"
+    },
+    {
+      "id": 15,
+      "name": "김용민",
+      "description": "더불어민주당 국회의원으로 검찰개혁과 사법개혁 의제에 목소리를 내 온 정치인",
+      "image": "https://www.assembly.go.kr/static/portal/img/openassm/new/e8f8918e741b4ae9b72377d8ec299645.png"
+    },
+    {
+      "id": 16,
+      "name": "한창민",
+      "description": "사회민주당을 중심으로 사회민주주의와 복지국가 의제를 제기해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%ED%95%9C%EC%B0%BD%EB%AF%BC%20%EC%9D%98%EC%9B%90.jpg?width=480"
+    }
+  ]
+}

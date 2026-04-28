@@ -1,0 +1,101 @@
+{
+  "title": "2020년대 보수정치인",
+  "items": [
+    {
+      "id": 1,
+      "name": "윤석열",
+      "description": "국민의힘 계열에서 대통령을 지내며 2020년대 보수 정치의 중심에 선 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/South%20Korea%20President%20Yoon%20Suk%20Yeol%20portrait%20%28crop%29.jpg?width=480"
+    },
+    {
+      "id": 2,
+      "name": "한동훈",
+      "description": "법무부 장관과 국민의힘 비상대책위원장을 지내며 보수 진영의 주요 인물로 부상한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Han%20Dong-hoon%27s%20Portrait%20%282025%29.png?width=480"
+    },
+    {
+      "id": 3,
+      "name": "홍준표",
+      "description": "국민의힘 대선 경선 후보와 대구광역시장을 지내며 보수 진영에서 강한 존재감을 보여 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hong%20Jun-pyo%27s%20Portrait%20%282020%29.jpg?width=480"
+    },
+    {
+      "id": 4,
+      "name": "오세훈",
+      "description": "서울특별시장으로 활동하며 도시 정책과 행정 경험을 바탕으로 보수 진영을 대표해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Oh%20Se-hoon%202023.jpg?width=480"
+    },
+    {
+      "id": 5,
+      "name": "원희룡",
+      "description": "제주특별자치도지사와 국토교통부 장관을 지내며 보수 진영의 정책형 정치인으로 활동한 인물",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Minister%20of%20Land%2C%20Infrastructure%20and%20Transport%20WON%20Hee-ryong%2020231129.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "안철수",
+      "description": "국민의힘에서 활동하며 중도·보수 연대와 과학기술 의제를 강조해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ahn%20Cheol-Soo%27s%20Portrait%20%282025%29.png?width=480"
+    },
+    {
+      "id": 7,
+      "name": "이준석",
+      "description": "국민의힘 대표를 지내며 2020년대 보수 정치의 세대교체와 정당 혁신 이슈를 이끈 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lee%20Jun-seok.jpg?width=480"
+    },
+    {
+      "id": 8,
+      "name": "나경원",
+      "description": "국민의힘 계열에서 원내대표 등을 지내며 보수 정당의 주요 인물로 활동해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Na%20Kyung-won%27s%20Portrait%20%282016.12%29.png?width=480"
+    },
+    {
+      "id": 9,
+      "name": "김기현",
+      "description": "국민의힘 대표와 울산광역시장을 지내며 보수 정당 운영과 지역 행정을 경험한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/%EA%B9%80%EA%B8%B0%ED%98%84%20%EC%A0%84%20%EC%9A%B8%EC%82%B0%EC%8B%9C%EC%9E%A5.jpg?width=480"
+    },
+    {
+      "id": 10,
+      "name": "권성동",
+      "description": "국민의힘 원내대표 등을 맡으며 보수 진영의 원내 전략과 정당 운영에 참여해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Kweon%20Seong-dong%27s%20Portrait%20%282025.1%29.png?width=480"
+    },
+    {
+      "id": 11,
+      "name": "장제원",
+      "description": "국민의힘 국회의원으로 활동하며 2020년대 보수 정권과 정당 내 주요 이슈에서 주목받은 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Chang%20Je-won%202018-11-22.jpg?width=480"
+    },
+    {
+      "id": 12,
+      "name": "유승민",
+      "description": "경제 정책과 개혁 보수 노선을 강조하며 보수 진영의 대선 주자로 활동해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Yoo%20Seong-min%20in%20Gangneung%20%28Cropped%29.jpg?width=480"
+    },
+    {
+      "id": 13,
+      "name": "김태호",
+      "description": "경상남도지사와 국회의원을 지내며 보수 진영에서 지역 행정과 중앙 정치를 경험한 정치인",
+      "image": "https://s3.ap-northeast-2.amazonaws.com/wwk.file/production/category/identity/2023/10/06/1696519835745-%EA%B9%80%ED%83%9C%ED%98%B8.webp"
+    },
+    {
+      "id": 14,
+      "name": "조경태",
+      "description": "국민의힘 국회의원으로 활동하며 보수 진영의 중진 정치인으로 자리해 온 인물",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Cho%20Kyoung-tae%2020250203.jpg?width=480"
+    },
+    {
+      "id": 15,
+      "name": "배현진",
+      "description": "국민의힘 국회의원으로 2020년대 보수 정당의 대변과 의정 활동에 참여해 온 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bae%20Hyun-jin%2020210919.jpg?width=480"
+    },
+    {
+      "id": 16,
+      "name": "김은혜",
+      "description": "국민의힘 국회의원과 대통령실 홍보수석을 지내며 보수 진영에서 메시지와 선거 이슈로 활동한 정치인",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/2017%2002%EC%9B%94%2022%EC%9D%BC%20MBN%20Y%20Forum%202017%20%2812%29%20%28cropped%29.jpg?width=480"
+    }
+  ]
+}

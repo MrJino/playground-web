@@ -1,0 +1,101 @@
+{
+  "title": "2020년대 미국 여가수",
+  "items": [
+    {
+      "id": 1,
+      "name": "Taylor Swift",
+      "description": "The Eras Tour와 재녹음 프로젝트로 2020년대 팝 신을 크게 흔든 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Taylor%20Swift%20at%20the%202023%20MTV%20Video%20Music%20Awards%20%282%29.png?width=480"
+    },
+    {
+      "id": 2,
+      "name": "Beyonce",
+      "description": "Renaissance와 Cowboy Carter로 장르 경계를 확장한 보컬리스트이자 퍼포머",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Beyonc%C3%A9%20-%20Tottenham%20Hotspur%20Stadium%20-%201st%20June%202023%20%2889%20of%20118%29%20%2852945896886%29%20%28cropped%29.jpg?width=480"
+    },
+    {
+      "id": 3,
+      "name": "Billie Eilish",
+      "description": "섬세한 보컬 톤과 미니멀한 프로덕션으로 독보적인 분위기를 만든 아티스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sziget%202024%20main%20stage%20day%206.jpg?width=480"
+    },
+    {
+      "id": 4,
+      "name": "Olivia Rodrigo",
+      "description": "SOUR와 GUTS로 2020년대 팝 록 감성을 대표하게 된 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Olivia%20Rodrigo%202023%2002.jpg?width=480"
+    },
+    {
+      "id": 5,
+      "name": "Sabrina Carpenter",
+      "description": "재치 있는 팝 송라이팅과 무대 매력으로 빠르게 존재감을 키운 아티스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sabrina%20Carpenter%20en%20Coachella%2001.jpg?width=480"
+    },
+    {
+      "id": 6,
+      "name": "Ariana Grande",
+      "description": "섬세한 보컬 운용과 팝/R&B 감각을 함께 보여주는 보컬리스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ariana%20Grande%20promoting%20Wicked%20%282024%29.jpg?width=480"
+    },
+    {
+      "id": 7,
+      "name": "Miley Cyrus",
+      "description": "허스키한 보컬과 록, 팝, 컨트리 감성을 넘나드는 퍼포머",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Miley%20Cyrus%20Grammy%20Awards%202024.png?width=480"
+    },
+    {
+      "id": 8,
+      "name": "Doja Cat",
+      "description": "랩과 팝을 오가며 독특한 비주얼과 훅 메이킹을 보여주는 아티스트",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Doja%20Cat%20in%202024.jpg?width=480"
+    },
+    {
+      "id": 9,
+      "name": "SZA",
+      "description": "SOS를 통해 얼터너티브 R&B의 결을 대중적으로 확장한 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SZA%20-%20Kill%20Bill%20%28SOS%20Tour%2C%20Toronto%29.png?width=480"
+    },
+    {
+      "id": 10,
+      "name": "Selena Gomez",
+      "description": "차분한 팝 보컬과 배우 활동을 함께 이어가는 멀티 엔터테이너",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Selena%20Gomez%20at%20the%202024%20Golden%20Globes%20%282%29.png?width=480"
+    },
+    {
+      "id": 11,
+      "name": "Lana Del Rey",
+      "description": "시네마틱한 분위기와 독특한 서사 감각을 가진 싱어송라이터",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Lana%20del%20rey%20MITA.jpg?width=480"
+    },
+    {
+      "id": 12,
+      "name": "Lady Gaga",
+      "description": "강한 콘셉트와 보컬 실력을 바탕으로 팝, 재즈, 영화 음악까지 넘나드는 아티스트",
+      "image": ""
+    },
+    {
+      "id": 13,
+      "name": "Chappell Roan",
+      "description": "극적인 팝 퍼포먼스와 퀴어 팝 감성으로 주목받은 신흥 스타",
+      "image": ""
+    },
+    {
+      "id": 14,
+      "name": "Halsey",
+      "description": "개인적인 서사와 얼터너티브 팝 감성을 결합해 온 싱어송라이터",
+      "image": ""
+    },
+    {
+      "id": 15,
+      "name": "Demi Lovato",
+      "description": "파워풀한 보컬과 팝 록 에너지를 함께 보여주는 보컬리스트",
+      "image": ""
+    },
+    {
+      "id": 16,
+      "name": "Megan Thee Stallion",
+      "description": "강렬한 랩 플로우와 에너지 있는 퍼포먼스로 2020년대를 대표하는 아티스트",
+      "image": ""
+    }
+  ]
+}

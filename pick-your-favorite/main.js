@@ -1,6 +1,7 @@
 const FINAL_CARDS_STORAGE_KEY = "worldcup-final-cards";
 const DEFAULT_MENU_VALUE = "boy-idol";
 const MENU_QUERY_PARAM = "menu";
+const MENU_CONFIG_SOURCE = "res/menu.json";
 const CLOUDFLARE_API_BASE_URL = "https://playground-api.for1self.workers.dev";
 
 let initialCards = [];
@@ -13,11 +14,19 @@ let hasStoredFinalWinner = false;
 let lastWinnerIndex = 0;
 let activeLoadRequestId = 0;
 let activeMenuValue = DEFAULT_MENU_VALUE;
+let menuGroups = [];
 
 const poolGrid = document.getElementById("poolGrid");
+const poolScroll = document.getElementById("poolScroll");
+const heroPlaceholder = document.getElementById("heroPlaceholder");
 const progressText = document.getElementById("progressText");
 const battleTitle = document.getElementById("battleTitle");
 const centerNote = document.getElementById("centerNote");
+const menuList = document.getElementById("menuList");
+const openMenuSearchButton = document.getElementById("openMenuSearchButton");
+const menuBrowserPanel = document.getElementById("menuBrowserPanel");
+const menuSearchInput = document.getElementById("menuSearchInput");
+const menuBrowserGrid = document.getElementById("menuBrowserGrid");
 const historyList = document.getElementById("historyList");
 const clearHistoryButton = document.getElementById("clearHistoryButton");
 const rankingButton = document.getElementById("rankingButton");
@@ -25,6 +34,7 @@ const confirmModal = document.getElementById("confirmModal");
 const confirmModalMessage = document.getElementById("confirmModalMessage");
 const cancelConfirmButton = document.getElementById("cancelConfirmButton");
 const acceptConfirmButton = document.getElementById("acceptConfirmButton");
+const battlePanel = document.getElementById("battlePanel");
 const battleGrid = document.getElementById("battleGrid");
 const leftCard = document.getElementById("leftCard");
 const rightCard = document.getElementById("rightCard");
@@ -35,8 +45,8 @@ const rightTitle = document.getElementById("rightTitle");
 const leftText = document.getElementById("leftText");
 const rightText = document.getElementById("rightText");
 const battleCards = [leftCard, rightCard];
-const menuToggleButtons = document.querySelectorAll("[data-menu-toggle]");
-const cardSourceButtons = document.querySelectorAll("[data-card-source]");
+let menuToggleButtons = [];
+let cardSourceButtons = [];
 const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
 const FINAL_CARD_SELECTION_DURATION = 1400;
@@ -47,6 +57,171 @@ function getMenuButtonByValue(menuValue) {
   return Array.from(cardSourceButtons).find(
     (button) => button.dataset.menuValue === menuValue,
   );
+}
+
+function renderMenuLoading() {
+  menuList.innerHTML = `
+    <div class="history-empty">
+      메뉴를 불러오는 중입니다.
+    </div>
+  `;
+}
+
+function renderMenuError() {
+  menuList.innerHTML = `
+    <div class="history-empty">
+      메뉴를 불러오지 못했습니다.
+    </div>
+  `;
+}
+
+async function loadMenuConfig() {
+  renderMenuLoading();
+
+  const response = await window.fetch(MENU_CONFIG_SOURCE);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load menu config: ${response.status}`);
+  }
+
+  const payload = await response.json();
+
+  if (!Array.isArray(payload.groups)) {
+    throw new Error("Menu config must include a groups array.");
+  }
+
+  menuGroups = payload.groups;
+  renderMenu(menuGroups);
+  renderMenuBrowser(menuGroups);
+  bindMenuEventListeners();
+}
+
+function getMenuItems(groups = menuGroups) {
+  return groups.flatMap((group) => {
+    const items = Array.isArray(group.items) ? group.items : [];
+
+    return items.map((item) => ({
+      ...item,
+      groupLabel: group.label || "",
+    }));
+  });
+}
+
+function renderMenu(groups) {
+  menuList.innerHTML = groups
+    .map((group, index) => {
+      const submenuId = `submenu-${escapeHtml(group.id || index)}`;
+      const isOpen = Boolean(group.isOpen);
+      const items = Array.isArray(group.items) ? group.items : [];
+
+      return `
+        <div class="menu-section">
+          <button
+            class="menu-group${isOpen ? " is-open" : ""}"
+            type="button"
+            data-menu-toggle
+            aria-expanded="${String(isOpen)}"
+            aria-controls="${submenuId}"
+          >
+            <span>${escapeHtml(group.label || "")}</span>
+            <span class="menu-arrow">+</span>
+          </button>
+          <div class="submenu${isOpen ? " is-open" : ""}" id="${submenuId}">
+            ${items
+              .map(
+                (item) => `
+                  <button
+                    class="submenu-item"
+                    type="button"
+                    data-menu-value="${escapeHtml(item.value || "")}"
+                    data-card-source="${escapeHtml(item.cardSource || "")}"
+                  >
+                    ${
+                      item.icon
+                        ? `<img class="submenu-item__icon" src="${escapeHtml(item.icon)}" alt="" aria-hidden="true" />`
+                        : ""
+                    }
+                    <span>${escapeHtml(item.label || "")}</span>
+                  </button>
+                `,
+              )
+              .join("")}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderMenuBrowser(groups = menuGroups, searchTerm = "") {
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const items = getMenuItems(groups).filter((item) => {
+    const searchText = `${item.label || ""} ${item.groupLabel || ""}`.toLowerCase();
+    return !normalizedSearchTerm || searchText.includes(normalizedSearchTerm);
+  });
+
+  if (items.length === 0) {
+    menuBrowserGrid.innerHTML = `
+      <div class="menu-browser-empty">
+        검색 결과가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  menuBrowserGrid.innerHTML = items
+    .map(
+      (item) => `
+        <button
+          class="menu-browser-card"
+          type="button"
+          data-menu-choice="${escapeHtml(item.value || "")}"
+        >
+          ${
+            item.icon
+              ? `<img class="menu-browser-card__icon" src="${escapeHtml(item.icon)}" alt="" aria-hidden="true" />`
+              : ""
+          }
+          <span class="menu-browser-card__group">${escapeHtml(item.groupLabel || "")}</span>
+          <strong>${escapeHtml(item.label || "")}</strong>
+        </button>
+      `,
+    )
+    .join("");
+}
+
+function hasMenuQueryParam() {
+  const params = new URLSearchParams(window.location.search);
+  return params.has(MENU_QUERY_PARAM);
+}
+
+function showMenuBrowser(options = {}) {
+  activeLoadRequestId += 1;
+  isTransitioning = false;
+  activeMenuValue = DEFAULT_MENU_VALUE;
+  cardSourceButtons.forEach((button) => {
+    button.classList.remove("is-active");
+    button.setAttribute("aria-current", "false");
+  });
+  heroPlaceholder.hidden = false;
+  poolScroll.hidden = true;
+  poolGrid.innerHTML = "";
+  progressText.textContent = "";
+  centerNote.textContent = "";
+  battlePanel.hidden = true;
+  menuBrowserPanel.hidden = false;
+  rankingButton.href = getRankingUrl(DEFAULT_MENU_VALUE);
+  rankingButton.setAttribute("aria-label", "기본 메뉴 랭킹화면으로 이동");
+
+  if (options.updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete(MENU_QUERY_PARAM);
+    window.history.pushState({}, "", url);
+  }
+
+  if (options.focusSearch) {
+    menuSearchInput.focus();
+  }
 }
 
 function getMenuLabel(button) {
@@ -74,7 +249,11 @@ function updateRankingLink(button) {
 
 function getInitialMenuButton() {
   const params = new URLSearchParams(window.location.search);
-  const menuValue = params.get(MENU_QUERY_PARAM) || DEFAULT_MENU_VALUE;
+  const menuValue = params.get(MENU_QUERY_PARAM);
+
+  if (!params.has(MENU_QUERY_PARAM)) {
+    return null;
+  }
 
   return (
     getMenuButtonByValue(menuValue) ||
@@ -142,6 +321,8 @@ async function activateMenuButton(button, options = {}) {
   activeLoadRequestId = loadRequestId;
 
   try {
+    menuBrowserPanel.hidden = true;
+    battlePanel.hidden = false;
     setActiveMenuButton(button);
     activeMenuValue = button.dataset.menuValue || DEFAULT_MENU_VALUE;
     updateMenuQueryParam(button.dataset.menuValue, options.replace);
@@ -249,6 +430,8 @@ function setBattleCardLoading(cardEl, imageEl, titleEl, textEl) {
 
 function renderCardsLoadingState() {
   isTransitioning = true;
+  heroPlaceholder.hidden = true;
+  poolScroll.hidden = false;
   initialCards = [];
   activePool = [];
   currentRoundCards = [];
@@ -908,24 +1091,53 @@ rightCard.addEventListener("keydown", (event) =>
   handleKeyboardSelection(event, 1),
 );
 
-menuToggleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const targetId = button.getAttribute("aria-controls");
-    const submenu = document.getElementById(targetId);
-    const isOpen = button.classList.toggle("is-open");
+function bindMenuEventListeners() {
+  menuToggleButtons = Array.from(document.querySelectorAll("[data-menu-toggle]"));
+  cardSourceButtons = Array.from(document.querySelectorAll("[data-card-source]"));
 
-    button.setAttribute("aria-expanded", String(isOpen));
-    submenu.classList.toggle("is-open", isOpen);
+  menuToggleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.getAttribute("aria-controls");
+      const submenu = document.getElementById(targetId);
+      const isOpen = button.classList.toggle("is-open");
+
+      button.setAttribute("aria-expanded", String(isOpen));
+      submenu?.classList.toggle("is-open", isOpen);
+    });
   });
+
+  cardSourceButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activateMenuButton(button);
+    });
+  });
+}
+
+menuSearchInput.addEventListener("input", () => {
+  renderMenuBrowser(menuGroups, menuSearchInput.value);
 });
 
-cardSourceButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    activateMenuButton(button);
-  });
+openMenuSearchButton.addEventListener("click", () => {
+  showMenuBrowser({ updateUrl: true, focusSearch: true });
+});
+
+menuBrowserGrid.addEventListener("click", (event) => {
+  const menuChoice = event.target.closest("[data-menu-choice]");
+
+  if (!menuChoice) {
+    return;
+  }
+
+  const menuButton = getMenuButtonByValue(menuChoice.dataset.menuChoice);
+  activateMenuButton(menuButton);
 });
 
 window.addEventListener("popstate", () => {
+  if (!hasMenuQueryParam()) {
+    showMenuBrowser();
+    return;
+  }
+
   activateMenuButton(getInitialMenuButton(), { replace: true });
 });
 
@@ -978,6 +1190,20 @@ document.addEventListener("keydown", (event) => {
 
 async function initializeApp() {
   renderFinalCardsHistory();
+  try {
+    await loadMenuConfig();
+  } catch (error) {
+    console.error(error);
+    renderMenuError();
+    centerNote.textContent = "메뉴 데이터를 불러오지 못했습니다.";
+    return;
+  }
+
+  if (!hasMenuQueryParam()) {
+    showMenuBrowser();
+    return;
+  }
+
   await activateMenuButton(getInitialMenuButton(), { replace: true });
 }
 

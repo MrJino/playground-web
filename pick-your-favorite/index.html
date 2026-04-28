@@ -10,137 +10,58 @@
   <body>
     <main class="page">
       <header class="hero">
-        <div class="pool-scroll">
+        <div class="hero-placeholder" id="heroPlaceholder" hidden>
+          <img class="hero-placeholder__image" src="./assets/icons/profile_jino.png" alt="Pick your favorite" />
+        </div>
+        <div class="pool-scroll" id="poolScroll">
           <div class="pool-grid" id="poolGrid"></div>
         </div>
       </header>
 
       <section class="content-layout">
         <aside class="menu-panel">
-          <div class="menu-panel__title">Menu</div>
-
-          <div class="menu-section">
-            <button
-              class="menu-group is-open"
-              type="button"
-              data-menu-toggle
-              aria-expanded="true"
-              aria-controls="submenu-2020"
-            >
-              <span>2020년대</span>
-              <span class="menu-arrow">+</span>
-            </button>
-            <div class="submenu is-open" id="submenu-2020">
-              <button
-                class="submenu-item"
-                type="button"
-                data-menu-value="boy-idol"
-                data-card-source="res/2020/boysgroup/cards.json"
-              >
-                <img
-                  class="submenu-item__icon"
-                  src="./assets/icons/boy-idol.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span>2020년대 남자아이돌</span>
-              </button>
-              <button
-                class="submenu-item"
-                type="button"
-                data-menu-value="girl-idol"
-                data-card-source="res/2020/girlsgroup/cards.json"
-              >
-                <img
-                  class="submenu-item__icon"
-                  src="./assets/icons/girl-idol.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span>2020년대 여자아이돌</span>
-              </button>
-            </div>
+          <div class="menu-panel__header">
+            <div class="menu-panel__title">Menu</div>
+            <button class="menu-panel__search" id="openMenuSearchButton" type="button" aria-label="메뉴 검색 화면 열기" title="메뉴 검색"></button>
           </div>
-
-          <div class="menu-section">
-            <button
-              class="menu-group"
-              type="button"
-              data-menu-toggle
-              aria-expanded="false"
-              aria-controls="submenu-1990"
-            >
-              <span>1990년대</span>
-              <span class="menu-arrow">+</span>
-            </button>
-            <div class="submenu" id="submenu-1990">
-              <button
-                class="submenu-item"
-                type="button"
-                data-menu-value="1990-male-singer"
-                data-card-source="res/1990/malesinger/cards.json"
-              >
-                <img
-                  class="submenu-item__icon"
-                  src="./assets/icons/boy-idol.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span>1990년대 남자가수</span>
-              </button>
-              <button
-                class="submenu-item"
-                type="button"
-                data-menu-value="1990-female-singer"
-                data-card-source="res/1990/femalesinger/cards.json"
-              >
-                <img
-                  class="submenu-item__icon"
-                  src="./assets/icons/girl-idol.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span>1990년대 여자가수</span>
-              </button>
-            </div>
-          </div>
+          <div id="menuList"></div>
         </aside>
 
-        <section class="battle-panel">
+        <section class="menu-browser-panel" id="menuBrowserPanel" hidden>
+          <div class="menu-browser__top">
+            <div>
+              <h2>메뉴 선택</h2>
+              <p>원하는 월드컵 메뉴를 골라 시작하세요.</p>
+            </div>
+            <label class="menu-search">
+              <span>메뉴 검색</span>
+              <input id="menuSearchInput" type="search" placeholder="예: 미국, 2020, 여가수" autocomplete="off" />
+            </label>
+          </div>
+          <div class="menu-browser-grid" id="menuBrowserGrid"></div>
+        </section>
+
+        <section class="battle-panel" id="battlePanel">
           <div class="battle-top">
             <h2 id="battleTitle">Random 2 Card Match</h2>
             <div class="progress" id="progressText">0 / 16 selected</div>
           </div>
 
           <div class="battle-grid" id="battleGrid">
-            <article
-              class="battle-card"
-              data-side="left"
-              id="leftCard"
-              role="button"
-              tabindex="0"
-            >
+            <article class="battle-card" data-side="left" id="leftCard" role="button" tabindex="0">
               <img class="battle-card__image" id="leftImage" alt="" />
               <h3 id="leftTitle"></h3>
               <p id="leftText"></p>
             </article>
 
-            <article
-              class="battle-card"
-              data-side="right"
-              id="rightCard"
-              role="button"
-              tabindex="0"
-            >
+            <article class="battle-card" data-side="right" id="rightCard" role="button" tabindex="0">
               <img class="battle-card__image" id="rightImage" alt="" />
               <h3 id="rightTitle"></h3>
               <p id="rightText"></p>
             </article>
           </div>
 
-          <p class="center-note" id="centerNote">
-            Click a card to build your final 16.
-          </p>
+          <p class="center-note" id="centerNote">Click a card to build your final 16.</p>
         </section>
 
         <aside class="history-panel">
@@ -151,9 +72,7 @@
                 <h2 class="history-panel__title">메뉴 랭킹</h2>
               </div>
             </div>
-            <a class="ranking-link" id="rankingButton" href="./ranking/">
-              랭킹화면으로 이동
-            </a>
+            <a class="ranking-link" id="rankingButton" href="./ranking/"> 랭킹화면으로 이동 </a>
           </section>
 
           <section class="history-section history-section--local">
@@ -162,13 +81,7 @@
                 <div class="history-panel__eyebrow">LocalStorage</div>
                 <h2 class="history-panel__title">Final Cards</h2>
               </div>
-              <button
-                class="history-panel__clear"
-                id="clearHistoryButton"
-                type="button"
-              >
-                전체삭제
-              </button>
+              <button class="history-panel__clear" id="clearHistoryButton" type="button">전체삭제</button>
             </div>
             <div class="history-list" id="historyList"></div>
           </section>
@@ -178,32 +91,12 @@
 
     <div class="confirm-modal" id="confirmModal" hidden>
       <div class="confirm-modal__backdrop" data-close-confirm-modal></div>
-      <div
-        class="confirm-modal__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirmModalTitle"
-        aria-describedby="confirmModalMessage"
-      >
+      <div class="confirm-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle" aria-describedby="confirmModalMessage">
         <h2 class="confirm-modal__title" id="confirmModalTitle">삭제 확인</h2>
-        <p class="confirm-modal__message" id="confirmModalMessage">
-          정말 삭제하시겠습니까?
-        </p>
+        <p class="confirm-modal__message" id="confirmModalMessage">정말 삭제하시겠습니까?</p>
         <div class="confirm-modal__actions">
-          <button
-            class="confirm-modal__button confirm-modal__button--secondary"
-            id="cancelConfirmButton"
-            type="button"
-          >
-            아니오
-          </button>
-          <button
-            class="confirm-modal__button confirm-modal__button--primary"
-            id="acceptConfirmButton"
-            type="button"
-          >
-            예
-          </button>
+          <button class="confirm-modal__button confirm-modal__button--secondary" id="cancelConfirmButton" type="button">아니오</button>
+          <button class="confirm-modal__button confirm-modal__button--primary" id="acceptConfirmButton" type="button">예</button>
         </div>
       </div>
     </div>

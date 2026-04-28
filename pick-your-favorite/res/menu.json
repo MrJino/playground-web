@@ -1,0 +1,66 @@
+{
+  "groups": [
+    {
+      "id": "2020",
+      "label": "2020년대",
+      "isOpen": true,
+      "items": [
+        {
+          "value": "boy-idol",
+          "label": "2020년대 남자아이돌",
+          "cardSource": "res/2020/boysgroup/cards.json",
+          "icon": "./assets/icons/boy-idol.svg"
+        },
+        {
+          "value": "girl-idol",
+          "label": "2020년대 여자아이돌",
+          "cardSource": "res/2020/girlsgroup/cards.json",
+          "icon": "./assets/icons/girl-idol.svg"
+        },
+        {
+          "value": "2020-us-female-singer",
+          "label": "2020년대 미국 여가수",
+          "cardSource": "res/2020/us-female-singer/cards.json",
+          "icon": "./assets/icons/girl-idol.svg"
+        },
+        {
+          "value": "2020-us-male-singer",
+          "label": "2020년대 미국 남자가수",
+          "cardSource": "res/2020/us-male-singer/cards.json",
+          "icon": "./assets/icons/boy-idol.svg"
+        },
+        {
+          "value": "2020-progressive-politician",
+          "label": "2020년대 진보정치인",
+          "cardSource": "res/2020/progressive-politician/cards.json",
+          "icon": "./assets/icons/girl-idol.svg"
+        },
+        {
+          "value": "2020-conservative-politician",
+          "label": "2020년대 보수정치인",
+          "cardSource": "res/2020/conservative-politician/cards.json",
+          "icon": "./assets/icons/boy-idol.svg"
+        }
+      ]
+    },
+    {
+      "id": "1990",
+      "label": "1990년대",
+      "isOpen": false,
+      "items": [
+        {
+          "value": "1990-male-singer",
+          "label": "1990년대 남자가수",
+          "cardSource": "res/1990/malesinger/cards.json",
+          "icon": "./assets/icons/boy-idol.svg"
+        },
+        {
+          "value": "1990-female-singer",
+          "label": "1990년대 여자가수",
+          "cardSource": "res/1990/femalesinger/cards.json",
+          "icon": "./assets/icons/girl-idol.svg"
+        }
+      ]
+    }
+  ]
+}
