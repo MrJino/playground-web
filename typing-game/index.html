@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>8-bit Typing Defender</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <section class="game-card" aria-label="타자연습 미사일 게임">
+        <div class="hud">
+          <div class="hud__item">
+            <span class="hud__label">SCORE</span>
+            <strong id="scoreText">0000</strong>
+          </div>
+          <div class="hud__item">
+            <span class="hud__label">LIFE</span>
+            <strong id="lifeText">★★★</strong>
+          </div>
+          <div class="hud__item">
+            <span class="hud__label">LEVEL</span>
+            <strong id="levelText">1</strong>
+          </div>
+        </div>
+
+        <div class="screen-wrap">
+          <canvas id="gameCanvas" width="960" height="620" aria-label="상단에서 글자가 내려오는 게임 화면"></canvas>
+          <div class="scanlines"></div>
+          <label class="input-catcher">
+            <input id="typingInput" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="단어 입력" />
+          </label>
+          <div class="start-panel" id="startPanel">
+            <h1>TYPE DEFENDER</h1>
+            <p>떨어지는 글자를 입력해서 미사일로 격추하세요.</p>
+            <div class="language-select" aria-label="게임 언어 선택">
+              <button class="language-button is-active" type="button" data-language="ko">한글</button>
+              <button class="language-button" type="button" data-language="en">English</button>
+            </div>
+            <div class="level-select" aria-label="게임 레벨 선택">
+              <button class="level-button" type="button" data-difficulty="easy">EASY</button>
+              <button class="level-button is-active" type="button" data-difficulty="normal">NORMAL</button>
+              <button class="level-button" type="button" data-difficulty="hard">HARD</button>
+            </div>
+            <button id="startButton" type="button">START</button>
+          </div>
+          <div class="game-over-panel" id="gameOverPanel" hidden>
+            <h2>GAME OVER</h2>
+            <p id="finalScoreText">SCORE 0000</p>
+            <button id="restartButton" type="button">RESTART</button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <script src="./game.js"></script>
+  </body>
+</html>
