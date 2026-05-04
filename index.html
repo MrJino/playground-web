@@ -4,9 +4,177 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="./favicon.ico" type="image/x-icon" />
-    <title>Pick your favorite</title>
+    <title>Playground</title>
+    <style>
+      :root {
+        --bg-top: #f5eadf;
+        --bg-bottom: #dae8f7;
+        --panel: rgba(255, 255, 255, 0.88);
+        --card: rgba(255, 255, 255, 0.95);
+        --line: rgba(23, 34, 48, 0.1);
+        --text: #182230;
+        --muted: #667282;
+        --warm: #f27f5d;
+        --cool: #3078ef;
+        --shadow: 0 18px 40px rgba(24, 34, 48, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 28%), linear-gradient(145deg, var(--bg-top), var(--bg-bottom));
+      }
+
+      .page {
+        width: min(1100px, 100%);
+        margin: 0 auto;
+        padding: 32px 18px;
+      }
+
+      .header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 5vw, 4.8rem);
+        line-height: 1;
+      }
+
+      .header p {
+        max-width: 420px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: right;
+      }
+
+      .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+      }
+
+      .app-card {
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        color: inherit;
+        text-decoration: none;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .app-card:hover {
+        border-color: rgba(48, 120, 239, 0.28);
+        box-shadow: 0 22px 46px rgba(24, 34, 48, 0.16);
+        transform: translateY(-4px);
+      }
+
+      .app-card__icon {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: linear-gradient(145deg, var(--cool), var(--warm));
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 900;
+      }
+
+      .app-card__title {
+        margin: 20px 0 8px;
+        font-size: 1.45rem;
+        line-height: 1.2;
+      }
+
+      .app-card__desc {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .app-card__meta {
+        margin-top: 22px;
+        color: var(--cool);
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          padding: 22px 10px;
+        }
+
+        .header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .header p {
+          text-align: left;
+        }
+      }
+    </style>
   </head>
   <body>
-    안녕~ 난 지노야~
+    <main class="page">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Playground</p>
+          <h1>메뉴</h1>
+        </div>
+        <p>작업 중인 웹 실험과 미니 앱으로 이동합니다. 새 화면은 아래 카드 형태로 계속 추가할 수 있습니다.</p>
+      </header>
+
+      <section class="app-grid" aria-label="앱 메뉴">
+        <a class="app-card" href="./pick-your-favorite/">
+          <div>
+            <div class="app-card__icon">P</div>
+            <h2 class="app-card__title">Pick your favorite</h2>
+            <p class="app-card__desc">카드를 골라 최종 후보를 만드는 월드컵형 선택 게임입니다.</p>
+          </div>
+          <div class="app-card__meta">열기</div>
+        </a>
+
+        <a class="app-card" href="./typing-game/">
+          <div>
+            <div class="app-card__icon">T</div>
+            <h2 class="app-card__title">Typing game</h2>
+            <p class="app-card__desc">떨어지는 글자와 단어를 입력해 미사일로 격추하는 타자 연습 게임입니다.</p>
+          </div>
+          <div class="app-card__meta">열기</div>
+        </a>
+      </section>
+    </main>
   </body>
 </html>

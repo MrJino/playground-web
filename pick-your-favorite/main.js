@@ -27,9 +27,15 @@ const openMenuSearchButton = document.getElementById("openMenuSearchButton");
 const menuBrowserPanel = document.getElementById("menuBrowserPanel");
 const menuSearchInput = document.getElementById("menuSearchInput");
 const menuBrowserGrid = document.getElementById("menuBrowserGrid");
+const menuPanel = document.getElementById("menuPanel");
+const historyPanel = document.getElementById("historyPanel");
 const historyList = document.getElementById("historyList");
 const clearHistoryButton = document.getElementById("clearHistoryButton");
 const rankingButton = document.getElementById("rankingButton");
+const mobilePanelBackdrop = document.getElementById("mobilePanelBackdrop");
+const openMobileMenuButton = document.getElementById("openMobileMenuButton");
+const openMobileSearchButton = document.getElementById("openMobileSearchButton");
+const openMobileHistoryButton = document.getElementById("openMobileHistoryButton");
 const confirmModal = document.getElementById("confirmModal");
 const confirmModalMessage = document.getElementById("confirmModalMessage");
 const cancelConfirmButton = document.getElementById("cancelConfirmButton");
@@ -49,6 +55,7 @@ const rightSource = document.getElementById("rightSource");
 const battleCards = [leftCard, rightCard];
 let menuToggleButtons = [];
 let cardSourceButtons = [];
+const MOBILE_PANEL_MEDIA_QUERY = "(max-width: 768px)";
 const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
 const FINAL_CARD_SELECTION_DURATION = 1400;
@@ -80,6 +87,58 @@ function getMenuButtonByValue(menuValue) {
   return Array.from(cardSourceButtons).find(
     (button) => button.dataset.menuValue === menuValue,
   );
+}
+
+function isMobilePanelLayout() {
+  return window.matchMedia(MOBILE_PANEL_MEDIA_QUERY).matches;
+}
+
+function setMobileNavState(activePanel) {
+  const isMenuOpen = activePanel === "menu";
+  const isSearchOpen = activePanel === "search";
+  const isHistoryOpen = activePanel === "history";
+
+  openMobileMenuButton?.classList.toggle("is-active", isMenuOpen);
+  openMobileMenuButton?.setAttribute("aria-expanded", String(isMenuOpen));
+  openMobileSearchButton?.classList.toggle("is-active", isSearchOpen);
+  openMobileHistoryButton?.classList.toggle("is-active", isHistoryOpen);
+  openMobileHistoryButton?.setAttribute("aria-expanded", String(isHistoryOpen));
+}
+
+function closeMobilePanels() {
+  menuPanel?.classList.remove("is-mobile-panel-open");
+  historyPanel?.classList.remove("is-mobile-panel-open");
+  document.body.classList.remove("mobile-panel-open");
+  setMobileNavState(null);
+
+  if (mobilePanelBackdrop) {
+    mobilePanelBackdrop.hidden = true;
+  }
+}
+
+function openMobilePanel(panelName) {
+  if (!isMobilePanelLayout()) {
+    return;
+  }
+
+  const isMenuPanel = panelName === "menu";
+  const activePanel = isMenuPanel ? menuPanel : historyPanel;
+  const inactivePanel = isMenuPanel ? historyPanel : menuPanel;
+  const isAlreadyOpen = activePanel?.classList.contains("is-mobile-panel-open");
+
+  if (isAlreadyOpen) {
+    closeMobilePanels();
+    return;
+  }
+
+  inactivePanel?.classList.remove("is-mobile-panel-open");
+  activePanel?.classList.add("is-mobile-panel-open");
+  document.body.classList.add("mobile-panel-open");
+  setMobileNavState(panelName);
+
+  if (mobilePanelBackdrop) {
+    mobilePanelBackdrop.hidden = false;
+  }
 }
 
 function renderMenuLoading() {
@@ -396,6 +455,7 @@ async function activateMenuButton(button, options = {}) {
   try {
     menuBrowserPanel.hidden = true;
     battlePanel.hidden = false;
+    closeMobilePanels();
     setActiveMenuButton(button);
     activeMenuValue = button.dataset.menuValue || DEFAULT_MENU_VALUE;
     updateMenuQueryParam(button.dataset.menuValue, options.replace);
@@ -745,15 +805,22 @@ function renderPool() {
   const visibleCards = getPoolVisibleCards();
   const activeIds = new Set(activePool.map((card) => card.id));
   const selectedIds = new Set(selectedCards.map((card) => card.id));
+  const currentRoundIds = new Set(currentRoundCards.map((card) => card.id));
 
   poolGrid.innerHTML = visibleCards
     .map((card) => {
       const isAlive = activeIds.has(card.id);
       const isSelected = selectedIds.has(card.id);
-      const stateClass = isSelected ? "selected" : isAlive ? "" : "eliminated";
+      const isCurrentRound = currentRoundIds.has(card.id);
+      const stateClasses = [
+        isSelected ? "selected" : isAlive ? "" : "eliminated",
+        isCurrentRound ? "is-current-round" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
       return `
-        <article class="pool-card ${stateClass}" data-name="${card.name}">
+        <article class="pool-card ${stateClasses}" data-name="${card.name}">
           ${card.image ? `<img class="pool-card__image" src="${card.image}" alt="${card.name}" />` : ""}
           <div class="pool-card__overlay">
             <span class="pool-card__overlay-name">${card.name}</span>
@@ -827,7 +894,7 @@ function renderBattle() {
 
   const currentRoundLabel = getRoundLabel(currentRoundCards.length);
   const roundTarget = getRoundTarget();
-  progressText.textContent = `${currentRoundLabel} ${selectedCards.length} / ${roundTarget}`;
+  progressText.textContent = `${selectedCards.length} / ${roundTarget}`;
 
   if (currentRoundCards.length === 1 && selectedCards.length === 1) {
     const winner = selectedCards[0];
@@ -897,7 +964,7 @@ function renderBattle() {
 function showByeAdvance(card) {
   currentPair = [];
   battleTitle.textContent = "Bye Advance";
-  progressText.textContent = `${getRoundLabel(currentRoundCards.length)} ${selectedCards.length + 1} / ${getRoundTarget()}`;
+  progressText.textContent = `${selectedCards.length + 1} / ${getRoundTarget()}`;
 
   battleGrid.classList.remove("is-choosing");
   battleGrid.classList.add("is-bye-advance");
@@ -1242,6 +1309,7 @@ menuSearchInput.addEventListener("input", () => {
 });
 
 openMenuSearchButton.addEventListener("click", () => {
+  closeMobilePanels();
   showMenuBrowser({ updateUrl: true, focusSearch: true });
 });
 
@@ -1283,6 +1351,30 @@ clearHistoryButton.addEventListener("click", () => {
   });
 });
 
+openMobileMenuButton?.addEventListener("click", () => {
+  openMobilePanel("menu");
+});
+
+openMobileSearchButton?.addEventListener("click", () => {
+  closeMobilePanels();
+  showMenuBrowser({ updateUrl: true, focusSearch: true });
+  setMobileNavState("search");
+});
+
+openMobileHistoryButton?.addEventListener("click", () => {
+  openMobilePanel("history");
+});
+
+mobilePanelBackdrop?.addEventListener("click", () => {
+  closeMobilePanels();
+});
+
+window.addEventListener("resize", () => {
+  if (!isMobilePanelLayout()) {
+    closeMobilePanels();
+  }
+});
+
 cancelConfirmButton.addEventListener("click", () => {
   closeConfirmModal();
 });
@@ -1298,6 +1390,10 @@ confirmModal.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && document.body.classList.contains("mobile-panel-open")) {
+    closeMobilePanels();
+  }
+
   if (confirmModal.hidden) {
     return;
   }

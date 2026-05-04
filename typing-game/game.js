@@ -21,13 +21,6 @@ const LETTER_SETS = {
   en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 };
 const WORD_SETS = {
-  ko: {
-    1: Array.from(LETTER_SETS.ko),
-    2: ["하늘", "바다", "구름", "별빛", "달빛", "사과", "학교", "친구", "우주", "게임", "타자", "번개", "폭발", "희망"],
-    3: ["바나나", "고양이", "강아지", "비행기", "컴퓨터", "미사일", "우주선", "손가락", "키보드", "별자리", "초록빛"],
-    4: ["오토바이", "대한민국", "타자연습", "우주기지", "별빛축제", "로켓발사", "방어작전", "게임시작", "하늘정원"],
-    5: ["미사일기지", "우주방어선", "타자연습장", "초록에너지", "하늘전투기", "별빛수호대", "로켓발사대", "키보드전사"],
-  },
   en: {
     1: Array.from(LETTER_SETS.en),
     2: ["GO", "UP", "ON", "IN", "NO", "OK", "BY", "ME", "WE", "IT", "DO", "BE", "SO", "TO"],
@@ -36,6 +29,9 @@ const WORD_SETS = {
     5: ["ROBOT", "LASER", "ROCKET", "PIXEL", "ALIEN", "POWER", "ORBIT", "COMET", "TYPER", "BLAST", "SPACE"],
   },
 };
+const HANGUL_CHO = [0, 2, 3, 5, 6, 7, 9, 11, 12, 14, 15, 16, 17, 18];
+const HANGUL_JUNG = [0, 2, 4, 6, 8, 13, 18, 20];
+const HANGUL_JONG = [1, 4, 8, 16, 17, 21];
 const DIFFICULTIES = {
   easy: {
     label: "EASY",
@@ -104,12 +100,61 @@ function normalizeText(value) {
   return currentLanguage === "en" ? normalized.toUpperCase() : normalized;
 }
 
-function getTargetLength() {
+function randomFrom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function getKoreanLevelSpec() {
+  let remainingLevel = level;
+
+  for (let syllableCount = 1; syllableCount <= 5; syllableCount += 1) {
+    const steps = syllableCount + 1;
+
+    if (remainingLevel <= steps) {
+      return {
+        syllableCount,
+        batchimCount: remainingLevel - 1,
+      };
+    }
+
+    remainingLevel -= steps;
+  }
+
+  return {
+    syllableCount: 5,
+    batchimCount: 5,
+  };
+}
+
+function composeHangulSyllable(hasBatchim) {
+  const cho = randomFrom(HANGUL_CHO);
+  const jung = randomFrom(HANGUL_JUNG);
+  const jong = hasBatchim ? randomFrom(HANGUL_JONG) : 0;
+
+  return String.fromCharCode(0xac00 + (cho * 21 + jung) * 28 + jong);
+}
+
+function randomKoreanTargetText() {
+  const { syllableCount, batchimCount } = getKoreanLevelSpec();
+  const batchimSlots = new Set();
+
+  while (batchimSlots.size < batchimCount) {
+    batchimSlots.add(Math.floor(Math.random() * syllableCount));
+  }
+
+  return Array.from({ length: syllableCount }, (_, index) => composeHangulSyllable(batchimSlots.has(index))).join("");
+}
+
+function getEnglishTargetLength() {
   return Math.max(1, Math.min(5, level));
 }
 
 function randomTargetText() {
-  const words = WORD_SETS[currentLanguage][getTargetLength()];
+  if (currentLanguage === "ko") {
+    return randomKoreanTargetText();
+  }
+
+  const words = WORD_SETS.en[getEnglishTargetLength()];
   return words[Math.floor(Math.random() * words.length)];
 }
 

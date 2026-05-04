@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Atashinchi character icon">
+  <defs>
+    <linearGradient id="atashinchi-bg" x1="8" y1="7" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#atashinchi-bg)"/>
+  <path fill="#ffffff" opacity=".24" d="M10 18c8-6 17-8 27-4 6 2.4 12 2 17-1.4v12.6c-6 3.6-13 4-21 1.2-8-2.8-15.6-1-23 5.2z"/>
+  <path fill="#7c2d12" d="M14 32 32 17l18 15v18H14z"/>
+  <path fill="#fef3c7" d="M18 34h28v16H18z"/>
+  <path fill="#ef4444" d="M32 17 51 33l-3.3 3.8L32 23.7 16.3 36.8 13 33z"/>
+  <circle cx="25" cy="40" r="6" fill="#fde68a"/>
+  <circle cx="39" cy="40" r="6" fill="#fde68a"/>
+  <path fill="#111827" d="M23 39h3v3h-3zm14 0h3v3h-3z"/>
+  <path fill="#ef4444" d="M28 45h8v3h-8z"/>
+  <path fill="#38bdf8" d="M20 51h24v4H20z"/>
+</svg>

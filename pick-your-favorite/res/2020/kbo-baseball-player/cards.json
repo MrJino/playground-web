@@ -1,0 +1,117 @@
+{
+  "title": "2020년대 한국리그 야구선수",
+  "items": [
+    {
+      "id": 1,
+      "name": "양현종",
+      "description": "KIA 타이거즈를 대표하는 좌완 에이스로 2020년대에도 꾸준한 선발 투수 존재감을 보여준 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/b3/%EC%96%91%ED%98%84%EC%A2%85_%28KIA_%ED%83%80%EC%9D%B4%EA%B1%B0%EC%A6%88%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 2,
+      "name": "최정",
+      "description": "SSG 랜더스의 장타 중심 타자로 KBO 통산 홈런 기록 경쟁을 이끈 대표적인 3루수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/90/Jeong_Choi_on_March_2%2C_2013.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 3,
+      "name": "이정후",
+      "description": "정교한 타격과 스타성을 앞세워 2020년대 초반 KBO를 대표한 외야수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/01/Kiwoom_Heroes_Lee_Jeong-Hoo_%282019%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 4,
+      "name": "강백호",
+      "description": "KT 위즈의 중심 타자로 강한 타격 재능과 장타력을 보여준 2020년대 KBO 스타",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/5/58/Kang_Baek-Ho_2019_Premier_12.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 5,
+      "name": "양의지",
+      "description": "공수에서 영향력이 큰 포수로 두산과 NC에서 우승 경쟁의 중심에 섰던 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/25/151208._2015_KBO_%EA%B3%A8%EB%93%A0_%EA%B8%80%EB%9F%AC%EB%B8%8C_%EC%8B%9C%EC%83%81%EC%8B%9D._62.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 6,
+      "name": "구자욱",
+      "description": "삼성 라이온즈의 중심 외야수로 정교한 타격과 장타력을 함께 보여준 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/74/2017_09_01_%EC%82%BC%EC%84%B1_vs_SK_%EA%B5%BF%EB%B0%94%EC%9D%B4_%EB%9D%BC%EC%9D%B4%EC%98%A8%ED%82%B9_1_%284%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 7,
+      "name": "나성범",
+      "description": "강한 어깨와 장타력을 갖춘 외야수로 NC와 KIA에서 중심 타선을 맡은 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f6/%EB%82%98%EC%84%B1%EB%B2%94_%EC%84%A0%EC%88%98.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 8,
+      "name": "손아섭",
+      "description": "꾸준한 안타 생산력으로 KBO 리그를 대표하는 교타자 계보를 이어온 외야수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Son_Ah-Seop2023.webp",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 9,
+      "name": "김재환",
+      "description": "두산 베어스의 장타력 있는 좌타 거포로 중심 타선에서 활약한 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/5/52/Kim_Jae-hwan_%EA%B9%80%EC%9E%AC%ED%99%98_2016_%EA%B3%A8%EB%93%A0%EA%B8%80%EB%9F%AC%EB%B8%8C.png",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 10,
+      "name": "오지환",
+      "description": "LG 트윈스의 주전 유격수로 안정적인 수비와 팀 리더십을 보여준 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e6/%EC%98%A4%EC%A7%80%ED%99%98LG%EC%A3%BC%EC%9E%A5.png",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 11,
+      "name": "박민우",
+      "description": "NC 다이노스의 내야 핵심 자원으로 빠른 발과 컨택 능력을 갖춘 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/29/151208._2015_KBO_%EA%B3%A8%EB%93%A0_%EA%B8%80%EB%9F%AC%EB%B8%8C_%EC%8B%9C%EC%83%81%EC%8B%9D._48.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 12,
+      "name": "고영표",
+      "description": "KT 위즈의 제구형 선발 투수로 안정적인 이닝 소화 능력을 보여준 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6f/%EA%B3%A0%EC%98%81%ED%91%9C_%EC%95%BC%EA%B5%AC_%EC%84%A0%EC%88%98.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 13,
+      "name": "원태인",
+      "description": "삼성 라이온즈의 젊은 우완 선발 투수로 국가대표와 리그에서 성장세를 보여준 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Won_Tae-in_%28ZGbHvfTK0V4%29.png",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 14,
+      "name": "문동주",
+      "description": "한화 이글스의 강속구 유망주로 2020년대 KBO를 대표할 젊은 투수로 주목받은 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Moon_Dong-ju_2023.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 15,
+      "name": "홍창기",
+      "description": "LG 트윈스의 출루 능력 좋은 외야수로 팀 공격의 연결고리 역할을 맡은 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/4f/%ED%99%8D%EC%B0%BD%EA%B8%B0_%EC%84%A0%EC%88%98.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 16,
+      "name": "김혜성",
+      "description": "키움 히어로즈의 빠른 발과 수비력을 갖춘 내야수로 2020년대 리그에서 꾸준히 활약한 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/11/%EA%B9%80%ED%98%9C%EC%84%B1_%EC%84%A0%EC%88%98.jpg",
+      "imageSource": "Wikimedia Commons"
+    }
+  ]
+}

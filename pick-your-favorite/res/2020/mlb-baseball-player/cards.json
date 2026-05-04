@@ -1,0 +1,117 @@
+{
+  "title": "2020년대 미국리그 야구선수",
+  "items": [
+    {
+      "id": 1,
+      "name": "오타니 쇼헤이",
+      "description": "투타 겸업과 MVP급 활약으로 2020년대 메이저리그를 대표하는 슈퍼스타",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Dodgers_at_Nationals_%2853677192000%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 2,
+      "name": "애런 저지",
+      "description": "압도적인 장타력과 홈런 생산력으로 뉴욕 양키스 타선을 이끄는 거포",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Aaron_Judge_posing_with_Donald_Trump_2025-09-11_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 3,
+      "name": "마이크 트라웃",
+      "description": "공수주를 겸비한 메이저리그 최고 외야수 계보의 중심에 있는 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/82/Mike_Trout_%2852252097714%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 4,
+      "name": "무키 베츠",
+      "description": "정교한 타격과 수비, 주루를 모두 갖춘 2020년대 다재다능한 스타",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Dodgers_at_Nationals_%2853676957188%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 5,
+      "name": "브라이스 하퍼",
+      "description": "강한 스타성과 클러치 능력으로 필라델피아 타선을 상징하는 강타자",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Bryce_Harper_Stare_Down_Pregame_from_Nationals_vs._Phillies_at_Nationals_Park%2C_May_13th%2C_2021_%28All-Pro_Reels_Photography%29_%2851188354283%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 6,
+      "name": "프레디 프리먼",
+      "description": "꾸준한 타격과 리더십으로 2020년대 정상급 1루수로 활약한 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/3/30/Freddie_Freeman_-_Dodgers_vs_Nationals_4-23-2024.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 7,
+      "name": "클레이튼 커쇼",
+      "description": "세대를 대표하는 좌완 에이스로 큰 경기와 정규시즌에서 존재감을 이어온 투수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/70/Clayton_Kershaw_on_July_23%2C_2015_%282%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 8,
+      "name": "후안 소토",
+      "description": "뛰어난 선구안과 장타력을 앞세워 젊은 나이에 리그 최정상급 타자로 올라선 선수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/d/df/Mets_Spring_Training%2C_March_23%2C_2025_%28Leo_Altes%29_-_00010_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 9,
+      "name": "게릿 콜",
+      "description": "강력한 구위와 탈삼진 능력으로 2020년대 메이저리그를 대표한 선발 투수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Gerrit_Cole_%2853947688783%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 10,
+      "name": "류현진",
+      "description": "정교한 제구와 완급 조절로 한국 야구 팬들에게 오래 사랑받은 좌완 투수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Ryu_Hyun-jin_2025.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 11,
+      "name": "김하성",
+      "description": "내야 전 포지션을 소화하는 수비력과 주루, 장타를 갖춘 한국인 메이저리거",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Ha-seong_Kim-25.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 12,
+      "name": "이정후",
+      "description": "KBO 최고 타자에서 메이저리그로 도전한 정교한 컨택형 외야수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/JHLee.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 13,
+      "name": "야마모토 요시노부",
+      "description": "일본 프로야구를 평정한 뒤 메이저리그에서도 주목받은 정상급 선발 투수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/29/Yoshinobu_Yamamoto_in_2024_%2853676737736%29_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 14,
+      "name": "로날드 아쿠냐 주니어",
+      "description": "파워와 스피드를 동시에 갖춘 애틀랜타의 프랜차이즈급 외야수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Ronald_Acuna_Jr._HR_from_Nationals_vs._Braves_at_Nationals_Park%2C_April_6th%2C_2021_%28All-Pro_Reels_Photography%29_%2851102624580%29.png",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 15,
+      "name": "매니 마차도",
+      "description": "강한 타구 생산력과 3루 수비로 2020년대 샌디에이고를 대표한 스타",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/16/Manny_Machado_8.27.21_%28cropped%29.jpg",
+      "imageSource": "Wikimedia Commons"
+    },
+    {
+      "id": 16,
+      "name": "블라디미르 게레로 주니어",
+      "description": "강력한 스윙과 장타력으로 토론토 타선의 중심을 맡은 1루수",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/24/Vladimir_guerrero_jr.jpg",
+      "imageSource": "Wikimedia Commons"
+    }
+  ]
+}

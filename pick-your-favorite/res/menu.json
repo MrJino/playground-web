@@ -52,6 +52,22 @@
           "browserLabel": "2020년대 한국 보수정치인",
           "cardSource": "res/2020/conservative-politician/cards.json",
           "icon": "./assets/icons/conservative-politician.svg"
+        },
+        {
+          "value": "2020-kbo-baseball-player",
+          "label": "2020년대 한국리그 야구선수",
+          "menuLabel": "한국리그 야구선수",
+          "browserLabel": "2020년대 한국리그 야구선수",
+          "cardSource": "res/2020/kbo-baseball-player/cards.json",
+          "icon": "./assets/icons/baseball-player.svg"
+        },
+        {
+          "value": "2020-mlb-baseball-player",
+          "label": "2020년대 미국리그 야구선수",
+          "menuLabel": "미국리그 야구선수",
+          "browserLabel": "2020년대 미국리그 야구선수",
+          "cardSource": "res/2020/mlb-baseball-player/cards.json",
+          "icon": "./assets/icons/baseball-player.svg"
         }
       ]
     },
@@ -88,14 +104,16 @@
           "label": "아따맘마 캐릭터",
           "menuLabel": "아따맘마 캐릭터",
           "browserLabel": "아따맘마 캐릭터",
-          "cardSource": "res/etc/atashinchi-character/cards.json"
+          "cardSource": "res/etc/atashinchi-character/cards.json",
+          "icon": "./assets/icons/atashinchi-character.svg"
         },
         {
           "value": "rude-miss-young-ae",
           "label": "막돼먹은 영애씨",
           "menuLabel": "막돼먹은 영애씨",
           "browserLabel": "막돼먹은 영애씨",
-          "cardSource": "res/etc/rude-miss-young-ae/cards.json"
+          "cardSource": "res/etc/rude-miss-young-ae/cards.json",
+          "icon": "./assets/icons/rude-miss-young-ae.svg"
         }
       ]
     }

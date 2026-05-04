@@ -19,7 +19,7 @@
       </header>
 
       <section class="content-layout">
-        <aside class="menu-panel">
+        <aside class="menu-panel" id="menuPanel">
           <div class="menu-panel__header">
             <div class="menu-panel__title">Menu</div>
             <button class="menu-panel__search" id="openMenuSearchButton" type="button" aria-label="메뉴 검색 화면 열기" title="메뉴 검색"></button>
@@ -64,7 +64,7 @@
           </div>
         </section>
 
-        <aside class="history-panel">
+        <aside class="history-panel" id="historyPanel">
           <section class="history-section history-section--ranking">
             <div class="history-panel__top">
               <div>
@@ -87,7 +87,24 @@
           </section>
         </aside>
       </section>
+
+      <nav class="mobile-nav" aria-label="모바일 패널 메뉴">
+        <button class="mobile-nav__button" id="openMobileSearchButton" type="button" aria-controls="menuBrowserPanel">
+          <span class="mobile-nav__icon mobile-nav__icon--search"></span>
+          <span>검색</span>
+        </button>
+        <button class="mobile-nav__button" id="openMobileMenuButton" type="button" aria-controls="menuPanel" aria-expanded="false">
+          <span class="mobile-nav__icon mobile-nav__icon--menu"></span>
+          <span>메뉴</span>
+        </button>
+        <button class="mobile-nav__button" id="openMobileHistoryButton" type="button" aria-controls="historyPanel" aria-expanded="false">
+          <span class="mobile-nav__icon mobile-nav__icon--history"></span>
+          <span>기록</span>
+        </button>
+      </nav>
     </main>
+
+    <div class="mobile-panel-backdrop" id="mobilePanelBackdrop" hidden></div>
 
     <div class="confirm-modal" id="confirmModal" hidden>
       <div class="confirm-modal__backdrop" data-close-confirm-modal></div>
