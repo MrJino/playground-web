@@ -48,7 +48,7 @@ body.modal-open {
   flex-direction: column;
   height: 100%;
   max-height: 100%;
-  padding: 18px;
+  padding: 12px;
   border-radius: 26px;
   overflow: hidden;
 }
@@ -392,7 +392,7 @@ body.modal-open {
 }
 
 .menu-browser-panel {
-  width: min(1000px, 100%);
+  width: 100%;
   max-height: 100%;
   margin: 0 auto;
   padding: 28px;
@@ -410,7 +410,7 @@ body.modal-open {
   grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
   gap: 20px;
   align-items: end;
-  margin-bottom: 22px;
+  margin-bottom: 10px;
 }
 
 .menu-browser__top h2 {
@@ -468,9 +468,13 @@ body.modal-open {
 .menu-browser-card {
   min-height: 136px;
   display: grid;
-  align-content: space-between;
-  gap: 12px;
-  padding: 18px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-areas:
+    'icon group'
+    'icon title';
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px;
   border: 1px solid rgba(23, 34, 48, 0.08);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.76);
@@ -493,18 +497,23 @@ body.modal-open {
 }
 
 .menu-browser-card__icon {
+  grid-area: icon;
   width: 34px;
   height: 34px;
   object-fit: contain;
 }
 
 .menu-browser-card__group {
+  grid-area: group;
+  align-self: end;
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 800;
 }
 
 .menu-browser-card strong {
+  grid-area: title;
+  align-self: start;
   display: block;
   font-size: 1.08rem;
   line-height: 1.35;
@@ -1506,6 +1515,7 @@ body.modal-open {
     flex: 1;
     min-height: 0;
     align-items: stretch;
+    border-radius: 12px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -1533,6 +1543,8 @@ body.modal-open {
   }
 
   .pool-scroll {
+    width: 100%;
+    flex: 1 1 auto;
     height: auto;
     max-height: none;
     overflow-x: hidden;
@@ -1593,6 +1605,13 @@ body.modal-open {
   .battle-panel,
   .menu-browser-panel {
     padding: 12px;
+  }
+
+  .menu-browser-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: 12px;
   }
 
   .hero {
@@ -1750,10 +1769,26 @@ body.modal-open {
     align-items: stretch;
   }
 
+  .menu-browser__top > div {
+    display: none;
+  }
+
+  .menu-search {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .menu-search > span {
+    margin-left: 8px;
+  }
+
   .menu-browser-grid {
     grid-template-columns: 1fr;
+    flex: 1;
+    min-height: 0;
     max-height: none;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .history-list {
