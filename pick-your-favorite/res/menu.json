@@ -114,6 +114,14 @@
           "browserLabel": "막돼먹은 영애씨",
           "cardSource": "res/etc/rude-miss-young-ae/cards.json",
           "icon": "./assets/icons/rude-miss-young-ae.svg"
+        },
+        {
+          "value": "pororo-character",
+          "label": "뽀로로 캐릭터",
+          "menuLabel": "뽀로로 캐릭터",
+          "browserLabel": "뽀로로 캐릭터",
+          "cardSource": "res/etc/pororo-character/cards.json",
+          "icon": "https://pororo.fandom.com/wiki/Special:Redirect/file/PororoCurrentOutfit.jpg"
         }
       ]
     }

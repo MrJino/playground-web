@@ -11,16 +11,152 @@ const finalScoreText = document.getElementById("finalScoreText");
 const startButton = document.getElementById("startButton");
 const restartButton = document.getElementById("restartButton");
 const languageButtons = document.querySelectorAll("[data-language]");
-const difficultyButtons = document.querySelectorAll("[data-difficulty]");
+const wordMenuButtons = document.querySelectorAll("[data-word-menu]");
+const historyList = document.getElementById("historyList");
+const clearHistoryButton = document.getElementById("clearHistoryButton");
+const confirmModal = document.getElementById("confirmModal");
+const confirmModalMessage = document.getElementById("confirmModalMessage");
+const cancelConfirmButton = document.getElementById("cancelConfirmButton");
+const acceptConfirmButton = document.getElementById("acceptConfirmButton");
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const BASE_Y = HEIGHT - 54;
+const GAME_HISTORY_STORAGE_KEY = "typing-game-history";
+const MAX_HISTORY_ITEMS = 20;
 const LETTER_SETS = {
   ko: "가나다라마바사아자차카타파하거너더러머버서어저처커터퍼허고노도로모보소오조초코토포호구누두루무부수우주추쿠투푸후기니디리미비시이지치키티피히",
   en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 };
 const WORD_SETS = {
+  "boy-idol-name": {
+    ko: {
+      1: ["뷔", "진", "정국", "지민", "슈가", "알엠", "차은우", "백현"],
+      2: ["제이홉", "민규", "도겸", "원우", "호시", "연준", "수빈", "범규"],
+      3: ["박지훈", "한유진", "김지웅", "김태형", "김석진", "전정국", "박지민", "민윤기"],
+      4: ["차은우", "황민현", "강다니엘", "이도현", "최연준", "최수빈", "김남준"],
+      5: ["방탄소년단뷔", "방탄소년단진", "방탄소년단정국", "세븐틴민규", "투모로우바이투게더연준"],
+    },
+    en: {
+      1: ["V", "JIN", "JUNGKOOK", "JIMIN", "SUGA", "RM", "BAEKHYUN"],
+      2: ["JHOPE", "MINGYU", "DK", "WONWOO", "HOSHI", "YEONJUN", "SOOBIN"],
+      3: ["PARKJIHOON", "HANYUJIN", "KIMJIWOONG", "CHAEUNWOO", "HWANGMINHYUN"],
+      4: ["KANGDANIEL", "KIMTAEHYUNG", "KIMSEOKJIN", "JEONJUNGKOOK", "PARKJIMIN"],
+      5: ["BTSJUNGKOOK", "SEVENTEENMINGYU", "TXTYEONJUN", "ZEROBASEONEHANYUJIN"],
+    },
+  },
+  "girl-idol-name": {
+    ko: {
+      1: ["장원영", "안유진", "카리나", "윈터", "민지", "하니", "해린", "태연"],
+      2: ["리즈", "레이", "가을", "이서", "지젤", "닝닝", "다니엘", "혜인"],
+      3: ["김채원", "사쿠라", "허윤진", "카즈하", "홍은채", "아이린", "슬기", "조이"],
+      4: ["제니", "지수", "로제", "리사", "나연", "정연", "모모", "사나"],
+      5: ["아이브장원영", "아이브안유진", "에스파카리나", "뉴진스민지", "르세라핌김채원"],
+    },
+    en: {
+      1: ["WONYOUNG", "YUJIN", "KARINA", "WINTER", "MINJI", "HANNI", "HAERIN", "TAEYEON"],
+      2: ["LIZ", "REI", "GAEUL", "LEESEO", "GISELLE", "NINGNING", "DANIELLE", "HYEIN"],
+      3: ["KIMCHAEWON", "SAKURA", "HUHYUNJIN", "KAZUHA", "HONGEUNCHAE"],
+      4: ["JENNIE", "JISOO", "ROSE", "LISA", "NAYEON", "JEONGYEON", "MOMO", "SANA"],
+      5: ["IVEWONYOUNG", "IVEYUJIN", "AESPAKARINA", "NEWJEANSMINJI", "LESSERAFIMCHAEWON"],
+    },
+  },
+  food: {
+    ko: {
+      1: ["밥", "국", "물", "빵", "면", "죽", "떡", "차"],
+      2: ["김밥", "라면", "우동", "만두", "피자", "치킨", "국수", "갈비", "카레", "초밥"],
+      3: ["된장국", "김치전", "비빔밥", "떡볶이", "샌드위치", "스파게티", "오므라이스", "짜장면"],
+      4: ["부대찌개", "김치찌개", "감자탕", "삼계탕", "해물파전", "불고기덮밥", "치즈버거"],
+      5: ["제육볶음", "닭갈비볶음", "고등어구이", "순두부찌개", "콩나물국밥", "크림파스타"],
+    },
+    en: {
+      1: ["RICE", "SOUP", "BREAD", "NOODLE", "CAKE", "MILK", "TEA", "MEAT"],
+      2: ["PIZZA", "PASTA", "BURGER", "SALAD", "SUSHI", "CURRY", "STEAK", "TOAST"],
+      3: ["CHICKEN", "PANCAKE", "DUMPLING", "SAUSAGE", "OMELET", "COOKIE", "KIMCHI"],
+      4: ["SANDWICH", "SPAGHETTI", "BIBIMBAP", "RAMEN", "SEAFOOD", "HOTDOG"],
+      5: ["TTEOKBOKKI", "CHEESEBURGER", "FRIEDCHICKEN", "KIMCHISTEW", "BULGOGI"],
+    },
+  },
+  mood: {
+    ko: {
+      1: ["행복", "기쁨", "슬픔", "분노", "평온", "불안", "설렘", "외로움"],
+      2: ["즐거움", "쓸쓸함", "뿌듯함", "답답함", "상쾌함", "긴장감", "포근함", "후련함"],
+      3: ["자신감", "우울함", "무기력", "만족감", "불편함", "안도감", "초조함", "서운함"],
+      4: ["행복하다", "기분좋다", "속상하다", "화가난다", "마음편함", "두근두근", "울적하다"],
+      5: ["기대된다", "불안하다", "편안하다", "신난다", "부끄럽다", "감동이다", "짜증난다"],
+    },
+    en: {
+      1: ["HAPPY", "SAD", "ANGRY", "CALM", "PROUD", "TIRED", "LONELY", "EXCITED"],
+      2: ["JOYFUL", "WORRIED", "RELAXED", "NERVOUS", "BORED", "PEACEFUL", "UPSET"],
+      3: ["CONFIDENT", "ANXIOUS", "GRATEFUL", "ASHAMED", "RELIEVED", "JEALOUS"],
+      4: ["DELIGHTED", "FRUSTRATED", "DEPRESSED", "HOPEFUL", "RESTLESS"],
+      5: ["OVERWHELMED", "DISAPPOINTED", "EMBARRASSED", "SATISFIED"],
+    },
+  },
+  animal: {
+    ko: {
+      1: ["개", "고양이", "소", "말", "양", "돼지", "닭", "오리"],
+      2: ["토끼", "사자", "호랑이", "기린", "코끼리", "원숭이", "여우", "늑대"],
+      3: ["다람쥐", "고슴도치", "너구리", "펭귄", "돌고래", "악어", "하마", "캥거루"],
+      4: ["북극곰", "수달", "알파카", "치타", "얼룩말", "코알라", "판다", "바다표범"],
+      5: ["침팬지", "플라밍고", "카멜레온", "오랑우탄", "사막여우", "청설모"],
+    },
+    en: {
+      1: ["DOG", "CAT", "COW", "HORSE", "SHEEP", "PIG", "DUCK", "BIRD"],
+      2: ["RABBIT", "LION", "TIGER", "GIRAFFE", "MONKEY", "WOLF", "FOX", "BEAR"],
+      3: ["SQUIRREL", "PENGUIN", "DOLPHIN", "CROCODILE", "KANGAROO", "HAMSTER"],
+      4: ["ELEPHANT", "CHEETAH", "ZEBRA", "KOALA", "PANDA", "SEAL"],
+      5: ["CHIMPANZEE", "FLAMINGO", "CHAMELEON", "ORANGUTAN"],
+    },
+  },
+  transport: {
+    ko: {
+      1: ["차", "배", "기차", "버스", "택시", "지하철", "자전거", "비행기"],
+      2: ["승용차", "트럭", "오토바이", "스쿠터", "전철", "고속버스", "여객선", "헬기"],
+      3: ["구급차", "소방차", "경찰차", "화물차", "전기차", "캠핑카", "유람선", "요트"],
+      4: ["고속철도", "통근열차", "마을버스", "시외버스", "화물열차", "경비행기"],
+      5: ["자동차", "수상택시", "공항버스", "관광버스", "자기부상열차", "컨테이너선"],
+    },
+    en: {
+      1: ["CAR", "BUS", "TAXI", "TRAIN", "SHIP", "BIKE", "PLANE", "BOAT"],
+      2: ["TRUCK", "SUBWAY", "SCOOTER", "FERRY", "HELICOPTER", "VAN"],
+      3: ["AMBULANCE", "FIRETRUCK", "POLICECAR", "AIRPLANE", "BICYCLE", "YACHT"],
+      4: ["MOTORCYCLE", "SAILBOAT", "SPEEDBOAT", "AIRPORTBUS", "CAMPERVAN"],
+      5: ["HIGHSPEEDTRAIN", "CONTAINERSHIP", "ELECTRICCAR", "FREIGHTTRAIN"],
+    },
+  },
+  country: {
+    ko: {
+      1: ["한국", "미국", "일본", "중국", "영국", "독일", "프랑스", "호주"],
+      2: ["캐나다", "브라질", "인도", "베트남", "태국", "스페인", "이탈리아", "멕시코"],
+      3: ["그리스", "스웨덴", "노르웨이", "핀란드", "덴마크", "스위스", "폴란드", "튀르키예"],
+      4: ["뉴질랜드", "아르헨티나", "인도네시아", "필리핀", "싱가포르", "네덜란드"],
+      5: ["사우디아라비아", "아랍에미리트", "남아프리카공화국", "체코공화국"],
+    },
+    en: {
+      1: ["KOREA", "JAPAN", "CHINA", "INDIA", "FRANCE", "GERMANY", "CANADA", "BRAZIL"],
+      2: ["AMERICA", "ENGLAND", "AUSTRALIA", "THAILAND", "VIETNAM", "SPAIN", "ITALY"],
+      3: ["MEXICO", "GREECE", "SWEDEN", "NORWAY", "FINLAND", "DENMARK", "POLAND"],
+      4: ["SWITZERLAND", "NETHERLANDS", "INDONESIA", "PHILIPPINES", "SINGAPORE"],
+      5: ["NEWZEALAND", "ARGENTINA", "SOUTHAFRICA", "SAUDIARABIA"],
+    },
+  },
+  capital: {
+    ko: {
+      1: ["서울", "도쿄", "베이징", "런던", "파리", "로마", "베를린", "오타와"],
+      2: ["워싱턴", "캔버라", "마드리드", "방콕", "하노이", "마닐라", "자카르타"],
+      3: ["브라질리아", "뉴델리", "멕시코시티", "아테네", "스톡홀름", "오슬로", "헬싱키"],
+      4: ["코펜하겐", "암스테르담", "웰링턴", "부에노스아이레스", "싱가포르"],
+      5: ["프리토리아", "아부다비", "리야드", "앙카라", "바르샤바"],
+    },
+    en: {
+      1: ["SEOUL", "TOKYO", "BEIJING", "LONDON", "PARIS", "ROME", "BERLIN", "OTTAWA"],
+      2: ["WASHINGTON", "CANBERRA", "MADRID", "BANGKOK", "HANOI", "MANILA", "JAKARTA"],
+      3: ["BRASILIA", "NEWDELHI", "MEXICOCITY", "ATHENS", "STOCKHOLM", "OSLO"],
+      4: ["HELSINKI", "COPENHAGEN", "AMSTERDAM", "WELLINGTON", "SINGAPORE"],
+      5: ["BUENOSAIRES", "PRETORIA", "ABUDHABI", "RIYADH", "ANKARA", "WARSAW"],
+    },
+  },
   en: {
     1: Array.from(LETTER_SETS.en),
     2: ["GO", "UP", "ON", "IN", "NO", "OK", "BY", "ME", "WE", "IT", "DO", "BE", "SO", "TO"],
@@ -32,28 +168,11 @@ const WORD_SETS = {
 const HANGUL_CHO = [0, 2, 3, 5, 6, 7, 9, 11, 12, 14, 15, 16, 17, 18];
 const HANGUL_JUNG = [0, 2, 4, 6, 8, 13, 18, 20];
 const HANGUL_JONG = [1, 4, 8, 16, 17, 21];
-const DIFFICULTIES = {
-  easy: {
-    label: "EASY",
-    startLevel: 1,
-    spawnDelay: 2600,
-    minSpawnDelay: 1500,
-    speedBonus: -30,
-  },
-  normal: {
-    label: "NORMAL",
-    startLevel: 1,
-    spawnDelay: 2100,
-    minSpawnDelay: 1150,
-    speedBonus: -22,
-  },
-  hard: {
-    label: "HARD",
-    startLevel: 2,
-    spawnDelay: 1650,
-    minSpawnDelay: 820,
-    speedBonus: -8,
-  },
+const GAME_SPEED = {
+  startLevel: 1,
+  spawnDelay: 2100,
+  minSpawnDelay: 1150,
+  speedBonus: -22,
 };
 
 let targets = [];
@@ -69,19 +188,155 @@ let lastTime = 0;
 let running = false;
 let gameOver = false;
 let currentLanguage = "ko";
-let currentDifficulty = "normal";
+let currentWordMenu = "boy-idol-name";
 let isComposing = false;
+let pendingMenuButton = null;
+let isPausedForConfirm = false;
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function readHistory() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(GAME_HISTORY_STORAGE_KEY) || "[]");
+
+    if (Array.isArray(parsed)) {
+      return parsed.reduce((histories, item) => {
+        const menuValue = item.menuValue || "food";
+        histories[menuValue] = histories[menuValue] || [];
+        histories[menuValue].push(item);
+        return histories;
+      }, {});
+    }
+
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    console.error("Failed to parse typing game history.", error);
+    return {};
+  }
+}
+
+function writeHistory(histories) {
+  window.localStorage.setItem(GAME_HISTORY_STORAGE_KEY, JSON.stringify(histories));
+}
+
+function getCurrentMenuHistory(histories = readHistory()) {
+  const items = histories[currentWordMenu];
+  return Array.isArray(items) ? items : [];
+}
+
+function writeCurrentMenuHistory(items) {
+  const histories = readHistory();
+  histories[currentWordMenu] = items;
+  writeHistory(histories);
+}
+
+function getWordMenuLabel(menuValue = currentWordMenu) {
+  return document.querySelector(`[data-word-menu="${menuValue}"]`)?.textContent?.trim() || menuValue;
+}
+
+function getWordMenuButtonLabel(button) {
+  return button?.textContent?.trim() || "선택한 메뉴";
+}
+
+function selectWordMenu(button) {
+  currentWordMenu = button.dataset.wordMenu;
+  wordMenuButtons.forEach((item) => {
+    const isActive = item === button;
+    item.classList.toggle("is-active", isActive);
+    item.setAttribute("aria-current", isActive ? "true" : "false");
+  });
+
+  typingInput.value = "";
+  renderHistory();
+}
+
+function openMenuConfirm(button) {
+  pendingMenuButton = button;
+  isPausedForConfirm = true;
+  confirmModalMessage.textContent = `${getWordMenuButtonLabel(button)} 새로운 게임을 진행하시겠습니까?`;
+  confirmModal.hidden = false;
+  acceptConfirmButton.focus();
+}
+
+function closeMenuConfirm() {
+  pendingMenuButton = null;
+  isPausedForConfirm = false;
+  confirmModal.hidden = true;
+  if (running && !gameOver) {
+    lastTime = performance.now();
+    typingInput.focus();
+  }
+}
+
+function formatPlayedAt(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleString("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function renderHistory() {
+  const items = getCurrentMenuHistory();
+
+  if (items.length === 0) {
+    historyList.innerHTML = `<div class="history-empty">${escapeHtml(getWordMenuLabel())} 기록이 없습니다.</div>`;
+    return;
+  }
+
+  historyList.innerHTML = items
+    .map(
+      (item) => `
+        <article class="history-card">
+          <div class="history-card__meta">
+            <time datetime="${escapeHtml(item.playedAt)}">${escapeHtml(formatPlayedAt(item.playedAt))}</time>
+            <button class="history-card__delete" type="button" data-delete-history="${escapeHtml(item.id)}">삭제</button>
+          </div>
+          <h3>SCORE ${String(item.score).padStart(4, "0")}</h3>
+          <p>LEVEL ${escapeHtml(item.level)}</p>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function saveHistoryEntry() {
+  const entry = {
+    id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+    score,
+    level,
+    menuValue: currentWordMenu,
+    menuLabel: getWordMenuLabel(currentWordMenu),
+    playedAt: new Date().toISOString(),
+  };
+  const nextItems = [entry, ...getCurrentMenuHistory()].slice(0, MAX_HISTORY_ITEMS);
+  writeCurrentMenuHistory(nextItems);
+  renderHistory();
+}
 
 function resetGame() {
-  const difficulty = DIFFICULTIES[currentDifficulty];
   targets = [];
   missiles = [];
   explosions = [];
   score = 0;
   lives = 3;
-  level = difficulty.startLevel;
+  level = GAME_SPEED.startLevel;
   spawnTimer = 0;
-  spawnDelay = difficulty.spawnDelay;
+  spawnDelay = GAME_SPEED.spawnDelay;
   gameOver = false;
   updateHud();
 }
@@ -102,6 +357,16 @@ function normalizeText(value) {
 
 function randomFrom(items) {
   return items[Math.floor(Math.random() * items.length)];
+}
+
+function getWordSetForCurrentMenu(language, wordLevel) {
+  if (currentWordMenu === "all") {
+    return Object.entries(WORD_SETS)
+      .filter(([key]) => key !== "en")
+      .flatMap(([, set]) => set[language]?.[wordLevel] || []);
+  }
+
+  return WORD_SETS[currentWordMenu]?.[language]?.[wordLevel] || [];
 }
 
 function getKoreanLevelSpec() {
@@ -135,6 +400,12 @@ function composeHangulSyllable(hasBatchim) {
 }
 
 function randomKoreanTargetText() {
+  const words = getWordSetForCurrentMenu("ko", Math.max(1, Math.min(5, level)));
+
+  if (words.length > 0) {
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
   const { syllableCount, batchimCount } = getKoreanLevelSpec();
   const batchimSlots = new Set();
 
@@ -154,12 +425,12 @@ function randomTargetText() {
     return randomKoreanTargetText();
   }
 
-  const words = WORD_SETS.en[getEnglishTargetLength()];
-  return words[Math.floor(Math.random() * words.length)];
+  const words = getWordSetForCurrentMenu("en", getEnglishTargetLength());
+  const fallbackWords = words.length > 0 ? words : WORD_SETS.en[getEnglishTargetLength()];
+  return fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
 }
 
 function spawnTarget() {
-  const difficulty = DIFFICULTIES[currentDifficulty];
   const text = randomTargetText();
   const textLength = Array.from(text).length;
   const size = 34 + Math.floor(Math.random() * 10);
@@ -170,7 +441,7 @@ function spawnTarget() {
     text,
     x: width / 2 + 22 + Math.random() * (WIDTH - width - 44),
     y: -36,
-    vy: 32 + level * 4 + difficulty.speedBonus + Math.random() * 12,
+    vy: 32 + level * 4 + GAME_SPEED.speedBonus + Math.random() * 12,
     size,
     width,
     fontSize,
@@ -228,6 +499,7 @@ function endGame() {
   document.body.classList.remove("is-playing");
   finalScoreText.textContent = `SCORE ${String(score).padStart(4, "0")}`;
   gameOverPanel.hidden = false;
+  saveHistoryEntry();
 }
 
 function handleInput(value) {
@@ -243,12 +515,6 @@ function handleInput(value) {
     .sort((a, b) => b.y - a.y)[0];
 
   if (!match) {
-    const hasPrefix = targets.some((target) => !target.hit && normalizeText(target.text).startsWith(text));
-
-    if (hasPrefix) {
-      return;
-    }
-
     flashBase("#ff4f6d");
     typingInput.value = "";
     return;
@@ -299,6 +565,13 @@ function tick(now) {
     return;
   }
 
+  if (isPausedForConfirm) {
+    lastTime = now;
+    draw();
+    requestAnimationFrame(tick);
+    return;
+  }
+
   const dt = Math.min(40, now - lastTime);
   lastTime = now;
   update(dt);
@@ -307,12 +580,11 @@ function tick(now) {
 }
 
 function update(dt) {
-  const difficulty = DIFFICULTIES[currentDifficulty];
   const seconds = dt / 1000;
   spawnTimer += dt;
 
-  level = difficulty.startLevel + Math.floor(score / 16);
-  spawnDelay = Math.max(difficulty.minSpawnDelay, difficulty.spawnDelay - level * 45);
+  level = GAME_SPEED.startLevel + Math.floor(score / 16);
+  spawnDelay = Math.max(GAME_SPEED.minSpawnDelay, GAME_SPEED.spawnDelay - level * 45);
 
   if (spawnTimer >= spawnDelay) {
     spawnTimer = 0;
@@ -511,21 +783,12 @@ function drawBase() {
 startButton.addEventListener("click", startGame);
 restartButton.addEventListener("click", startGame);
 
-typingInput.addEventListener("input", (event) => {
-  if (isComposing || event.isComposing) {
-    return;
-  }
-
-  handleInput(event.target.value);
-});
-
 typingInput.addEventListener("compositionstart", () => {
   isComposing = true;
 });
 
-typingInput.addEventListener("compositionend", (event) => {
+typingInput.addEventListener("compositionend", () => {
   isComposing = false;
-  handleInput(event.target.value);
 });
 
 languageButtons.forEach((button) => {
@@ -537,13 +800,57 @@ languageButtons.forEach((button) => {
   });
 });
 
-difficultyButtons.forEach((button) => {
+wordMenuButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    currentDifficulty = button.dataset.difficulty;
-    difficultyButtons.forEach((item) => item.classList.toggle("is-active", item === button));
-    level = DIFFICULTIES[currentDifficulty].startLevel;
-    updateHud();
+    if (button.dataset.wordMenu === currentWordMenu) {
+      return;
+    }
+
+    if (running) {
+      openMenuConfirm(button);
+      return;
+    }
+
+    selectWordMenu(button);
   });
+});
+
+cancelConfirmButton.addEventListener("click", closeMenuConfirm);
+
+confirmModal.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-confirm-modal]")) {
+    closeMenuConfirm();
+  }
+});
+
+acceptConfirmButton.addEventListener("click", () => {
+  if (!pendingMenuButton) {
+    closeMenuConfirm();
+    return;
+  }
+
+  const nextMenuButton = pendingMenuButton;
+  isPausedForConfirm = false;
+  confirmModal.hidden = true;
+  pendingMenuButton = null;
+  selectWordMenu(nextMenuButton);
+  startGame();
+});
+
+historyList.addEventListener("click", (event) => {
+  const deleteButton = event.target.closest("[data-delete-history]");
+
+  if (!deleteButton) {
+    return;
+  }
+
+  writeCurrentMenuHistory(getCurrentMenuHistory().filter((item) => item.id !== deleteButton.dataset.deleteHistory));
+  renderHistory();
+});
+
+clearHistoryButton.addEventListener("click", () => {
+  writeCurrentMenuHistory([]);
+  renderHistory();
 });
 
 document.addEventListener("keydown", (event) => {
@@ -551,8 +858,23 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
+  if (event.key === "Escape" && !confirmModal.hidden) {
+    closeMenuConfirm();
+    return;
+  }
+
+  if (!confirmModal.hidden) {
+    return;
+  }
+
   if (event.key === "Enter" && (!running || gameOver)) {
     startGame();
+    return;
+  }
+
+  if (event.key === "Enter" && running) {
+    event.preventDefault();
+    handleInput(typingInput.value);
     return;
   }
 
@@ -572,4 +894,5 @@ window.addEventListener("pointerdown", () => {
 
 makeStars();
 resetGame();
+renderHistory();
 draw();
