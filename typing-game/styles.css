@@ -1,4 +1,5 @@
 :root {
+  --app-height: 100vh;
   --bg-top: #f5eadf;
   --bg-bottom: #dae8f7;
   --ink: #f8f6d8;
@@ -27,7 +28,6 @@ body {
   margin: 0;
   height: 100%;
   min-height: 100%;
-  overscroll-behavior: none;
 }
 
 body {
@@ -559,8 +559,8 @@ body:not(.is-playing) .input-catcher {
 @media (max-width: 720px) {
   html,
   body {
-    height: 100dvh;
-    min-height: 100dvh;
+    height: var(--app-height);
+    min-height: var(--app-height);
     overflow: hidden;
   }
 
@@ -571,8 +571,8 @@ body:not(.is-playing) .input-catcher {
   .game-shell {
     grid-template-columns: 1fr;
     gap: 10px;
-    height: 100dvh;
-    min-height: 100dvh;
+    height: var(--app-height);
+    min-height: var(--app-height);
     overflow: hidden;
     padding: 4px 4px 78px;
     align-items: start;
@@ -734,7 +734,7 @@ body:not(.is-playing) .input-catcher {
   .game-card {
     width: min(100%, calc(100vw - 8px));
     min-height: 0;
-    max-height: calc(100dvh - 82px);
+    max-height: calc(var(--app-height) - 82px);
     padding: 10px;
   }
 

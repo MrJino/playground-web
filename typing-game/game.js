@@ -242,6 +242,11 @@ function isMobileGameLayout() {
   return window.matchMedia(MOBILE_PANEL_MEDIA_QUERY).matches;
 }
 
+function updateAppViewportHeight() {
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', `${Math.round(viewportHeight)}px`);
+}
+
 function setMobileNavState(activePanel) {
   const isMenuOpen = activePanel === 'menu';
   const isHistoryOpen = activePanel === 'history';
@@ -1013,10 +1018,15 @@ mobilePanelBackdrop?.addEventListener('click', () => {
 });
 
 window.addEventListener('resize', () => {
+  updateAppViewportHeight();
+
   if (!isMobilePanelLayout()) {
     closeMobilePanels();
   }
 });
+
+window.visualViewport?.addEventListener('resize', updateAppViewportHeight);
+window.visualViewport?.addEventListener('scroll', updateAppViewportHeight);
 
 historyList.addEventListener('click', (event) => {
   const deleteButton = event.target.closest('[data-delete-history]');
@@ -1088,6 +1098,7 @@ window.addEventListener('pointerdown', (event) => {
 });
 
 makeStars();
+updateAppViewportHeight();
 resetGame();
 applyMenuFromQueryParam();
 updateSelectedMenuText();
