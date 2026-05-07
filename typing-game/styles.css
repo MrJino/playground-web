@@ -27,6 +27,7 @@ body {
   margin: 0;
   height: 100%;
   min-height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
@@ -556,8 +557,11 @@ body:not(.is-playing) .input-catcher {
 }
 
 @media (max-width: 720px) {
+  html,
   body {
-    overflow: auto;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
   }
 
   body.mobile-panel-open {
@@ -567,8 +571,9 @@ body:not(.is-playing) .input-catcher {
   .game-shell {
     grid-template-columns: 1fr;
     gap: 10px;
-    height: auto;
-    min-height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
     padding: 4px 4px 78px;
     align-items: start;
   }
@@ -589,6 +594,7 @@ body:not(.is-playing) .input-catcher {
     transform: translateY(calc(100% + 96px));
     opacity: 0;
     pointer-events: none;
+    overflow: hidden;
     transition:
       opacity 0.22s ease,
       transform 0.22s ease;
@@ -609,6 +615,7 @@ body:not(.is-playing) .input-catcher {
     transform: translateY(calc(100% + 96px));
     opacity: 0;
     pointer-events: none;
+    overflow: hidden;
     transition:
       opacity 0.22s ease,
       transform 0.22s ease;
@@ -727,6 +734,7 @@ body:not(.is-playing) .input-catcher {
   .game-card {
     width: min(100%, calc(100vw - 8px));
     min-height: 0;
+    max-height: calc(100dvh - 82px);
     padding: 10px;
   }
 

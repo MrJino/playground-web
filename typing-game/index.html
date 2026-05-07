@@ -63,7 +63,17 @@
           <canvas id="gameCanvas" width="960" height="620" aria-label="상단에서 글자가 내려오는 게임 화면"></canvas>
           <div class="scanlines"></div>
           <label class="input-catcher">
-            <input id="typingInput" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="단어 입력" />
+            <input
+              id="typingInput"
+              name="typing-game-word"
+              type="text"
+              inputmode="text"
+              autocomplete="new-password"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="단어 입력"
+            />
           </label>
           <div class="start-panel" id="startPanel">
             <h1>TYPE DEFENDER</h1>
