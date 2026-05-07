@@ -574,7 +574,7 @@ body:not(.is-playing) .input-catcher {
     height: var(--app-height);
     min-height: var(--app-height);
     overflow: hidden;
-    padding: 4px 4px 78px;
+    padding: 4px 4px 48px;
     align-items: start;
   }
 
@@ -732,9 +732,11 @@ body:not(.is-playing) .input-catcher {
   }
 
   .game-card {
-    width: min(100%, calc(100vw - 8px));
+    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - 82px));
+    width: var(--game-card-size);
+    height: var(--game-card-size);
     min-height: 0;
-    max-height: calc(var(--app-height) - 82px);
+    max-height: none;
     padding: 10px;
   }
 
@@ -772,5 +774,4 @@ body:not(.is-playing) .input-catcher {
   .input-catcher input {
     font-size: 0.78rem;
   }
-
 }
