@@ -1,5 +1,6 @@
 :root {
   --app-height: 100vh;
+  --mobile-nav-height: 50px;
   --bg-top: #f5eadf;
   --bg-bottom: #dae8f7;
   --ink: #f8f6d8;
@@ -569,13 +570,15 @@ body:not(.is-playing) .input-catcher {
   }
 
   .game-shell {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     height: var(--app-height);
     min-height: var(--app-height);
     overflow: hidden;
-    padding: 4px 4px 48px;
-    align-items: start;
+    padding: 4px;
+    justify-content: flex-start;
+    align-items: center;
   }
 
   .menu-panel {
@@ -583,7 +586,7 @@ body:not(.is-playing) .input-catcher {
     top: 4px;
     left: 4px;
     right: 4px;
-    bottom: 82px;
+    bottom: calc(var(--mobile-nav-height) + 8px);
     z-index: 80;
     width: auto;
     height: auto;
@@ -605,7 +608,7 @@ body:not(.is-playing) .input-catcher {
     top: 4px;
     left: 4px;
     right: 4px;
-    bottom: 82px;
+    bottom: calc(var(--mobile-nav-height) + 8px);
     z-index: 80;
     width: auto;
     height: auto;
@@ -642,10 +645,9 @@ body:not(.is-playing) .input-catcher {
   }
 
   .mobile-nav {
-    position: fixed;
-    left: 4px;
-    right: 4px;
-    bottom: 4px;
+    position: relative;
+    width: 100%;
+    flex: 0 0 var(--mobile-nav-height);
     z-index: 90;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -732,9 +734,11 @@ body:not(.is-playing) .input-catcher {
   }
 
   .game-card {
-    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - 82px));
+    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - var(--mobile-nav-height) - 18px));
+    flex: 0 0 var(--game-card-size);
     width: var(--game-card-size);
     height: var(--game-card-size);
+    margin-bottom: auto;
     min-height: 0;
     max-height: none;
     padding: 10px;
