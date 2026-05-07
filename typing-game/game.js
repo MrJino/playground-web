@@ -11,6 +11,11 @@ const gameOverPanel = document.getElementById('gameOverPanel');
 const finalScoreText = document.getElementById('finalScoreText');
 const startButton = document.getElementById('startButton');
 const restartButton = document.getElementById('restartButton');
+const menuPanel = document.getElementById('menuPanel');
+const historyPanel = document.getElementById('historyPanel');
+const mobilePanelBackdrop = document.getElementById('mobilePanelBackdrop');
+const openMobileMenuButton = document.getElementById('openMobileMenuButton');
+const openMobileHistoryButton = document.getElementById('openMobileHistoryButton');
 const languageButtons = document.querySelectorAll('[data-language]');
 const wordMenuButtons = document.querySelectorAll('[data-word-menu]');
 const historyList = document.getElementById('historyList');
@@ -32,6 +37,7 @@ const LETTER_SETS = {
   en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 };
 const WORD_SETS_URL = './res/words.json';
+const MOBILE_PANEL_MEDIA_QUERY = '(max-width: 720px)';
 let wordSets = {};
 let wordSetsLoadPromise = null;
 const HANGUL_CHO = [0, 2, 3, 5, 6, 7, 9, 11, 12, 14, 15, 16, 17, 18];
@@ -225,6 +231,64 @@ function applyMenuFromQueryParam() {
 
   if (button) {
     selectWordMenu(button, { updateUrl: false });
+  }
+}
+
+function isMobilePanelLayout() {
+  return window.matchMedia(MOBILE_PANEL_MEDIA_QUERY).matches;
+}
+
+function isMobileGameLayout() {
+  return window.matchMedia(MOBILE_PANEL_MEDIA_QUERY).matches;
+}
+
+function setMobileNavState(activePanel) {
+  const isMenuOpen = activePanel === 'menu';
+  const isHistoryOpen = activePanel === 'history';
+
+  openMobileMenuButton?.classList.toggle('is-active', isMenuOpen);
+  openMobileMenuButton?.setAttribute('aria-expanded', String(isMenuOpen));
+  openMobileHistoryButton?.classList.toggle('is-active', isHistoryOpen);
+  openMobileHistoryButton?.setAttribute('aria-expanded', String(isHistoryOpen));
+}
+
+function closeMobilePanels() {
+  menuPanel?.classList.remove('is-mobile-panel-open');
+  historyPanel?.classList.remove('is-mobile-panel-open');
+  document.body.classList.remove('mobile-panel-open');
+  setMobileNavState(null);
+
+  if (mobilePanelBackdrop) {
+    mobilePanelBackdrop.hidden = true;
+  }
+}
+
+function hasOpenMobilePanel() {
+  return Boolean(menuPanel?.classList.contains('is-mobile-panel-open') || historyPanel?.classList.contains('is-mobile-panel-open'));
+}
+
+function openMobilePanel(panelName) {
+  if (!isMobilePanelLayout()) {
+    return;
+  }
+
+  const isMenuPanel = panelName === 'menu';
+  const activePanel = isMenuPanel ? menuPanel : historyPanel;
+  const inactivePanel = isMenuPanel ? historyPanel : menuPanel;
+  const isAlreadyOpen = activePanel?.classList.contains('is-mobile-panel-open');
+
+  if (isAlreadyOpen) {
+    closeMobilePanels();
+    return;
+  }
+
+  inactivePanel?.classList.remove('is-mobile-panel-open');
+  activePanel?.classList.add('is-mobile-panel-open');
+  document.body.classList.add('mobile-panel-open');
+  setMobileNavState(panelName);
+
+  if (mobilePanelBackdrop) {
+    mobilePanelBackdrop.hidden = false;
   }
 }
 
@@ -508,7 +572,8 @@ function randomTargetText() {
 function spawnTarget() {
   const text = randomTargetText();
   const textLength = Array.from(text).length;
-  const size = 34 + Math.floor(Math.random() * 10);
+  const targetScale = isMobileGameLayout() ? 1.22 : 1;
+  const size = Math.floor((34 + Math.floor(Math.random() * 10)) * targetScale);
   const fontSize = Math.max(20, Math.floor(size * (textLength === 1 ? 0.72 : 0.54)));
   const width = Math.max(size + 10, textLength * fontSize * 0.72 + 30);
   targets.push({
@@ -908,6 +973,7 @@ wordMenuButtons.forEach((button) => {
 
     selectWordMenu(button);
     showStartScreen();
+    closeMobilePanels();
   });
 });
 
@@ -931,6 +997,25 @@ acceptConfirmButton.addEventListener('click', () => {
   pendingMenuButton = null;
   selectWordMenu(nextMenuButton);
   showStartScreen();
+  closeMobilePanels();
+});
+
+openMobileMenuButton?.addEventListener('click', () => {
+  openMobilePanel('menu');
+});
+
+openMobileHistoryButton?.addEventListener('click', () => {
+  openMobilePanel('history');
+});
+
+mobilePanelBackdrop?.addEventListener('click', () => {
+  closeMobilePanels();
+});
+
+window.addEventListener('resize', () => {
+  if (!isMobilePanelLayout()) {
+    closeMobilePanels();
+  }
 });
 
 historyList.addEventListener('click', (event) => {
@@ -951,6 +1036,11 @@ clearHistoryButton.addEventListener('click', () => {
 
 document.addEventListener('keydown', (event) => {
   if (event.isComposing) {
+    return;
+  }
+
+  if (event.key === 'Escape' && hasOpenMobilePanel()) {
+    closeMobilePanels();
     return;
   }
 
@@ -985,7 +1075,15 @@ document.addEventListener('keydown', (event) => {
   typingInput.focus();
 });
 
-window.addEventListener('pointerdown', () => {
+window.addEventListener('pointerdown', (event) => {
+  if (event.target.closest('.mobile-nav, .menu-panel, .history-panel, .confirm-modal')) {
+    return;
+  }
+
+  if (!running) {
+    return;
+  }
+
   typingInput.focus();
 });
 

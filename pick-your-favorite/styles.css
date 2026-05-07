@@ -1669,9 +1669,9 @@ body.modal-open {
     flex: 0 0 auto;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    gap: 6px;
     margin-top: 8px;
-    padding: 8px;
+    padding: 4px;
     border: 1px solid rgba(23, 34, 48, 0.12);
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.9);
@@ -1680,7 +1680,7 @@ body.modal-open {
   }
 
   .mobile-nav__button {
-    min-height: 50px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
