@@ -363,7 +363,7 @@ input {
 
 .hud {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -388,9 +388,13 @@ input {
 }
 
 .hud strong {
+  display: block;
+  overflow: hidden;
   color: var(--green);
   font-size: 1.45rem;
   letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .screen-wrap {
@@ -588,7 +592,4 @@ body:not(.is-playing) .input-catcher {
     grid-template-columns: 1fr 1fr;
   }
 
-  .hud__item:last-child {
-    grid-column: 1 / -1;
-  }
 }
