@@ -7,6 +7,7 @@ const levelText = document.getElementById('levelText');
 const selectedMenuText = document.getElementById('selectedMenuText');
 const typingInput = document.getElementById('typingInput');
 const startPanel = document.getElementById('startPanel');
+const startPanelMenuText = document.getElementById('startPanelMenuText');
 const gameOverPanel = document.getElementById('gameOverPanel');
 const finalScoreText = document.getElementById('finalScoreText');
 const startButton = document.getElementById('startButton');
@@ -184,7 +185,9 @@ function getWordMenuButtonLabel(button) {
 }
 
 function updateSelectedMenuText() {
-  selectedMenuText.textContent = getWordMenuLabel();
+  const menuLabel = getWordMenuLabel();
+  selectedMenuText.textContent = menuLabel;
+  startPanelMenuText.textContent = menuLabel;
 }
 
 function getWordMenuButton(menuValue) {

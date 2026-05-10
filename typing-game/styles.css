@@ -1,6 +1,7 @@
 :root {
   --app-height: 100vh;
   --mobile-nav-height: 50px;
+  --mobile-game-nav-gap: 4px;
   --bg-top: #f5eadf;
   --bg-bottom: #dae8f7;
   --ink: #f8f6d8;
@@ -572,7 +573,7 @@ body:not(.is-playing) .input-catcher {
   .game-shell {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--mobile-game-nav-gap);
     height: var(--app-height);
     min-height: var(--app-height);
     overflow: hidden;
@@ -734,14 +735,14 @@ body:not(.is-playing) .input-catcher {
   }
 
   .game-card {
-    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - var(--mobile-nav-height) - 18px));
+    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - var(--mobile-nav-height) - var(--mobile-game-nav-gap) - 8px));
     flex: 0 0 var(--game-card-size);
     width: var(--game-card-size);
     height: var(--game-card-size);
     margin-bottom: auto;
     min-height: 0;
     max-height: none;
-    padding: 10px;
+    padding: 4px;
   }
 
   .hud {
