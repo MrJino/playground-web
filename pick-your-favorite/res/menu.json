@@ -10,6 +10,7 @@
           "label": "2020년대 K-POP 남자아이돌",
           "menuLabel": "K-POP 남자아이돌",
           "browserLabel": "2020년대 K-POP 남자아이돌",
+          "country": "kr",
           "cardSource": "res/2020/boysgroup/cards.json",
           "icon": "./assets/icons/boy-idol.svg"
         },
@@ -18,6 +19,7 @@
           "label": "2020년대 K-POP 여자아이돌",
           "menuLabel": "K-POP 여자아이돌",
           "browserLabel": "2020년대 K-POP 여자아이돌",
+          "country": "kr",
           "cardSource": "res/2020/girlsgroup/cards.json",
           "icon": "./assets/icons/girl-idol.svg"
         },
@@ -26,6 +28,7 @@
           "label": "2020년대 미국 여자가수",
           "menuLabel": "미국 여자가수",
           "browserLabel": "2020년대 미국 여자가수",
+          "country": "us",
           "cardSource": "res/2020/us-female-singer/cards.json",
           "icon": "./assets/icons/female-singer.svg"
         },
@@ -34,6 +37,7 @@
           "label": "2020년대 미국 남자가수",
           "menuLabel": "미국 남자가수",
           "browserLabel": "2020년대 미국 남자가수",
+          "country": "us",
           "cardSource": "res/2020/us-male-singer/cards.json",
           "icon": "./assets/icons/male-singer.svg"
         },
@@ -42,6 +46,7 @@
           "label": "2020년대 진보정치인",
           "menuLabel": "한국 진보정치인",
           "browserLabel": "2020년대 한국 진보정치인",
+          "country": "kr",
           "cardSource": "res/2020/progressive-politician/cards.json",
           "icon": "./assets/icons/progressive-politician.svg"
         },
@@ -50,6 +55,7 @@
           "label": "2020년대 한국보수정치인",
           "menuLabel": "한국 보수정치인",
           "browserLabel": "2020년대 한국 보수정치인",
+          "country": "kr",
           "cardSource": "res/2020/conservative-politician/cards.json",
           "icon": "./assets/icons/conservative-politician.svg"
         },
@@ -58,6 +64,7 @@
           "label": "2020년대 한국리그 야구선수",
           "menuLabel": "한국리그 야구선수",
           "browserLabel": "2020년대 한국리그 야구선수",
+          "country": "kr",
           "cardSource": "res/2020/kbo-baseball-player/cards.json",
           "icon": "./assets/icons/baseball-player.svg"
         },
@@ -66,6 +73,7 @@
           "label": "2020년대 미국리그 야구선수",
           "menuLabel": "미국리그 야구선수",
           "browserLabel": "2020년대 미국리그 야구선수",
+          "country": "us",
           "cardSource": "res/2020/mlb-baseball-player/cards.json",
           "icon": "./assets/icons/baseball-player.svg"
         }
@@ -81,6 +89,7 @@
           "label": "1990년대 남자가수",
           "menuLabel": "한국 남자가수",
           "browserLabel": "1990년대 한국 남자가수",
+          "country": "kr",
           "cardSource": "res/1990/malesinger/cards.json",
           "icon": "./assets/icons/male-singer.svg"
         },
@@ -89,6 +98,7 @@
           "label": "1990년대 여자가수",
           "menuLabel": "한국 여자가수",
           "browserLabel": "1990년대 한국 여자가수",
+          "country": "kr",
           "cardSource": "res/1990/femalesinger/cards.json",
           "icon": "./assets/icons/female-singer.svg"
         }
@@ -112,6 +122,7 @@
           "label": "막돼먹은 영애씨",
           "menuLabel": "막돼먹은 영애씨",
           "browserLabel": "막돼먹은 영애씨",
+          "country": "kr",
           "cardSource": "res/etc/rude-miss-young-ae/cards.json",
           "icon": "./assets/icons/rude-miss-young-ae.svg"
         },
@@ -120,6 +131,7 @@
           "label": "뽀로로 캐릭터",
           "menuLabel": "뽀로로 캐릭터",
           "browserLabel": "뽀로로 캐릭터",
+          "country": "kr",
           "cardSource": "res/etc/pororo-character/cards.json",
           "icon": "https://pororo.fandom.com/wiki/Special:Redirect/file/PororoCurrentOutfit.jpg"
         }

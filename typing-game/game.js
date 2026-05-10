@@ -17,7 +17,11 @@ const historyPanel = document.getElementById('historyPanel');
 const mobilePanelBackdrop = document.getElementById('mobilePanelBackdrop');
 const openMobileMenuButton = document.getElementById('openMobileMenuButton');
 const openMobileHistoryButton = document.getElementById('openMobileHistoryButton');
-const languageButtons = document.querySelectorAll('[data-language]');
+const languageDropdown = document.querySelector('[data-language-dropdown]');
+const languageDropdownTrigger = document.getElementById('languageDropdownButton');
+const languageDropdownLabel = document.getElementById('languageDropdownLabel');
+const languageDropdownMenu = languageDropdown?.querySelector('.hero-language__menu');
+const languageOptionButtons = document.querySelectorAll('[data-language-option]');
 const wordMenuButtons = document.querySelectorAll('[data-word-menu]');
 const historyList = document.getElementById('historyList');
 const clearHistoryButton = document.getElementById('clearHistoryButton');
@@ -32,6 +36,7 @@ const BASE_Y = HEIGHT - 54;
 const DEFENSE_LINE_Y = BASE_Y - 8;
 const BASE_SURFACE_Y = BASE_Y;
 const GAME_HISTORY_STORAGE_KEY = 'typing-game-history';
+const LANGUAGE_STORAGE_KEY = 'playground-language';
 const MAX_HISTORY_ITEMS = 20;
 const LETTER_SETS = {
   ko: '가나다라마바사아자차카타파하거너더러머버서어저처커터퍼허고노도로모보소오조초코토포호구누두루무부수우주추쿠투푸후기니디리미비시이지치키티피히',
@@ -63,7 +68,7 @@ let spawnDelay = 1180;
 let lastTime = 0;
 let running = false;
 let gameOver = false;
-let currentLanguage = 'ko';
+let currentLanguage = getInitialLanguage();
 let currentWordMenu = 'boy-idol-name';
 let isComposing = false;
 let pendingMenuButton = null;
@@ -84,6 +89,15 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function getBrowserLanguage() {
+  return navigator.language?.toLowerCase().startsWith('ko') ? 'ko' : 'en';
+}
+
+function getInitialLanguage() {
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return ['ko', 'en'].includes(storedLanguage) ? storedLanguage : getBrowserLanguage();
 }
 
 function normalizeWordSetsData(data) {
@@ -958,14 +972,61 @@ typingInput.addEventListener('compositionend', () => {
   isComposing = false;
 });
 
-languageButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    currentLanguage = button.dataset.language;
-    languageButtons.forEach((item) => item.classList.toggle('is-active', item === button));
-    typingInput.lang = currentLanguage;
-    typingInput.value = '';
-    renderHistory();
+function setLanguage(language, options = {}) {
+  currentLanguage = language;
+  typingInput.lang = currentLanguage;
+  typingInput.value = '';
+
+  if (options.persist) {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+  }
+
+  languageOptionButtons.forEach((button) => {
+    const isActive = button.dataset.languageOption === currentLanguage;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-selected', String(isActive));
+
+    if (isActive && languageDropdownLabel) {
+      languageDropdownLabel.textContent = button.textContent.trim();
+    }
   });
+
+  if (options.renderHistory !== false) {
+    renderHistory();
+  }
+}
+
+function setLanguageDropdownOpen(isOpen) {
+  if (!languageDropdownTrigger || !languageDropdownMenu) {
+    return;
+  }
+
+  languageDropdownTrigger.setAttribute('aria-expanded', String(isOpen));
+  languageDropdownMenu.hidden = !isOpen;
+}
+
+languageDropdownTrigger?.addEventListener('click', () => {
+  const isOpen = languageDropdownTrigger.getAttribute('aria-expanded') === 'true';
+  setLanguageDropdownOpen(!isOpen);
+});
+
+languageOptionButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setLanguage(button.dataset.languageOption || 'ko', { persist: true });
+    setLanguageDropdownOpen(false);
+  });
+});
+
+document.addEventListener('click', (event) => {
+  if (!languageDropdown?.contains(event.target)) {
+    setLanguageDropdownOpen(false);
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    setLanguageDropdownOpen(false);
+  }
 });
 
 wordMenuButtons.forEach((button) => {
@@ -1102,6 +1163,7 @@ window.addEventListener('pointerdown', (event) => {
 
 makeStars();
 updateAppViewportHeight();
+setLanguage(currentLanguage, { renderHistory: false });
 resetGame();
 applyMenuFromQueryParam();
 updateSelectedMenuText();

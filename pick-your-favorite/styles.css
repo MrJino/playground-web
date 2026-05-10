@@ -216,6 +216,8 @@ body.modal-open {
 }
 
 .content-layout {
+  position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 0;
   display: grid;
@@ -225,6 +227,8 @@ body.modal-open {
 }
 
 .hero {
+  position: relative;
+  z-index: 20;
   border-radius: 12px;
   padding: 0px;
   margin-bottom: 12px;
@@ -269,6 +273,93 @@ body.modal-open {
 .hero-placeholder__link:focus-visible {
   outline: 3px solid rgba(48, 120, 239, 0.42);
   outline-offset: 3px;
+}
+
+.hero-language {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  z-index: 30;
+  display: block;
+  min-width: 138px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  transform: translateY(-50%);
+}
+
+.hero-language[hidden] {
+  display: none;
+}
+
+.hero-language__trigger {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(23, 34, 48, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.hero-language__trigger:focus-visible {
+  outline: none;
+  border-color: rgba(48, 120, 239, 0.48);
+  box-shadow: 0 0 0 3px rgba(48, 120, 239, 0.12);
+}
+
+.hero-language__chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.hero-language__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  width: 100%;
+  min-width: 138px;
+  padding: 5px;
+  border: 1px solid rgba(23, 34, 48, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 28px rgba(24, 34, 48, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.hero-language__menu[hidden] {
+  display: none;
+}
+
+.hero-language__option {
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hero-language__option:hover,
+.hero-language__option.is-active {
+  background: rgba(48, 120, 239, 0.14);
+  color: var(--cool);
 }
 
 .pool-scroll {
@@ -458,6 +549,49 @@ body.modal-open {
 .menu-search input:focus {
   border-color: rgba(48, 120, 239, 0.48);
   box-shadow: 0 0 0 3px rgba(48, 120, 239, 0.12);
+}
+
+.country-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+.country-filter legend {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.country-filter__button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(23, 34, 48, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.country-filter__button:hover {
+  border-color: rgba(48, 120, 239, 0.28);
+  background: rgba(48, 120, 239, 0.1);
+}
+
+.country-filter__button.is-active {
+  border-color: rgba(48, 120, 239, 0.38);
+  background: rgba(48, 120, 239, 0.16);
+  color: var(--cool);
 }
 
 .menu-browser-grid {
@@ -1645,6 +1779,29 @@ body.modal-open {
     max-height: none;
   }
 
+  .hero-language {
+    right: 8px;
+    min-width: 112px;
+    font-size: 0.64rem;
+  }
+
+  .hero-language__trigger {
+    min-height: 32px;
+    padding: 5px 9px;
+    border-radius: 10px;
+    font-size: 0.76rem;
+  }
+
+  .hero-language__menu {
+    min-width: 112px;
+    border-radius: 10px;
+  }
+
+  .hero-language__option {
+    min-height: 30px;
+    font-size: 0.74rem;
+  }
+
   .battle-panel {
     align-self: center;
     height: auto;
@@ -1807,6 +1964,22 @@ body.modal-open {
 
   .menu-search > span {
     margin-left: 8px;
+  }
+
+  .country-filter {
+    width: 100%;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .country-filter legend {
+    width: 100%;
+    margin: 0 0 2px 8px;
+  }
+
+  .country-filter__button {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .menu-browser-grid {

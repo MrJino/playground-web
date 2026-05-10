@@ -18,10 +18,26 @@
         <div class="pool-scroll" id="poolScroll">
           <div class="pool-grid" id="poolGrid"></div>
         </div>
+        <div class="hero-language" data-language-dropdown>
+          <button class="hero-language__trigger" id="languageDropdownButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span id="languageDropdownLabel">한글</span>
+            <span class="hero-language__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="hero-language__menu" role="listbox" aria-labelledby="languageDropdownButton" hidden>
+            <button class="hero-language__option is-active" type="button" role="option" data-language-option="ko" aria-selected="true">한글</button>
+            <button class="hero-language__option" type="button" role="option" data-language-option="en" aria-selected="false">English</button>
+          </div>
+        </div>
       </header>
 
       <section class="content-layout">
         <aside class="menu-panel" id="menuPanel">
+          <fieldset class="country-filter" aria-label="국가 선택">
+            <legend>국가</legend>
+            <button class="country-filter__button is-active" type="button" data-country-filter="all" aria-pressed="true">전체</button>
+            <button class="country-filter__button" type="button" data-country-filter="kr" aria-pressed="false">한국</button>
+            <button class="country-filter__button" type="button" data-country-filter="us" aria-pressed="false">미국</button>
+          </fieldset>
           <div class="menu-panel__header">
             <div class="menu-panel__title">Menu</div>
             <button class="menu-panel__search" id="openMenuSearchButton" type="button" aria-label="메뉴 검색 화면 열기" title="메뉴 검색"></button>

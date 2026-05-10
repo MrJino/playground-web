@@ -3,6 +3,7 @@ const DEFAULT_MENU_VALUE = "boy-idol";
 const MENU_QUERY_PARAM = "menu";
 const MENU_CONFIG_SOURCE = "res/menu.json";
 const CLOUDFLARE_API_BASE_URL = "https://playground-api.for1self.workers.dev";
+const LANGUAGE_STORAGE_KEY = "playground-language";
 
 let initialCards = [];
 let activePool = [];
@@ -27,6 +28,12 @@ const openMenuSearchButton = document.getElementById("openMenuSearchButton");
 const menuBrowserPanel = document.getElementById("menuBrowserPanel");
 const menuSearchInput = document.getElementById("menuSearchInput");
 const menuBrowserGrid = document.getElementById("menuBrowserGrid");
+const countryFilterButtons = document.querySelectorAll("[data-country-filter]");
+const languageDropdown = document.querySelector("[data-language-dropdown]");
+const languageDropdownTrigger = document.getElementById("languageDropdownButton");
+const languageDropdownLabel = document.getElementById("languageDropdownLabel");
+const languageDropdownMenu = languageDropdown?.querySelector(".hero-language__menu");
+const languageOptionButtons = document.querySelectorAll("[data-language-option]");
 const menuPanel = document.getElementById("menuPanel");
 const historyPanel = document.getElementById("historyPanel");
 const historyList = document.getElementById("historyList");
@@ -55,6 +62,8 @@ const rightSource = document.getElementById("rightSource");
 const battleCards = [leftCard, rightCard];
 let menuToggleButtons = [];
 let cardSourceButtons = [];
+let activeCountryFilter = "all";
+let activeLanguage = getInitialLanguage();
 const MOBILE_PANEL_MEDIA_QUERY = "(max-width: 768px)";
 const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
@@ -82,6 +91,15 @@ const HANGUL_INITIAL_CONSONANTS = [
 ];
 let confirmAction = null;
 let selectionAudioContext = null;
+
+function getBrowserLanguage() {
+  return navigator.language?.toLowerCase().startsWith("ko") ? "ko" : "en";
+}
+
+function getInitialLanguage() {
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return ["ko", "en"].includes(storedLanguage) ? storedLanguage : getBrowserLanguage();
+}
 
 function getMenuButtonByValue(menuValue) {
   return Array.from(cardSourceButtons).find(
@@ -172,9 +190,9 @@ async function loadMenuConfig() {
     throw new Error("Menu config must include a groups array.");
   }
 
-  menuGroups = payload.groups;
-  renderMenu(menuGroups);
-  renderMenuBrowser(menuGroups);
+  menuGroups = await hydrateMenuGroupsWithCardMetadata(payload.groups);
+  renderMenu(menuGroups, activeCountryFilter);
+  renderMenuBrowser(menuGroups, menuSearchInput.value, activeCountryFilter);
   bindMenuEventListeners();
 }
 
@@ -189,12 +207,82 @@ function getMenuItems(groups = menuGroups) {
   });
 }
 
+async function getCardSourceMetadata(cardSource) {
+  if (!cardSource) {
+    return {};
+  }
+
+  try {
+    const response = await window.fetch(cardSource);
+
+    if (!response.ok) {
+      return {};
+    }
+
+    const payload = await response.json();
+
+    return {
+      country: payload.country,
+    };
+  } catch {
+    return {};
+  }
+}
+
+async function hydrateMenuGroupsWithCardMetadata(groups) {
+  return Promise.all(
+    groups.map(async (group) => {
+      const items = Array.isArray(group.items) ? group.items : [];
+      const hydratedItems = await Promise.all(
+        items.map(async (item) => {
+          const metadata = await getCardSourceMetadata(item.cardSource);
+
+          return {
+            ...item,
+            country: metadata.country || item.country,
+          };
+        }),
+      );
+
+      return {
+        ...group,
+        items: hydratedItems,
+      };
+    }),
+  );
+}
+
 function getMenuItemMenuLabel(item) {
   return item.menuLabel || item.label || "";
 }
 
 function getMenuItemBrowserLabel(item) {
   return item.browserLabel || item.label || getMenuItemMenuLabel(item);
+}
+
+function getMenuItemCountry(item) {
+  return item.country || "all";
+}
+
+function doesMenuItemMatchCountry(item, countryFilter = activeCountryFilter) {
+  const country = getMenuItemCountry(item);
+  return countryFilter === "all" || country === countryFilter;
+}
+
+function getCountryFilteredMenuGroups(groups = menuGroups, countryFilter = activeCountryFilter) {
+  return groups
+    .map((group) => {
+      const items = Array.isArray(group.items) ? group.items : [];
+      const filteredItems = items.filter((item) =>
+        doesMenuItemMatchCountry(item, countryFilter),
+      );
+
+      return {
+        ...group,
+        items: filteredItems,
+      };
+    })
+    .filter((group) => group.items.length > 0);
 }
 
 function getHangulInitialConsonants(value) {
@@ -234,8 +322,19 @@ function getMenuItemSearchText(item) {
     .join(" ");
 }
 
-function renderMenu(groups) {
-  menuList.innerHTML = groups
+function renderMenu(groups = menuGroups, countryFilter = activeCountryFilter) {
+  const filteredGroups = getCountryFilteredMenuGroups(groups, countryFilter);
+
+  if (filteredGroups.length === 0) {
+    menuList.innerHTML = `
+      <div class="history-empty">
+        표시할 메뉴가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  menuList.innerHTML = filteredGroups
     .map((group, index) => {
       const submenuId = `submenu-${escapeHtml(group.id || index)}`;
       const isOpen = Boolean(group.isOpen);
@@ -280,16 +379,18 @@ function renderMenu(groups) {
     .join("");
 }
 
-function renderMenuBrowser(groups = menuGroups, searchTerm = "") {
+function renderMenuBrowser(groups = menuGroups, searchTerm = "", countryFilter = activeCountryFilter) {
   const normalizedSearchTerm = normalizeSearchText(searchTerm);
   const compactSearchTerm = compactSearchText(searchTerm);
   const items = getMenuItems(groups).filter((item) => {
     const searchText = getMenuItemSearchText(item);
+    const matchesCountry = doesMenuItemMatchCountry(item, countryFilter);
 
     return (
-      !normalizedSearchTerm ||
-      searchText.includes(normalizedSearchTerm) ||
-      searchText.includes(compactSearchTerm)
+      matchesCountry &&
+      (!normalizedSearchTerm ||
+        searchText.includes(normalizedSearchTerm) ||
+        searchText.includes(compactSearchTerm))
     );
   });
 
@@ -323,6 +424,65 @@ function renderMenuBrowser(groups = menuGroups, searchTerm = "") {
     .join("");
 }
 
+function setCountryFilter(countryFilter) {
+  activeCountryFilter = countryFilter || "all";
+
+  countryFilterButtons.forEach((button) => {
+    const isActive = button.dataset.countryFilter === activeCountryFilter;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  renderMenu(menuGroups, activeCountryFilter);
+  bindMenuEventListeners();
+
+  const activeButton = getMenuButtonByValue(activeMenuValue);
+  if (activeButton) {
+    setActiveMenuButton(activeButton);
+  }
+
+  renderMenuBrowser(menuGroups, menuSearchInput.value, activeCountryFilter);
+}
+
+function setLanguage(language, options = {}) {
+  activeLanguage = language || "ko";
+
+  if (options.persist) {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, activeLanguage);
+  }
+
+  languageOptionButtons.forEach((button) => {
+    const isActive = button.dataset.languageOption === activeLanguage;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+
+    if (isActive && languageDropdownLabel) {
+      languageDropdownLabel.textContent = button.textContent.trim();
+    }
+  });
+}
+
+function setLanguageDropdownOpen(isOpen) {
+  if (!languageDropdownTrigger || !languageDropdownMenu) {
+    return;
+  }
+
+  languageDropdownTrigger.setAttribute("aria-expanded", String(isOpen));
+  languageDropdownMenu.hidden = !isOpen;
+}
+
+function syncHeroLanguageVisibility() {
+  if (!languageDropdown) {
+    return;
+  }
+
+  languageDropdown.hidden = !poolScroll.hidden;
+
+  if (languageDropdown.hidden) {
+    setLanguageDropdownOpen(false);
+  }
+}
+
 function hasMenuQueryParam() {
   const params = new URLSearchParams(window.location.search);
   return params.has(MENU_QUERY_PARAM);
@@ -338,6 +498,7 @@ function showMenuBrowser(options = {}) {
   });
   heroPlaceholder.hidden = false;
   poolScroll.hidden = true;
+  syncHeroLanguageVisibility();
   poolGrid.innerHTML = "";
   progressText.textContent = "";
   battlePanel.hidden = true;
@@ -572,6 +733,7 @@ function renderCardsLoadingState() {
   isTransitioning = true;
   heroPlaceholder.hidden = true;
   poolScroll.hidden = false;
+  syncHeroLanguageVisibility();
   initialCards = [];
   activePool = [];
   currentRoundCards = [];
@@ -1305,7 +1467,37 @@ function bindMenuEventListeners() {
 }
 
 menuSearchInput.addEventListener("input", () => {
-  renderMenuBrowser(menuGroups, menuSearchInput.value);
+  renderMenuBrowser(menuGroups, menuSearchInput.value, activeCountryFilter);
+});
+
+countryFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setCountryFilter(button.dataset.countryFilter);
+  });
+});
+
+languageDropdownTrigger?.addEventListener("click", () => {
+  const isOpen = languageDropdownTrigger.getAttribute("aria-expanded") === "true";
+  setLanguageDropdownOpen(!isOpen);
+});
+
+languageOptionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setLanguage(button.dataset.languageOption, { persist: true });
+    setLanguageDropdownOpen(false);
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!languageDropdown?.contains(event.target)) {
+    setLanguageDropdownOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    setLanguageDropdownOpen(false);
+  }
 });
 
 openMenuSearchButton.addEventListener("click", () => {
@@ -1409,6 +1601,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 async function initializeApp() {
+  setLanguage(activeLanguage);
   renderFinalCardsHistory();
   try {
     await loadMenuConfig();
