@@ -65,14 +65,17 @@
           <label class="input-catcher">
             <input
               id="typingInput"
-              name="typing-game-word"
-              type="text"
-              inputmode="text"
+              name="typingGameInput"
+              type="search"
+              inputmode="search"
+              enterkeyhint="done"
               autocomplete="off"
-              autocapitalize="none"
+              autocapitalize="off"
               autocorrect="off"
               spellcheck="false"
               placeholder="단어 입력"
+              readonly
+              onfocus="this.removeAttribute('readonly')"
             />
           </label>
           <div class="start-panel" id="startPanel">
