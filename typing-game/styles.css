@@ -19,6 +19,7 @@
   --menu-line: rgba(23, 34, 48, 0.1);
   --menu-shadow: 0 18px 40px rgba(24, 34, 48, 0.12);
   --line: #46506e;
+  --hero-strip-height: calc((100vw / 36) * 88 / 63 + 24px);
 }
 
 * {
@@ -50,10 +51,53 @@ input {
   height: 100vh;
   min-height: 0;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   grid-template-columns: 280px minmax(0, 1fr) 280px;
   align-items: center;
-  gap: 16px;
+  gap: 12px 16px;
   padding: 8px;
+}
+
+.hero {
+  grid-column: 1 / -1;
+  width: 100%;
+  border: 1px solid var(--menu-line);
+  border-radius: 12px;
+  background: var(--menu-panel);
+  box-shadow: var(--menu-shadow);
+  backdrop-filter: blur(10px);
+  overflow: visible;
+}
+
+.hero-placeholder {
+  height: var(--hero-strip-height);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px;
+}
+
+.hero-placeholder__image {
+  width: calc(var(--hero-strip-height) - 16px);
+  height: calc(var(--hero-strip-height) - 16px);
+  max-width: 82px;
+  max-height: 82px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 10px 22px rgba(24, 34, 48, 0.1);
+}
+
+.hero-placeholder__link {
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 8px;
+}
+
+.hero-placeholder__link:focus-visible {
+  outline: 3px solid rgba(48, 120, 239, 0.42);
+  outline-offset: 3px;
 }
 
 .menu-panel {
@@ -351,7 +395,7 @@ input {
 }
 
 .game-card {
-  width: min(100%, calc(100vw - 16px), calc(100vh - 36px));
+  width: min(100%, calc(100vw - 16px), calc(100vh - var(--hero-strip-height) - 48px));
   aspect-ratio: 1 / 1;
   height: auto;
   min-height: 0;
@@ -582,6 +626,31 @@ body:not(.is-playing) .input-catcher {
     align-items: center;
   }
 
+  .hero {
+    flex: 0 0 auto;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+  }
+
+  .hero-placeholder {
+    width: 100%;
+    height: 52px;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .hero-placeholder__link {
+    height: 100%;
+  }
+
+  .hero-placeholder__image {
+    width: auto;
+    height: 100%;
+    max-height: none;
+  }
+
   .menu-panel {
     position: fixed;
     top: 4px;
@@ -735,7 +804,7 @@ body:not(.is-playing) .input-catcher {
   }
 
   .game-card {
-    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - var(--mobile-nav-height) - var(--mobile-game-nav-gap) - 8px));
+    --game-card-size: min(100%, calc(100vw - 8px), calc(var(--app-height) - 64px - var(--mobile-nav-height) - var(--mobile-game-nav-gap) - var(--mobile-game-nav-gap) - 8px));
     flex: 0 0 var(--game-card-size);
     width: var(--game-card-size);
     height: var(--game-card-size);

@@ -260,6 +260,17 @@ body.modal-open {
   min-width: 0;
 }
 
+.hero-placeholder__link {
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 8px;
+}
+
+.hero-placeholder__link:focus-visible {
+  outline: 3px solid rgba(48, 120, 239, 0.42);
+  outline-offset: 3px;
+}
+
 .pool-scroll {
   height: var(--hero-strip-height);
   overflow-x: auto;
@@ -1508,7 +1519,7 @@ body.modal-open {
     min-height: 60px;
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .content-layout {
@@ -1618,6 +1629,22 @@ body.modal-open {
     padding: 4px;
   }
 
+  .hero-placeholder {
+    width: 100%;
+    height: 52px;
+    padding: 0;
+  }
+
+  .hero-placeholder__link {
+    height: 100%;
+  }
+
+  .hero-placeholder__image {
+    width: auto;
+    height: 100%;
+    max-height: none;
+  }
+
   .battle-panel {
     align-self: center;
     height: auto;
@@ -1670,7 +1697,7 @@ body.modal-open {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
-    margin-top: 8px;
+    margin-top: 4px;
     padding: 4px;
     border: 1px solid rgba(23, 34, 48, 0.12);
     border-radius: 12px;
