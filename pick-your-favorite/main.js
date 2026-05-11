@@ -49,6 +49,11 @@ const cancelConfirmButton = document.getElementById("cancelConfirmButton");
 const acceptConfirmButton = document.getElementById("acceptConfirmButton");
 const battlePanel = document.getElementById("battlePanel");
 const battleGrid = document.getElementById("battleGrid");
+const battleIntroPanel = document.getElementById("battleIntroPanel");
+const battleIntroTitle = document.getElementById("battleIntroTitle");
+const battleIntroDescription = document.getElementById("battleIntroDescription");
+const battleIntroCardCount = document.getElementById("battleIntroCardCount");
+const battleStartButton = document.getElementById("battleStartButton");
 const leftCard = document.getElementById("leftCard");
 const rightCard = document.getElementById("rightCard");
 const leftImage = document.getElementById("leftImage");
@@ -502,6 +507,8 @@ function showMenuBrowser(options = {}) {
   poolGrid.innerHTML = "";
   progressText.textContent = "";
   battlePanel.hidden = true;
+  battleIntroPanel.hidden = true;
+  battleGrid.hidden = false;
   menuBrowserPanel.hidden = false;
   rankingButton.href = getRankingUrl(DEFAULT_MENU_VALUE);
   rankingButton.setAttribute("aria-label", "기본 메뉴 랭킹화면으로 이동");
@@ -705,7 +712,7 @@ async function loadCards(cardSource, loadRequestId = activeLoadRequestId) {
   hasShownInitialBattlePair = false;
 
   renderPool();
-  renderBattle();
+  renderBattleIntro();
 }
 
 function setBattleCardLoading(cardEl, imageEl, titleEl, textEl, sourceEl) {
@@ -746,16 +753,41 @@ function renderCardsLoadingState() {
     { length: 16 },
     () => '<article class="pool-card pool-card--loading"></article>',
   ).join("");
-  battleGrid.hidden = false;
+  battleGrid.hidden = true;
+  battleIntroPanel.hidden = true;
   battleGrid.classList.remove(
     "is-final-winner-grid",
     "is-choosing",
     "is-bye-advance",
   );
-  setBattleCardLoading(leftCard, leftImage, leftTitle, leftText, leftSource);
-  setBattleCardLoading(rightCard, rightImage, rightTitle, rightText, rightSource);
-  battleTitle.textContent = "Loading Cards";
+  battleTitle.textContent = "";
   progressText.textContent = "";
+}
+
+function renderBattleIntro() {
+  const menuLabel = getMenuLabel(getMenuButtonByValue(activeMenuValue));
+
+  isTransitioning = false;
+  currentPair = [];
+  heroPlaceholder.hidden = true;
+  poolScroll.hidden = false;
+  syncHeroLanguageVisibility();
+  battleGrid.hidden = true;
+  battleIntroPanel.hidden = false;
+  battleTitle.textContent = "Battle Ready";
+  progressText.textContent = "";
+  battleIntroTitle.textContent = `${menuLabel} 배틀`;
+  battleIntroDescription.textContent =
+    "두 카드 중 더 마음에 드는 카드를 선택해 최종 우승 카드를 정하세요.";
+  battleIntroCardCount.textContent = `${initialCards.length}장`;
+  battleStartButton.focus();
+}
+
+function startBattle() {
+  heroPlaceholder.hidden = true;
+  poolScroll.hidden = false;
+  syncHeroLanguageVisibility();
+  renderBattle();
 }
 
 function readFinalCards() {
@@ -1054,6 +1086,7 @@ function renderBattle() {
   const existingFanfare = document.querySelector(".fanfare");
   if (existingFanfare) existingFanfare.remove();
 
+  battleIntroPanel.hidden = true;
   const currentRoundLabel = getRoundLabel(currentRoundCards.length);
   const roundTarget = getRoundTarget();
   progressText.textContent = `${selectedCards.length} / ${roundTarget}`;
@@ -1443,6 +1476,9 @@ leftCard.addEventListener("keydown", (event) =>
 rightCard.addEventListener("keydown", (event) =>
   handleKeyboardSelection(event, 1),
 );
+battleStartButton.addEventListener("click", () => {
+  startBattle();
+});
 
 function bindMenuEventListeners() {
   menuToggleButtons = Array.from(document.querySelectorAll("[data-menu-toggle]"));

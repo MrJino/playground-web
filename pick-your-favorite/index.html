@@ -65,6 +65,23 @@
             <div class="progress" id="progressText">0 / 16 selected</div>
           </div>
 
+          <div class="battle-intro" id="battleIntroPanel" hidden>
+            <div class="battle-intro__eyebrow">World Cup Battle</div>
+            <h3 id="battleIntroTitle">배틀 준비 완료</h3>
+            <p id="battleIntroDescription">두 카드 중 더 마음에 드는 카드를 선택해 최종 우승 카드를 정하세요.</p>
+            <dl class="battle-intro__meta">
+              <div>
+                <dt>카드</dt>
+                <dd id="battleIntroCardCount">0장</dd>
+              </div>
+              <div>
+                <dt>방식</dt>
+                <dd>1:1 선택</dd>
+              </div>
+            </dl>
+            <button class="battle-intro__start" id="battleStartButton" type="button">배틀시작</button>
+          </div>
+
           <div class="battle-grid" id="battleGrid">
             <article class="battle-card" data-side="left" id="leftCard" role="button" tabindex="0">
               <img class="battle-card__image" id="leftImage" alt="" />
