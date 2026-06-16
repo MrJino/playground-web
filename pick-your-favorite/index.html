@@ -11,36 +11,42 @@
     <main class="page">
       <header class="hero">
         <div class="hero-placeholder" id="heroPlaceholder" hidden>
-          <a class="hero-placeholder__link" href="../index.html" aria-label="홈으로 이동">
+          <a class="hero-placeholder__link" href="https://mrjino.github.io/playground/index.html" aria-label="홈으로 이동">
             <img class="hero-placeholder__image" src="./assets/icons/profile_jino.png" alt="Pick your favorite" />
           </a>
+          <fieldset class="country-filter" data-country-dropdown aria-label="국가 선택">
+            <legend>국가</legend>
+            <button class="country-filter__trigger" id="countryDropdownButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span id="countryDropdownLabel">전체</span>
+              <span class="country-filter__chevron" aria-hidden="true"></span>
+            </button>
+            <div class="country-filter__menu" role="listbox" aria-labelledby="countryDropdownButton" hidden>
+              <button class="country-filter__option is-active" type="button" role="option" data-country-filter="all" aria-selected="true">전체</button>
+              <button class="country-filter__option" type="button" role="option" data-country-filter="kr" aria-selected="false">한국</button>
+              <button class="country-filter__option" type="button" role="option" data-country-filter="us" aria-selected="false">미국</button>
+            </div>
+          </fieldset>
+          <div class="hero-language" data-language-dropdown>
+            <button class="hero-language__trigger" id="languageDropdownButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span id="languageDropdownLabel">한글</span>
+              <span class="hero-language__chevron" aria-hidden="true"></span>
+            </button>
+            <div class="hero-language__menu" role="listbox" aria-labelledby="languageDropdownButton" hidden>
+              <button class="hero-language__option is-active" type="button" role="option" data-language-option="ko" aria-selected="true">한글</button>
+              <button class="hero-language__option" type="button" role="option" data-language-option="en" aria-selected="false">English</button>
+            </div>
+          </div>
         </div>
         <div class="pool-scroll" id="poolScroll">
           <div class="pool-grid" id="poolGrid"></div>
-        </div>
-        <div class="hero-language" data-language-dropdown>
-          <button class="hero-language__trigger" id="languageDropdownButton" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span id="languageDropdownLabel">한글</span>
-            <span class="hero-language__chevron" aria-hidden="true"></span>
-          </button>
-          <div class="hero-language__menu" role="listbox" aria-labelledby="languageDropdownButton" hidden>
-            <button class="hero-language__option is-active" type="button" role="option" data-language-option="ko" aria-selected="true">한글</button>
-            <button class="hero-language__option" type="button" role="option" data-language-option="en" aria-selected="false">English</button>
-          </div>
         </div>
       </header>
 
       <section class="content-layout">
         <aside class="menu-panel" id="menuPanel">
-          <fieldset class="country-filter" aria-label="국가 선택">
-            <legend>국가</legend>
-            <button class="country-filter__button is-active" type="button" data-country-filter="all" aria-pressed="true">전체</button>
-            <button class="country-filter__button" type="button" data-country-filter="kr" aria-pressed="false">한국</button>
-            <button class="country-filter__button" type="button" data-country-filter="us" aria-pressed="false">미국</button>
-          </fieldset>
           <div class="menu-panel__header">
-            <div class="menu-panel__title">Menu</div>
-            <button class="menu-panel__search" id="openMenuSearchButton" type="button" aria-label="메뉴 검색 화면 열기" title="메뉴 검색"></button>
+            <div class="menu-panel__title">메뉴트리</div>
+            <button class="menu-panel__search" id="openMenuSearchButton" type="button">전체메뉴 검색하기</button>
           </div>
           <div id="menuList"></div>
         </aside>
@@ -61,28 +67,16 @@
 
         <section class="battle-panel" id="battlePanel">
           <div class="battle-top">
-            <h2 id="battleTitle">Random 2 Card Match</h2>
-            <div class="progress" id="progressText">0 / 16 selected</div>
+            <h2 id="battleTitle"></h2>
+            <div class="progress" id="progressText"></div>
           </div>
 
           <div class="battle-intro" id="battleIntroPanel" hidden>
-            <div class="battle-intro__eyebrow">World Cup Battle</div>
             <h3 id="battleIntroTitle">배틀 준비 완료</h3>
-            <p id="battleIntroDescription">두 카드 중 더 마음에 드는 카드를 선택해 최종 우승 카드를 정하세요.</p>
-            <dl class="battle-intro__meta">
-              <div>
-                <dt>카드</dt>
-                <dd id="battleIntroCardCount">0장</dd>
-              </div>
-              <div>
-                <dt>방식</dt>
-                <dd>1:1 선택</dd>
-              </div>
-            </dl>
             <button class="battle-intro__start" id="battleStartButton" type="button">배틀시작</button>
           </div>
 
-          <div class="battle-grid" id="battleGrid">
+          <div class="battle-grid" id="battleGrid" hidden>
             <article class="battle-card" data-side="left" id="leftCard" role="button" tabindex="0">
               <img class="battle-card__image" id="leftImage" alt="" />
               <h3 id="leftTitle"></h3>
@@ -100,14 +94,15 @@
         </section>
 
         <aside class="history-panel" id="historyPanel">
-          <section class="history-section history-section--ranking">
+          <section class="history-section history-section--ranking" id="menuRankingSection" hidden>
             <div class="history-panel__top">
               <div>
                 <div class="history-panel__eyebrow">Ranking</div>
                 <h2 class="history-panel__title">메뉴 랭킹</h2>
               </div>
+              <a class="ranking-link" id="rankingButton" href="./ranking/?menu=boy-idol">전체보기</a>
             </div>
-            <a class="ranking-link" id="rankingButton" href="./ranking/"> 랭킹화면으로 이동 </a>
+            <div class="ranking-list ranking-list--panel" id="menuRankingList" aria-live="polite"></div>
           </section>
 
           <section class="history-section history-section--local">

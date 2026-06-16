@@ -8,6 +8,10 @@ const rankingSummary = document.getElementById('rankingSummary');
 const rankingList = document.getElementById('rankingList');
 const backToGameLink = document.getElementById('backToGameLink');
 
+if (new URLSearchParams(window.location.search).get('embed') === '1') {
+  document.body.classList.add('ranking-embed');
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
