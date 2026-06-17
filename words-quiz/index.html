@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <title>Words Quiz</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero-placeholder">
+          <a class="hero-placeholder__link" href="https://mrjino.github.io/playground/index.html" aria-label="홈으로 이동">
+            <img class="hero-placeholder__image" src="../assets/icons/profile_jino.png" alt="Words Quiz" />
+          </a>
+          <div class="hero-placeholder__content"></div>
+          <div class="hero-actions">
+            <a class="hero-action-button" href="./add/">퀴즈 추가</a>
+            <div class="hero-stats" aria-label="게임 현황">
+              <div>
+                <span>Score</span>
+                <strong id="scoreText">0</strong>
+              </div>
+              <div>
+                <span>Streak</span>
+                <strong id="streakText">0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content-layout">
+        <aside class="menu-panel" aria-label="단어 목록">
+          <div class="menu-panel__header">
+            <div class="menu-panel__title">오늘의 단어</div>
+            <button class="ghost-button" id="shuffleButton" type="button">섞기</button>
+          </div>
+          <div class="word-list" id="wordList"></div>
+        </aside>
+
+        <section class="battle-panel quiz-card" aria-live="polite">
+          <div class="round-meta">
+            <span id="roundText">1 / 1</span>
+            <span id="accuracyText">정답률 0%</span>
+          </div>
+
+          <div class="prompt-card">
+            <span class="prompt-label">Abbreviation</span>
+            <strong id="abbreviationText">API</strong>
+          </div>
+
+          <form class="answer-form" id="answerForm">
+            <label for="answerInputs">Full name</label>
+            <div class="answer-row">
+              <div class="answer-inputs" id="answerInputs"></div>
+              <button class="primary-button" type="submit">확인</button>
+            </div>
+          </form>
+
+          <div class="feedback" id="feedbackBox" hidden>
+            <div class="feedback__result" id="feedbackResult"></div>
+            <div class="feedback__answer" id="feedbackAnswer"></div>
+            <p id="descriptionText"></p>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="ghost-button" id="hintButton" type="button">힌트</button>
+            <button class="ghost-button" id="skipButton" type="button">건너뛰기</button>
+            <button class="primary-button" id="nextButton" type="button" hidden>다음</button>
+          </div>
+        </section>
+
+        <aside class="history-panel" aria-label="풀이 기록">
+          <section class="history-section history-section--local">
+            <div class="history-panel__top">
+              <div>
+                <p class="history-panel__eyebrow">History</p>
+                <h2 class="history-panel__title">최근 풀이</h2>
+              </div>
+              <button class="ghost-button" id="resetButton" type="button">초기화</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./game.js"></script>
+  </body>
+</html>

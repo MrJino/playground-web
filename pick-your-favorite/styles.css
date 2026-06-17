@@ -1,6 +1,5 @@
 :root {
-  --bg-top: #f5eadf;
-  --bg-bottom: #dae8f7;
+  --page-bg: #f6f7f9;
   --panel: rgba(255, 255, 255, 0.88);
   --card: rgba(255, 255, 255, 0.95);
   --line: rgba(23, 34, 48, 0.1);
@@ -26,7 +25,7 @@ body {
   min-height: 100vh;
   font-family: 'Segoe UI', Arial, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 28%), linear-gradient(145deg, var(--bg-top), var(--bg-bottom));
+  background: var(--page-bg);
 }
 
 body.modal-open {
@@ -39,9 +38,9 @@ body.modal-open {
 .battle-panel,
 .history-panel {
   border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  background: #fff;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .menu-panel {
@@ -54,7 +53,7 @@ body.modal-open {
   height: 100%;
   max-height: 100%;
   padding: 20px;
-  border-radius: 26px;
+  border-radius: 16px;
   overflow: hidden;
 }
 
@@ -207,7 +206,7 @@ body.modal-open {
   min-height: 0;
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr) 280px;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -216,7 +215,7 @@ body.modal-open {
   z-index: 20;
   border-radius: 12px;
   padding: 0px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   overflow: visible;
 }
 
@@ -241,7 +240,6 @@ body.modal-open {
   border-radius: 8px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 10px 22px rgba(24, 34, 48, 0.1);
 }
 
 .hero-placeholder__content {
@@ -477,9 +475,9 @@ body.modal-open {
   position: relative;
   grid-column: 2;
   width: min(1000px, 100%);
-  height: min(720px, calc(100vh - 180px));
+  height: min(860px, calc(100vh - 180px));
   margin: 0 auto;
-  border-radius: 26px;
+  border-radius: 16px;
   padding: 28px;
   display: flex;
   flex-direction: column;
@@ -491,7 +489,7 @@ body.modal-open {
   max-height: 100%;
   margin: 0 auto;
   padding: 28px;
-  border-radius: 26px;
+  border-radius: 16px;
   align-self: start;
   overflow: hidden;
 }
@@ -746,7 +744,7 @@ body.modal-open {
 .history-panel {
   grid-column: 3;
   align-self: stretch;
-  border-radius: 26px;
+  border-radius: 16px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -1124,6 +1122,9 @@ body.modal-open {
 
 .battle-card {
   aspect-ratio: 63 / 88;
+  width: min(100%, clamp(320px, 46vh, 520px));
+  max-width: 100%;
+  justify-self: center;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -1433,7 +1434,7 @@ body.modal-open {
 }
 
 .ranking-card__place::before {
-  content: "#";
+  content: '#';
 }
 
 .ranking-card__image {
@@ -1594,13 +1595,13 @@ body.modal-open {
 .battle-grid.is-final-winner-grid .battle-card.is-final-winner {
   grid-column: 1 / -1;
   justify-self: center;
-  width: calc(50% - 12px);
+  width: min(100%, clamp(320px, 46vh, 520px));
 }
 
 .battle-grid.is-bye-advance .battle-card.is-bye-card {
   grid-column: 1 / -1;
   justify-self: center;
-  width: calc(50% - 12px);
+  width: min(100%, clamp(320px, 46vh, 520px));
 }
 
 .battle-card.is-final-winner {
@@ -1876,7 +1877,7 @@ body.modal-open {
     min-height: 60px;
     display: flex;
     align-items: center;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
 
   .content-layout {
@@ -1951,6 +1952,7 @@ body.modal-open {
   }
 
   .battle-card {
+    width: 100%;
     border-radius: 16px;
     padding: 16px 12px;
   }

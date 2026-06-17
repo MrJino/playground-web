@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
+    <title>Words Quiz - Add</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero-placeholder">
+          <a class="hero-placeholder__link" href="https://mrjino.github.io/playground/index.html" aria-label="홈으로 이동">
+            <img class="hero-placeholder__image" src="../../assets/icons/profile_jino.png" alt="Words Quiz" />
+          </a>
+          <div class="hero-placeholder__content"></div>
+          <div class="hero-actions">
+            <a class="hero-action-button" href="../index.html">퀴즈로 돌아가기</a>
+          </div>
+        </div>
+      </header>
+
+      <section class="editor-layout">
+        <section class="editor-panel" aria-labelledby="editorTitle">
+          <div class="editor-panel__header">
+            <div>
+              <p class="hero-placeholder__eyebrow">Words Quiz</p>
+              <h1 id="editorTitle">퀴즈 데이터 추가</h1>
+            </div>
+            <button class="ghost-button" id="clearSavedButton" type="button">새로고침</button>
+          </div>
+
+          <form class="word-editor-form" id="wordEditorForm">
+            <label>
+              <span>약자</span>
+              <input id="abbreviationInput" name="abbreviation" type="text" autocomplete="off" placeholder="API" required />
+            </label>
+            <label>
+              <span>Full name</span>
+              <input id="fullNameInput" name="fullName" type="text" autocomplete="off" placeholder="Application Programming Interface" required />
+            </label>
+            <label>
+              <span>Description</span>
+              <textarea id="descriptionInput" name="description" rows="4" placeholder="단어 설명을 입력하세요." required></textarea>
+            </label>
+            <div class="editor-actions">
+              <button class="primary-button" type="submit">저장</button>
+              <a class="ghost-link" href="../index.html">완료</a>
+            </div>
+          </form>
+
+          <p class="editor-message" id="editorMessage" aria-live="polite"></p>
+        </section>
+
+        <aside class="editor-panel editor-panel--list" aria-label="저장된 퀴즈 데이터">
+          <div class="editor-panel__header">
+            <div>
+              <p class="hero-placeholder__eyebrow">Saved</p>
+              <h2>추가한 단어</h2>
+            </div>
+          </div>
+          <div class="saved-word-list" id="savedWordList"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./add-word.js"></script>
+  </body>
+</html>
