@@ -11,7 +11,7 @@
     <main class="page">
       <header class="hero">
         <div class="hero-placeholder">
-          <a class="hero-placeholder__link" href="https://mrjino.github.io/playground/index.html" aria-label="홈으로 이동">
+          <a class="hero-placeholder__link" href="https://mrjino.github.io/playground" aria-label="홈으로 이동">
             <img class="hero-placeholder__image" src="../assets/icons/profile_jino.png" alt="Words Quiz" />
           </a>
           <div class="hero-placeholder__content"></div>
@@ -34,41 +34,64 @@
       <section class="content-layout">
         <aside class="menu-panel" aria-label="단어 목록">
           <div class="menu-panel__header">
-            <div class="menu-panel__title">오늘의 단어</div>
-            <button class="ghost-button" id="shuffleButton" type="button">섞기</button>
+            <div class="menu-panel__title">메뉴트리</div>
+            <button class="menu-panel__search" id="openSubjectSearchButton" type="button">전체토픽 검색하기</button>
           </div>
-          <div class="word-list" id="wordList"></div>
+          <div class="subject-list" id="subjectList"></div>
         </aside>
 
-        <section class="battle-panel quiz-card" aria-live="polite">
-          <div class="round-meta">
-            <span id="roundText">1 / 1</span>
-            <span id="accuracyText">정답률 0%</span>
-          </div>
-
-          <div class="prompt-card">
-            <span class="prompt-label">Abbreviation</span>
-            <strong id="abbreviationText">API</strong>
-          </div>
-
-          <form class="answer-form" id="answerForm">
-            <label for="answerInputs">Full name</label>
-            <div class="answer-row">
-              <div class="answer-inputs" id="answerInputs"></div>
-              <button class="primary-button" type="submit">확인</button>
+        <section class="subject-browser-panel" id="subjectBrowserPanel" hidden>
+          <div class="subject-browser__top">
+            <div>
+              <h2>토픽 선택</h2>
+              <p>원하는 퀴즈 subject를 골라 시작하세요.</p>
             </div>
-          </form>
+            <label class="subject-search">
+              <span>토픽 검색</span>
+              <input id="subjectSearchInput" type="search" placeholder="예: CS, 네트워크, 영어" autocomplete="off" />
+            </label>
+          </div>
+          <div class="subject-browser-grid" id="subjectBrowserGrid"></div>
+          <div class="subject-browser__actions">
+            <a class="ghost-link" href="./add/">Subject / Quiz 관리</a>
+          </div>
+        </section>
 
-          <div class="feedback" id="feedbackBox" hidden>
-            <div class="feedback__result" id="feedbackResult"></div>
-            <div class="feedback__answer" id="feedbackAnswer"></div>
-            <p id="descriptionText"></p>
+        <section class="battle-panel quiz-card" aria-live="polite">
+          <div class="quiz-intro" id="quizIntroPanel">
+            <h2 id="quizIntroTitle">토픽을 선택하세요</h2>
+            <button class="quiz-intro__start" id="quizStartButton" type="button" disabled>퀴즈시작</button>
           </div>
 
-          <div class="quiz-actions">
-            <button class="ghost-button" id="hintButton" type="button">힌트</button>
-            <button class="ghost-button" id="skipButton" type="button">건너뛰기</button>
-            <button class="primary-button" id="nextButton" type="button" hidden>다음</button>
+          <div class="quiz-play-area" id="quizPlayArea" hidden>
+            <div class="round-meta">
+              <span id="roundText">1 / 1</span>
+              <span id="accuracyText">정답률 0%</span>
+            </div>
+
+            <div class="prompt-card">
+              <strong id="abbreviationText">API</strong>
+            </div>
+
+            <form class="answer-form" id="answerForm">
+              <label for="answerInputs">Full name</label>
+              <div class="answer-row">
+                <div class="answer-inputs" id="answerInputs"></div>
+              </div>
+            </form>
+
+            <div class="feedback" id="feedbackBox" hidden>
+              <div class="feedback__result" id="feedbackResult"></div>
+              <div class="feedback__answer" id="feedbackAnswer"></div>
+              <p id="descriptionText"></p>
+            </div>
+
+            <div class="quiz-actions">
+              <button class="primary-button" type="submit" form="answerForm">확인</button>
+              <button class="ghost-button" id="hintButton" type="button">힌트</button>
+              <button class="ghost-button" id="skipButton" type="button">건너뛰기</button>
+              <button class="primary-button" id="nextButton" type="button" hidden>다음</button>
+            </div>
           </div>
         </section>
 

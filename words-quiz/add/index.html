@@ -22,16 +22,44 @@
       </header>
 
       <section class="editor-layout">
-        <section class="editor-panel" aria-labelledby="editorTitle">
+        <section class="editor-panel" aria-labelledby="subjectEditorTitle">
           <div class="editor-panel__header">
             <div>
               <p class="hero-placeholder__eyebrow">Words Quiz</p>
-              <h1 id="editorTitle">퀴즈 데이터 추가</h1>
+              <h1 id="subjectEditorTitle">Subject 관리</h1>
             </div>
-            <button class="ghost-button" id="clearSavedButton" type="button">새로고침</button>
+            <button class="ghost-button" id="refreshButton" type="button">새로고침</button>
+          </div>
+
+          <form class="word-editor-form" id="subjectEditorForm">
+            <input id="subjectIdInput" name="id" type="hidden" />
+            <label>
+              <span>Title</span>
+              <input id="subjectTitleInput" name="title" type="text" autocomplete="off" placeholder="Computer Science" required />
+            </label>
+            <label>
+              <span>Description</span>
+              <textarea id="subjectDescriptionInput" name="description" rows="3" placeholder="Subject 설명을 입력하세요."></textarea>
+            </label>
+            <div class="editor-actions">
+              <button class="primary-button" type="submit">Subject 저장</button>
+              <button class="ghost-button" id="newSubjectButton" type="button">새 Subject</button>
+            </div>
+          </form>
+
+          <div class="saved-word-list subject-editor-list" id="subjectList"></div>
+        </section>
+
+        <section class="editor-panel editor-panel--list" aria-labelledby="wordEditorTitle">
+          <div class="editor-panel__header">
+            <div>
+              <p class="hero-placeholder__eyebrow">Selected Subject</p>
+              <h2 id="wordEditorTitle">퀴즈 데이터 관리</h2>
+            </div>
           </div>
 
           <form class="word-editor-form" id="wordEditorForm">
+            <input id="wordIdInput" name="id" type="hidden" />
             <label>
               <span>약자</span>
               <input id="abbreviationInput" name="abbreviation" type="text" autocomplete="off" placeholder="API" required />
@@ -45,23 +73,16 @@
               <textarea id="descriptionInput" name="description" rows="4" placeholder="단어 설명을 입력하세요." required></textarea>
             </label>
             <div class="editor-actions">
-              <button class="primary-button" type="submit">저장</button>
+              <button class="primary-button" type="submit">퀴즈 저장</button>
+              <button class="ghost-button" id="newWordButton" type="button">새 퀴즈</button>
               <a class="ghost-link" href="../index.html">완료</a>
             </div>
           </form>
 
           <p class="editor-message" id="editorMessage" aria-live="polite"></p>
-        </section>
 
-        <aside class="editor-panel editor-panel--list" aria-label="저장된 퀴즈 데이터">
-          <div class="editor-panel__header">
-            <div>
-              <p class="hero-placeholder__eyebrow">Saved</p>
-              <h2>추가한 단어</h2>
-            </div>
-          </div>
           <div class="saved-word-list" id="savedWordList"></div>
-        </aside>
+        </section>
       </section>
     </main>
 

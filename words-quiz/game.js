@@ -1,60 +1,13 @@
-const WORDS = [
-  {
-    abbreviation: 'API',
-    fullName: 'Application Programming Interface',
-    description: '소프트웨어끼리 기능과 데이터를 주고받기 위해 정의한 인터페이스입니다.',
-  },
-  {
-    abbreviation: 'CPU',
-    fullName: 'Central Processing Unit',
-    description: '컴퓨터의 명령어를 해석하고 실행하는 핵심 처리 장치입니다.',
-  },
-  {
-    abbreviation: 'HTML',
-    fullName: 'HyperText Markup Language',
-    description: '웹 페이지의 구조와 콘텐츠를 표현하는 마크업 언어입니다.',
-  },
-  {
-    abbreviation: 'CSS',
-    fullName: 'Cascading Style Sheets',
-    description: '웹 문서의 색상, 배치, 크기 같은 시각 표현을 정의합니다.',
-  },
-  {
-    abbreviation: 'SQL',
-    fullName: 'Structured Query Language',
-    description: '관계형 데이터베이스의 데이터를 조회하고 조작하는 언어입니다.',
-  },
-  {
-    abbreviation: 'URL',
-    fullName: 'Uniform Resource Locator',
-    description: '웹에서 리소스의 위치를 나타내는 주소 형식입니다.',
-  },
-  {
-    abbreviation: 'JSON',
-    fullName: 'JavaScript Object Notation',
-    description: '사람과 기계가 읽기 쉬운 경량 데이터 교환 형식입니다.',
-  },
-  {
-    abbreviation: 'DNS',
-    fullName: 'Domain Name System',
-    description: '도메인 이름을 네트워크 주소로 변환하는 시스템입니다.',
-  },
-  {
-    abbreviation: 'HTTP',
-    fullName: 'HyperText Transfer Protocol',
-    description: '웹 클라이언트와 서버가 요청과 응답을 주고받는 프로토콜입니다.',
-  },
-  {
-    abbreviation: 'RAM',
-    fullName: 'Random Access Memory',
-    description: '프로그램 실행 중 필요한 데이터를 임시로 저장하는 메모리입니다.',
-  },
-];
-
+const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
+const QUIZ_WORDS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/quiz-words`;
+const SUBJECTS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/subjects`;
 const STORAGE_KEY = 'words-quiz-history';
-const CUSTOM_WORDS_STORAGE_KEY = 'words-quiz-custom-words';
+const SELECTED_SUBJECT_STORAGE_KEY = 'words-quiz-selected-subject';
+const ABBREVIATION_REVEAL_INTERVAL = 600;
 
-let words = shuffle(getQuizWords());
+let subjects = [];
+let selectedSubjectId = null;
+let words = [];
 let currentIndex = 0;
 let score = 0;
 let streak = 0;
@@ -62,15 +15,26 @@ let attempts = 0;
 let correctAnswers = 0;
 let hasAnsweredCurrent = false;
 let history = readHistory();
+let abbreviationRevealTimer = null;
 
 const scoreText = document.getElementById('scoreText');
 const streakText = document.getElementById('streakText');
-const wordList = document.getElementById('wordList');
+const subjectList = document.getElementById('subjectList');
+const openSubjectSearchButton = document.getElementById('openSubjectSearchButton');
+const subjectBrowserPanel = document.getElementById('subjectBrowserPanel');
+const subjectSearchInput = document.getElementById('subjectSearchInput');
+const subjectBrowserGrid = document.getElementById('subjectBrowserGrid');
+const battlePanel = document.querySelector('.battle-panel');
+const quizIntroPanel = document.getElementById('quizIntroPanel');
+const quizIntroTitle = document.getElementById('quizIntroTitle');
+const quizStartButton = document.getElementById('quizStartButton');
+const quizPlayArea = document.getElementById('quizPlayArea');
 const historyList = document.getElementById('historyList');
 const roundText = document.getElementById('roundText');
 const accuracyText = document.getElementById('accuracyText');
 const abbreviationText = document.getElementById('abbreviationText');
 const answerForm = document.getElementById('answerForm');
+const answerSubmitButton = document.querySelector('[type="submit"][form="answerForm"]');
 const answerInputs = document.getElementById('answerInputs');
 const feedbackBox = document.getElementById('feedbackBox');
 const feedbackResult = document.getElementById('feedbackResult');
@@ -79,7 +43,6 @@ const descriptionText = document.getElementById('descriptionText');
 const hintButton = document.getElementById('hintButton');
 const skipButton = document.getElementById('skipButton');
 const nextButton = document.getElementById('nextButton');
-const shuffleButton = document.getElementById('shuffleButton');
 const resetButton = document.getElementById('resetButton');
 
 function shuffle(items) {
@@ -115,49 +78,160 @@ function readHistory() {
   }
 }
 
-function readCustomWords() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(CUSTOM_WORDS_STORAGE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed.filter(isValidWord) : [];
-  } catch {
-    return [];
-  }
-}
-
 function isValidWord(word) {
-  return Boolean(word?.abbreviation && word?.fullName && word?.description);
+  return Boolean(word?.abbreviation && word?.fullName);
 }
 
-function getQuizWords() {
-  const customWords = readCustomWords();
-  const merged = new Map();
+function toSubject(row) {
+  return {
+    id: Number(row.id),
+    title: String(row.title || '').trim(),
+    description: String(row.description || '').trim(),
+  };
+}
 
-  [...WORDS, ...customWords].forEach((word) => {
-    merged.set(word.abbreviation.trim().toUpperCase(), {
-      abbreviation: word.abbreviation.trim().toUpperCase(),
-      fullName: word.fullName.trim(),
-      description: word.description.trim(),
-    });
+function toQuizWord(row) {
+  return {
+    id: Number(row.id),
+    subjectId: row.subject_id === null || row.subject_id === undefined ? null : Number(row.subject_id),
+    abbreviation: String(row.abbreviation || '')
+      .trim()
+      .toUpperCase(),
+    fullName: String(row.full_name || row.fullName || '').trim(),
+    description: String(row.description || '').trim(),
+  };
+}
+
+function logApiRequest(label, url, options = {}) {
+  console.log('[WordsQuiz API] request', {
+    label,
+    method: options.method || 'GET',
+    url: String(url),
   });
+}
 
-  return Array.from(merged.values());
+function logApiResponse(label, response, payload) {
+  console.log('[WordsQuiz API] response', {
+    label,
+    status: response.status,
+    ok: response.ok,
+    payload,
+  });
+}
+
+async function fetchSubjects() {
+  logApiRequest('fetchSubjects', SUBJECTS_API_URL);
+  const response = await window.fetch(SUBJECTS_API_URL);
+  const payload = await response.json();
+  logApiResponse('fetchSubjects', response, payload);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load subjects: ${response.status}`);
+  }
+
+  const rows = Array.isArray(payload.subjects) ? payload.subjects : [];
+  return rows.map(toSubject).filter((subject) => subject.id && subject.title);
+}
+
+async function fetchQuizWords(subjectId) {
+  const url = new URL(QUIZ_WORDS_API_URL);
+
+  if (subjectId !== null) {
+    url.searchParams.set('subjectId', String(subjectId));
+  }
+
+  logApiRequest('fetchQuizWords', url);
+  const response = await window.fetch(url);
+  const payload = await response.json();
+  logApiResponse('fetchQuizWords', response, payload);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load quiz words: ${response.status}`);
+  }
+
+  const rows = Array.isArray(payload.words) ? payload.words : [];
+  return rows.map(toQuizWord).filter(isValidWord);
 }
 
 function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+  return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
+function stopAbbreviationReveal() {
+  if (abbreviationRevealTimer) {
+    window.clearInterval(abbreviationRevealTimer);
+    abbreviationRevealTimer = null;
+  }
+
+  abbreviationText.classList.remove('is-revealing');
+}
+
+function setAbbreviationText(value) {
+  stopAbbreviationReveal();
+  abbreviationText.textContent = value;
+}
+
+function revealAbbreviation(value) {
+  const letters = Array.from(String(value || ''));
+
+  stopAbbreviationReveal();
+  abbreviationText.textContent = '';
+
+  if (letters.length === 0) {
+    return;
+  }
+
+  let index = 0;
+  abbreviationText.classList.add('is-revealing');
+
+  const revealNextLetter = () => {
+    const letter = document.createElement('span');
+    letter.className = 'abbreviation-letter';
+    letter.textContent = letters[index];
+    abbreviationText.append(letter);
+    index += 1;
+
+    if (index >= letters.length) {
+      stopAbbreviationReveal();
+    }
+  };
+
+  revealNextLetter();
+
+  if (index < letters.length) {
+    abbreviationRevealTimer = window.setInterval(revealNextLetter, ABBREVIATION_REVEAL_INTERVAL);
+  }
+}
+
+function normalizeSearchText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replaceAll(/\s+/g, ' ');
+}
+
+function compactSearchText(value) {
+  return normalizeSearchText(value).replaceAll(/\s+/g, '');
 }
 
 function writeHistory() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, 20)));
 }
 
+function writeSelectedSubjectId(subjectId) {
+  localStorage.setItem(SELECTED_SUBJECT_STORAGE_KEY, String(subjectId));
+}
+
+function clearSelectedSubjectId() {
+  localStorage.removeItem(SELECTED_SUBJECT_STORAGE_KEY);
+}
+
 function getCurrentWord() {
   return words[currentIndex];
+}
+
+function getSelectedSubject() {
+  return subjects.find((subject) => subject.id === selectedSubjectId) || null;
 }
 
 function getFullNameParts(fullName) {
@@ -178,28 +252,107 @@ function getUserAnswer() {
 function updateStats() {
   scoreText.textContent = String(score);
   streakText.textContent = String(streak);
-  roundText.textContent = `${currentIndex + 1} / ${words.length}`;
+  roundText.textContent = words.length === 0 ? '0 / 0' : `${currentIndex + 1} / ${words.length}`;
   const accuracy = attempts === 0 ? 0 : Math.round((correctAnswers / attempts) * 100);
   accuracyText.textContent = `정답률 ${accuracy}%`;
 }
 
-function renderWordList() {
-  const currentWord = getCurrentWord();
+function renderSubjectList() {
+  if (subjects.length === 0) {
+    subjectList.innerHTML = '<div class="empty-state">등록된 subject가 없습니다.</div>';
+    return;
+  }
 
-  wordList.innerHTML = words
-    .map((word, index) => {
-      const recent = history.find((item) => item.abbreviation === word.abbreviation);
-      const stateClass = recent ? (recent.correct ? ' is-correct' : ' is-wrong') : '';
-      const currentClass = word === currentWord ? ' is-current' : '';
-
+  subjectList.innerHTML = subjects
+    .map((subject) => {
+      const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
       return `
-        <div class="word-chip${stateClass}${currentClass}">
-          <strong>${escapeHtml(word.abbreviation)}</strong>
-          <span>${index + 1}</span>
-        </div>
+        <button class="subject-chip${activeClass}" type="button" data-subject-id="${subject.id}">
+          <strong>${escapeHtml(subject.title)}</strong>
+        </button>
       `;
     })
     .join('');
+}
+
+function renderSubjectBrowser(searchTerm = '') {
+  const normalizedSearchTerm = normalizeSearchText(searchTerm);
+  const compactTerm = compactSearchText(searchTerm);
+  const filteredSubjects = subjects.filter((subject) => {
+    const searchText = normalizeSearchText(`${subject.title} ${subject.description}`);
+    const compactSearchTextValue = compactSearchText(`${subject.title} ${subject.description}`);
+    return !normalizedSearchTerm || searchText.includes(normalizedSearchTerm) || compactSearchTextValue.includes(compactTerm);
+  });
+
+  if (filteredSubjects.length === 0) {
+    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  subjectBrowserGrid.innerHTML = filteredSubjects
+    .map((subject) => {
+      const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
+      return `
+        <button class="subject-browser-card${activeClass}" type="button" data-subject-choice="${subject.id}">
+          <span class="subject-browser-card__group">Subject</span>
+          <strong>${escapeHtml(subject.title)}</strong>
+          ${subject.description ? `<p>${escapeHtml(subject.description)}</p>` : ''}
+        </button>
+      `;
+    })
+    .join('');
+}
+
+function showSubjectBrowser({ focusSearch = false } = {}) {
+  selectedSubjectId = null;
+  clearSelectedSubjectId();
+  renderSubjectList();
+  showSubjectIntro();
+  renderSubjectBrowser(subjectSearchInput.value);
+  subjectBrowserPanel.hidden = false;
+  battlePanel.hidden = true;
+
+  if (focusSearch) {
+    subjectSearchInput.focus();
+  }
+}
+
+function hideSubjectBrowser() {
+  subjectBrowserPanel.hidden = true;
+  battlePanel.hidden = false;
+}
+
+function resetQuizState() {
+  stopAbbreviationReveal();
+  words = [];
+  currentIndex = 0;
+  score = 0;
+  streak = 0;
+  attempts = 0;
+  correctAnswers = 0;
+  hasAnsweredCurrent = false;
+  updateStats();
+}
+
+function showSubjectIntro() {
+  const subject = getSelectedSubject();
+  resetQuizState();
+  quizPlayArea.hidden = true;
+  quizIntroPanel.hidden = false;
+  quizStartButton.disabled = !subject;
+  quizStartButton.textContent = '퀴즈시작';
+
+  if (!subject) {
+    quizIntroTitle.textContent = '토픽을 선택하세요';
+    return;
+  }
+
+  quizIntroTitle.textContent = subject.title;
+}
+
+function showQuizPlayArea() {
+  quizIntroPanel.hidden = true;
+  quizPlayArea.hidden = false;
 }
 
 function renderHistory() {
@@ -227,7 +380,7 @@ function setFeedback({ correct, answer, description, userAnswer }) {
   feedbackResult.classList.toggle('is-wrong', !correct);
   feedbackResult.textContent = correct ? '정답입니다.' : '오답입니다.';
   feedbackAnswer.textContent = `정답: ${answer}`;
-  descriptionText.textContent = correct ? description : `입력: ${userAnswer || '없음'} · ${description}`;
+  descriptionText.textContent = correct ? description : `입력: ${userAnswer || '없음'}\n${description}`;
 }
 
 function clearFeedback() {
@@ -244,20 +397,22 @@ function renderAnswerInputs(word) {
   answerInputs.innerHTML = parts
     .map(
       (part, index) => `
-        <input
-          class="answer-word-input"
-          name="answerWord${index + 1}"
-          type="text"
-          size="${part.length}"
-          maxlength="${part.length}"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-          aria-label="${index + 1}번째 단어"
-          placeholder="${'_'.repeat(part.length)}"
-          style="--answer-ch: ${part.length}"
-          data-answer-index="${index}"
-        />
+        <label class="answer-word-field" style="--answer-ch: ${part.length}">
+          <span class="answer-word-prefix" aria-hidden="true">${escapeHtml(part[0] ?? '')}</span>
+          <input
+            class="answer-word-input"
+            name="answerWord${index + 1}"
+            type="text"
+            size="${part.length}"
+            maxlength="${part.length}"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="${index + 1}번째 단어, ${escapeHtml(part[0] ?? '')}로 시작"
+            placeholder="${'_'.repeat(part.length)}"
+            data-answer-index="${index}"
+          />
+        </label>
       `,
     )
     .join('');
@@ -278,15 +433,33 @@ function renderAnswerInputs(word) {
 
 function renderQuestion() {
   const word = getCurrentWord();
+
+  if (!word) {
+    hasAnsweredCurrent = false;
+    setAbbreviationText('-');
+    answerInputs.innerHTML = '';
+    feedbackBox.hidden = false;
+    feedbackResult.classList.remove('is-correct', 'is-wrong');
+    feedbackResult.textContent = '퀴즈 데이터가 없습니다.';
+    feedbackAnswer.textContent = '';
+    descriptionText.textContent = selectedSubjectId ? '선택한 subject에 퀴즈 데이터를 등록한 뒤 다시 시도하세요.' : 'subject를 선택하거나 추가하세요.';
+    nextButton.hidden = true;
+    hintButton.disabled = true;
+    skipButton.disabled = true;
+    answerSubmitButton.disabled = true;
+    updateStats();
+    return;
+  }
+
   hasAnsweredCurrent = false;
-  abbreviationText.textContent = word.abbreviation;
+  revealAbbreviation(word.abbreviation);
   renderAnswerInputs(word);
   nextButton.hidden = true;
   hintButton.disabled = false;
   skipButton.disabled = false;
+  answerSubmitButton.disabled = false;
   clearFeedback();
   updateStats();
-  renderWordList();
   getAnswerInputElements()[0]?.focus();
 }
 
@@ -335,7 +508,6 @@ function submitAnswer(userAnswer) {
   });
   recordAnswer(word, userAnswer, correct);
   updateStats();
-  renderWordList();
   nextButton.focus();
 }
 
@@ -356,15 +528,75 @@ function goNext() {
   renderQuestion();
 }
 
-function resetGame({ reshuffle = false } = {}) {
-  const quizWords = getQuizWords();
-  words = reshuffle ? shuffle(quizWords) : quizWords;
-  currentIndex = 0;
-  score = 0;
-  streak = 0;
-  attempts = 0;
-  correctAnswers = 0;
-  renderQuestion();
+function renderLoading() {
+  renderSubjectList();
+  showQuizPlayArea();
+  setAbbreviationText('...');
+  answerInputs.innerHTML = '';
+  feedbackBox.hidden = true;
+  hintButton.disabled = true;
+  skipButton.disabled = true;
+  answerSubmitButton.disabled = true;
+  updateStats();
+}
+
+function renderLoadError(error) {
+  setAbbreviationText('-');
+  answerInputs.innerHTML = '';
+  feedbackBox.hidden = false;
+  feedbackResult.classList.remove('is-correct', 'is-wrong');
+  feedbackResult.textContent = '데이터 로드 실패';
+  feedbackAnswer.textContent = '';
+  descriptionText.textContent = error instanceof Error ? error.message : '잠시 후 다시 시도하세요.';
+  hintButton.disabled = true;
+  skipButton.disabled = true;
+  answerSubmitButton.disabled = true;
+  updateStats();
+}
+
+async function loadQuizWords({ reshuffle = true } = {}) {
+  if (selectedSubjectId === null) {
+    showSubjectIntro();
+    return;
+  }
+
+  renderLoading();
+
+  try {
+    const loadedWords = await fetchQuizWords(selectedSubjectId);
+    words = reshuffle ? shuffle(loadedWords) : loadedWords;
+    currentIndex = 0;
+    score = 0;
+    streak = 0;
+    attempts = 0;
+    correctAnswers = 0;
+    renderQuestion();
+  } catch (error) {
+    words = [];
+    renderLoadError(error);
+  }
+}
+
+async function loadSubjects() {
+  subjectList.innerHTML = '<div class="empty-state">subject를 불러오는 중입니다.</div>';
+
+  try {
+    subjects = await fetchSubjects();
+    selectedSubjectId = null;
+    clearSelectedSubjectId();
+    renderSubjectList();
+    renderSubjectBrowser(subjectSearchInput.value);
+    showSubjectIntro();
+  } catch (error) {
+    subjects = [];
+    selectedSubjectId = null;
+    subjectList.innerHTML = '<div class="empty-state">subject를 불러오지 못했습니다.</div>';
+    resetQuizState();
+    quizPlayArea.hidden = true;
+    quizIntroPanel.hidden = false;
+    quizStartButton.disabled = true;
+    quizIntroTitle.textContent = 'subject를 불러오지 못했습니다.';
+  }
 }
 
 answerForm.addEventListener('submit', (event) => {
@@ -380,8 +612,45 @@ skipButton.addEventListener('click', () => {
 
 nextButton.addEventListener('click', goNext);
 
-shuffleButton.addEventListener('click', () => {
-  resetGame({ reshuffle: true });
+subjectList.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-subject-id]');
+
+  if (!button) {
+    return;
+  }
+
+  selectedSubjectId = Number(button.dataset.subjectId);
+  writeSelectedSubjectId(selectedSubjectId);
+  renderSubjectList();
+  hideSubjectBrowser();
+  showSubjectIntro();
+});
+
+openSubjectSearchButton.addEventListener('click', () => {
+  showSubjectBrowser({ focusSearch: true });
+});
+
+subjectSearchInput.addEventListener('input', () => {
+  renderSubjectBrowser(subjectSearchInput.value);
+});
+
+subjectBrowserGrid.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-subject-choice]');
+
+  if (!button) {
+    return;
+  }
+
+  selectedSubjectId = Number(button.dataset.subjectChoice);
+  writeSelectedSubjectId(selectedSubjectId);
+  renderSubjectList();
+  renderSubjectBrowser(subjectSearchInput.value);
+  hideSubjectBrowser();
+  showSubjectIntro();
+});
+
+quizStartButton.addEventListener('click', () => {
+  loadQuizWords();
 });
 
 resetButton.addEventListener('click', () => {
@@ -391,4 +660,4 @@ resetButton.addEventListener('click', () => {
 });
 
 renderHistory();
-renderQuestion();
+loadSubjects();
