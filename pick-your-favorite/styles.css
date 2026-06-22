@@ -78,10 +78,10 @@ body.modal-open {
   min-height: 38px;
   flex: 0 0 auto;
   padding: 8px 12px;
-  border: 1px solid rgba(23, 34, 48, 0.08);
+  border: 1px solid rgba(48, 120, 239, 0.22);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--text);
+  background: rgba(48, 120, 239, 0.12);
+  color: #245fbd;
   font: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -94,9 +94,21 @@ body.modal-open {
 }
 
 .menu-panel__search:hover {
-  border-color: rgba(48, 120, 239, 0.28);
-  background: rgba(48, 120, 239, 0.1);
+  border-color: rgba(48, 120, 239, 0.34);
+  background: rgba(48, 120, 239, 0.18);
   transform: translateY(-1px);
+}
+
+.menu-panel__search:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.menu-panel__search:disabled:hover {
+  border-color: rgba(48, 120, 239, 0.22);
+  background: rgba(48, 120, 239, 0.12);
+  transform: none;
 }
 
 #menuList {

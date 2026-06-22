@@ -501,6 +501,7 @@ function showMenuBrowser(options = {}) {
   battleIntroPanel.hidden = true;
   battleGrid.hidden = true;
   menuBrowserPanel.hidden = false;
+  openMenuSearchButton.disabled = true;
   hideMenuRanking();
 
   if (options.updateUrl) {
@@ -623,6 +624,7 @@ async function activateMenuButton(button, options = {}) {
   try {
     menuBrowserPanel.hidden = true;
     battlePanel.hidden = false;
+    openMenuSearchButton.disabled = false;
     closeMobilePanels();
     setActiveMenuButton(button);
     activeMenuValue = button.dataset.menuValue || DEFAULT_MENU_VALUE;

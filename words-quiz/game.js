@@ -3,7 +3,8 @@ const QUIZ_WORDS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/quiz-words`;
 const SUBJECTS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/subjects`;
 const STORAGE_KEY = 'words-quiz-history';
 const SELECTED_SUBJECT_STORAGE_KEY = 'words-quiz-selected-subject';
-const ABBREVIATION_REVEAL_INTERVAL = 600;
+const SUBJECT_QUERY_PARAM = 'subjectId';
+const ABBREVIATION_REVEAL_INTERVAL = 500;
 
 let subjects = [];
 let selectedSubjectId = null;
@@ -16,11 +17,11 @@ let correctAnswers = 0;
 let hasAnsweredCurrent = false;
 let history = readHistory();
 let abbreviationRevealTimer = null;
+let descriptionDisplayState = null;
 
-const scoreText = document.getElementById('scoreText');
-const streakText = document.getElementById('streakText');
 const subjectList = document.getElementById('subjectList');
 const openSubjectSearchButton = document.getElementById('openSubjectSearchButton');
+const openAdminConfirmButton = document.getElementById('openAdminConfirmButton');
 const subjectBrowserPanel = document.getElementById('subjectBrowserPanel');
 const subjectSearchInput = document.getElementById('subjectSearchInput');
 const subjectBrowserGrid = document.getElementById('subjectBrowserGrid');
@@ -40,10 +41,18 @@ const feedbackBox = document.getElementById('feedbackBox');
 const feedbackResult = document.getElementById('feedbackResult');
 const feedbackAnswer = document.getElementById('feedbackAnswer');
 const descriptionText = document.getElementById('descriptionText');
+const descriptionEditButton = document.getElementById('descriptionEditButton');
+const descriptionEditDialog = document.getElementById('descriptionEditDialog');
+const descriptionEditForm = document.getElementById('descriptionEditForm');
+const descriptionEditInput = document.getElementById('descriptionEditInput');
+const descriptionEditMessage = document.getElementById('descriptionEditMessage');
+const descriptionEditCancelButton = document.getElementById('descriptionEditCancelButton');
+const descriptionEditCancelAction = document.getElementById('descriptionEditCancelAction');
 const hintButton = document.getElementById('hintButton');
 const skipButton = document.getElementById('skipButton');
-const nextButton = document.getElementById('nextButton');
 const resetButton = document.getElementById('resetButton');
+const ANSWER_SUBMIT_TEXT = '확인';
+const ANSWER_NEXT_TEXT = '다음';
 
 function shuffle(items) {
   const result = [...items];
@@ -153,6 +162,27 @@ async function fetchQuizWords(subjectId) {
   return rows.map(toQuizWord).filter(isValidWord);
 }
 
+async function saveQuizWord(word) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(word),
+  };
+
+  logApiRequest('saveQuizWord', QUIZ_WORDS_API_URL, options);
+  const response = await window.fetch(QUIZ_WORDS_API_URL, options);
+  const payload = await response.json();
+  logApiResponse('saveQuizWord', response, payload);
+
+  if (!response.ok) {
+    throw new Error(`Failed to save quiz word: ${response.status}`);
+  }
+
+  return toQuizWord(payload.word);
+}
+
 function escapeHtml(value) {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
@@ -226,6 +256,45 @@ function clearSelectedSubjectId() {
   localStorage.removeItem(SELECTED_SUBJECT_STORAGE_KEY);
 }
 
+function hasSubjectQueryParam() {
+  const params = new URLSearchParams(window.location.search);
+  return params.has(SUBJECT_QUERY_PARAM);
+}
+
+function getSubjectIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const subjectId = Number(params.get(SUBJECT_QUERY_PARAM));
+  return Number.isInteger(subjectId) && subjectId > 0 ? subjectId : null;
+}
+
+function updateSubjectQueryParam(subjectId, shouldReplace = false) {
+  if (!subjectId) {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set(SUBJECT_QUERY_PARAM, String(subjectId));
+
+  if (url.href === window.location.href) {
+    return;
+  }
+
+  const method = shouldReplace ? 'replaceState' : 'pushState';
+  window.history[method]({}, '', url);
+}
+
+function clearSubjectQueryParam(shouldReplace = false) {
+  if (!hasSubjectQueryParam()) {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete(SUBJECT_QUERY_PARAM);
+
+  const method = shouldReplace ? 'replaceState' : 'pushState';
+  window.history[method]({}, '', url);
+}
+
 function getCurrentWord() {
   return words[currentIndex];
 }
@@ -250,8 +319,6 @@ function getUserAnswer() {
 }
 
 function updateStats() {
-  scoreText.textContent = String(score);
-  streakText.textContent = String(streak);
   roundText.textContent = words.length === 0 ? '0 / 0' : `${currentIndex + 1} / ${words.length}`;
   const accuracy = attempts === 0 ? 0 : Math.round((correctAnswers / attempts) * 100);
   accuracyText.textContent = `정답률 ${accuracy}%`;
@@ -294,7 +361,6 @@ function renderSubjectBrowser(searchTerm = '') {
       const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
       return `
         <button class="subject-browser-card${activeClass}" type="button" data-subject-choice="${subject.id}">
-          <span class="subject-browser-card__group">Subject</span>
           <strong>${escapeHtml(subject.title)}</strong>
           ${subject.description ? `<p>${escapeHtml(subject.description)}</p>` : ''}
         </button>
@@ -303,14 +369,19 @@ function renderSubjectBrowser(searchTerm = '') {
     .join('');
 }
 
-function showSubjectBrowser({ focusSearch = false } = {}) {
+function showSubjectBrowser({ updateUrl = false, focusSearch = false } = {}) {
   selectedSubjectId = null;
   clearSelectedSubjectId();
+  resetQuizState();
   renderSubjectList();
-  showSubjectIntro();
   renderSubjectBrowser(subjectSearchInput.value);
   subjectBrowserPanel.hidden = false;
   battlePanel.hidden = true;
+  openSubjectSearchButton.disabled = true;
+
+  if (updateUrl) {
+    clearSubjectQueryParam();
+  }
 
   if (focusSearch) {
     subjectSearchInput.focus();
@@ -320,6 +391,7 @@ function showSubjectBrowser({ focusSearch = false } = {}) {
 function hideSubjectBrowser() {
   subjectBrowserPanel.hidden = true;
   battlePanel.hidden = false;
+  openSubjectSearchButton.disabled = false;
 }
 
 function resetQuizState() {
@@ -343,7 +415,7 @@ function showSubjectIntro() {
   quizStartButton.textContent = '퀴즈시작';
 
   if (!subject) {
-    quizIntroTitle.textContent = '토픽을 선택하세요';
+    showSubjectBrowser();
     return;
   }
 
@@ -374,21 +446,37 @@ function renderHistory() {
     .join('');
 }
 
+function setDescriptionEditVisible(visible) {
+  descriptionEditButton.hidden = !visible;
+  descriptionEditButton.disabled = !visible;
+}
+
+function renderDescriptionText(description) {
+  descriptionText.textContent = description;
+}
+
 function setFeedback({ correct, answer, description, userAnswer }) {
   feedbackBox.hidden = false;
+  descriptionDisplayState = {
+    type: 'answer',
+    correct,
+  };
   feedbackResult.classList.toggle('is-correct', correct);
   feedbackResult.classList.toggle('is-wrong', !correct);
   feedbackResult.textContent = correct ? '정답입니다.' : '오답입니다.';
   feedbackAnswer.textContent = `정답: ${answer}`;
-  descriptionText.textContent = correct ? description : `입력: ${userAnswer || '없음'}\n${description}`;
+  renderDescriptionText(description);
+  setDescriptionEditVisible(Boolean(getCurrentWord()));
 }
 
 function clearFeedback() {
   feedbackBox.hidden = true;
+  descriptionDisplayState = null;
   feedbackResult.classList.remove('is-correct', 'is-wrong');
   feedbackResult.textContent = '';
   feedbackAnswer.textContent = '';
   descriptionText.textContent = '';
+  setDescriptionEditVisible(false);
 }
 
 function renderAnswerInputs(word) {
@@ -433,6 +521,7 @@ function renderAnswerInputs(word) {
 
 function renderQuestion() {
   const word = getCurrentWord();
+  answerSubmitButton.textContent = ANSWER_SUBMIT_TEXT;
 
   if (!word) {
     hasAnsweredCurrent = false;
@@ -443,7 +532,7 @@ function renderQuestion() {
     feedbackResult.textContent = '퀴즈 데이터가 없습니다.';
     feedbackAnswer.textContent = '';
     descriptionText.textContent = selectedSubjectId ? '선택한 subject에 퀴즈 데이터를 등록한 뒤 다시 시도하세요.' : 'subject를 선택하거나 추가하세요.';
-    nextButton.hidden = true;
+    setDescriptionEditVisible(false);
     hintButton.disabled = true;
     skipButton.disabled = true;
     answerSubmitButton.disabled = true;
@@ -454,7 +543,6 @@ function renderQuestion() {
   hasAnsweredCurrent = false;
   revealAbbreviation(word.abbreviation);
   renderAnswerInputs(word);
-  nextButton.hidden = true;
   hintButton.disabled = false;
   skipButton.disabled = false;
   answerSubmitButton.disabled = false;
@@ -490,7 +578,6 @@ function submitAnswer(userAnswer) {
   });
   hintButton.disabled = true;
   skipButton.disabled = true;
-  nextButton.hidden = false;
 
   if (correct) {
     correctAnswers += 1;
@@ -508,7 +595,7 @@ function submitAnswer(userAnswer) {
   });
   recordAnswer(word, userAnswer, correct);
   updateStats();
-  nextButton.focus();
+  answerSubmitButton.textContent = ANSWER_NEXT_TEXT;
 }
 
 function showHint() {
@@ -517,10 +604,64 @@ function showHint() {
   const hint = parts.map((part) => `${part[0]}${'_'.repeat(Math.max(part.length - 1, 0))}`).join(' ');
 
   feedbackBox.hidden = false;
+  descriptionDisplayState = {
+    type: 'hint',
+  };
   feedbackResult.classList.remove('is-correct', 'is-wrong');
   feedbackResult.textContent = '힌트';
   feedbackAnswer.textContent = hint;
-  descriptionText.textContent = word.description;
+  renderDescriptionText(word.description);
+  setDescriptionEditVisible(true);
+}
+
+function closeDescriptionEditor() {
+  descriptionEditDialog.close();
+}
+
+function openDescriptionEditor() {
+  const word = getCurrentWord();
+
+  if (!word) {
+    return;
+  }
+
+  descriptionEditInput.value = word.description;
+  descriptionEditMessage.textContent = '';
+  descriptionEditDialog.showModal();
+  descriptionEditInput.focus();
+}
+
+async function saveCurrentDescription() {
+  const word = getCurrentWord();
+
+  if (!word) {
+    descriptionEditMessage.textContent = '수정할 퀴즈를 찾지 못했습니다.';
+    return;
+  }
+
+  const description = descriptionEditInput.value.trim();
+  const submitButton = descriptionEditForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  descriptionEditMessage.textContent = '저장 중입니다.';
+
+  try {
+    const savedWord = await saveQuizWord({
+      id: word.id,
+      subjectId: word.subjectId,
+      abbreviation: word.abbreviation,
+      fullName: word.fullName,
+      description,
+    });
+
+    words[currentIndex] = savedWord;
+    renderDescriptionText(savedWord.description);
+    descriptionEditMessage.textContent = '저장했습니다.';
+    closeDescriptionEditor();
+  } catch (error) {
+    descriptionEditMessage.textContent = error instanceof Error ? error.message : '설명을 저장하지 못했습니다.';
+  } finally {
+    submitButton.disabled = false;
+  }
 }
 
 function goNext() {
@@ -534,6 +675,8 @@ function renderLoading() {
   setAbbreviationText('...');
   answerInputs.innerHTML = '';
   feedbackBox.hidden = true;
+  setDescriptionEditVisible(false);
+  answerSubmitButton.textContent = ANSWER_SUBMIT_TEXT;
   hintButton.disabled = true;
   skipButton.disabled = true;
   answerSubmitButton.disabled = true;
@@ -544,6 +687,8 @@ function renderLoadError(error) {
   setAbbreviationText('-');
   answerInputs.innerHTML = '';
   feedbackBox.hidden = false;
+  setDescriptionEditVisible(false);
+  answerSubmitButton.textContent = ANSWER_SUBMIT_TEXT;
   feedbackResult.classList.remove('is-correct', 'is-wrong');
   feedbackResult.textContent = '데이터 로드 실패';
   feedbackAnswer.textContent = '';
@@ -556,7 +701,7 @@ function renderLoadError(error) {
 
 async function loadQuizWords({ reshuffle = true } = {}) {
   if (selectedSubjectId === null) {
-    showSubjectIntro();
+    showSubjectBrowser({ updateUrl: true, focusSearch: true });
     return;
   }
 
@@ -580,23 +725,54 @@ async function loadQuizWords({ reshuffle = true } = {}) {
 async function loadSubjects() {
   subjectList.innerHTML = '<div class="empty-state">subject를 불러오는 중입니다.</div>';
 
+  if (!hasSubjectQueryParam()) {
+    resetQuizState();
+    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">토픽을 불러오는 중입니다.</div>';
+    subjectBrowserPanel.hidden = false;
+    battlePanel.hidden = true;
+  }
+
   try {
     subjects = await fetchSubjects();
     selectedSubjectId = null;
+
+    const initialSubjectId = getSubjectIdFromUrl();
+    if (initialSubjectId && selectSubject(initialSubjectId, { replace: true })) {
+      return;
+    }
+
     clearSelectedSubjectId();
-    renderSubjectList();
-    renderSubjectBrowser(subjectSearchInput.value);
-    showSubjectIntro();
+    if (hasSubjectQueryParam()) {
+      clearSubjectQueryParam(true);
+    }
+
+    showSubjectBrowser();
   } catch (error) {
     subjects = [];
     selectedSubjectId = null;
     subjectList.innerHTML = '<div class="empty-state">subject를 불러오지 못했습니다.</div>';
     resetQuizState();
-    quizPlayArea.hidden = true;
-    quizIntroPanel.hidden = false;
-    quizStartButton.disabled = true;
-    quizIntroTitle.textContent = 'subject를 불러오지 못했습니다.';
+    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">토픽을 불러오지 못했습니다.</div>';
+    subjectBrowserPanel.hidden = false;
+    battlePanel.hidden = true;
   }
+}
+
+function selectSubject(subjectId, options = {}) {
+  const nextSubjectId = Number(subjectId);
+
+  if (!subjects.some((subject) => subject.id === nextSubjectId)) {
+    return false;
+  }
+
+  selectedSubjectId = nextSubjectId;
+  writeSelectedSubjectId(selectedSubjectId);
+  updateSubjectQueryParam(selectedSubjectId, options.replace);
+  renderSubjectList();
+  renderSubjectBrowser(subjectSearchInput.value);
+  hideSubjectBrowser();
+  showSubjectIntro();
+  return true;
 }
 
 answerForm.addEventListener('submit', (event) => {
@@ -607,10 +783,30 @@ answerForm.addEventListener('submit', (event) => {
 hintButton.addEventListener('click', showHint);
 
 skipButton.addEventListener('click', () => {
-  submitAnswer('');
+  goNext();
 });
 
-nextButton.addEventListener('click', goNext);
+openAdminConfirmButton.addEventListener('click', () => {
+  window.ConfirmDialog.show({
+    title: 'Admin 페이지로 이동하시겠습니까?',
+    message: '현재 퀴즈 화면을 떠나 관리자 페이지로 이동합니다.',
+    confirmText: '네',
+    cancelText: '아니오',
+    onConfirm: () => {
+      window.location.href = '../admin/';
+    },
+  });
+});
+
+descriptionEditButton.addEventListener('click', openDescriptionEditor);
+
+descriptionEditForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  saveCurrentDescription();
+});
+
+descriptionEditCancelButton.addEventListener('click', closeDescriptionEditor);
+descriptionEditCancelAction.addEventListener('click', closeDescriptionEditor);
 
 subjectList.addEventListener('click', async (event) => {
   const button = event.target.closest('[data-subject-id]');
@@ -619,15 +815,11 @@ subjectList.addEventListener('click', async (event) => {
     return;
   }
 
-  selectedSubjectId = Number(button.dataset.subjectId);
-  writeSelectedSubjectId(selectedSubjectId);
-  renderSubjectList();
-  hideSubjectBrowser();
-  showSubjectIntro();
+  selectSubject(button.dataset.subjectId);
 });
 
 openSubjectSearchButton.addEventListener('click', () => {
-  showSubjectBrowser({ focusSearch: true });
+  showSubjectBrowser({ updateUrl: true, focusSearch: true });
 });
 
 subjectSearchInput.addEventListener('input', () => {
@@ -641,12 +833,7 @@ subjectBrowserGrid.addEventListener('click', async (event) => {
     return;
   }
 
-  selectedSubjectId = Number(button.dataset.subjectChoice);
-  writeSelectedSubjectId(selectedSubjectId);
-  renderSubjectList();
-  renderSubjectBrowser(subjectSearchInput.value);
-  hideSubjectBrowser();
-  showSubjectIntro();
+  selectSubject(button.dataset.subjectChoice);
 });
 
 quizStartButton.addEventListener('click', () => {
@@ -657,6 +844,14 @@ resetButton.addEventListener('click', () => {
   history = [];
   writeHistory();
   renderHistory();
+});
+
+window.addEventListener('popstate', () => {
+  const subjectId = getSubjectIdFromUrl();
+
+  if (!subjectId || !selectSubject(subjectId, { replace: true })) {
+    showSubjectBrowser();
+  }
 });
 
 renderHistory();

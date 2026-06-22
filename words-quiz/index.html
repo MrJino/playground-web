@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
     <title>Words Quiz</title>
+    <link rel="stylesheet" href="../shared/confirm-dialog.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -16,17 +17,7 @@
           </a>
           <div class="hero-placeholder__content"></div>
           <div class="hero-actions">
-            <a class="hero-action-button" href="./add/">퀴즈 추가</a>
-            <div class="hero-stats" aria-label="게임 현황">
-              <div>
-                <span>Score</span>
-                <strong id="scoreText">0</strong>
-              </div>
-              <div>
-                <span>Streak</span>
-                <strong id="streakText">0</strong>
-              </div>
-            </div>
+            <button class="hero-action-button" id="openAdminConfirmButton" type="button">Admin</button>
           </div>
         </div>
       </header>
@@ -44,7 +35,7 @@
           <div class="subject-browser__top">
             <div>
               <h2>토픽 선택</h2>
-              <p>원하는 퀴즈 subject를 골라 시작하세요.</p>
+              <p>원하는 퀴즈 토픽을 골라 시작하세요.</p>
             </div>
             <label class="subject-search">
               <span>토픽 검색</span>
@@ -52,45 +43,44 @@
             </label>
           </div>
           <div class="subject-browser-grid" id="subjectBrowserGrid"></div>
-          <div class="subject-browser__actions">
-            <a class="ghost-link" href="./add/">Subject / Quiz 관리</a>
-          </div>
         </section>
 
         <section class="battle-panel quiz-card" aria-live="polite">
           <div class="quiz-intro" id="quizIntroPanel">
-            <h2 id="quizIntroTitle">토픽을 선택하세요</h2>
+            <h2 id="quizIntroTitle"></h2>
             <button class="quiz-intro__start" id="quizStartButton" type="button" disabled>퀴즈시작</button>
           </div>
 
           <div class="quiz-play-area" id="quizPlayArea" hidden>
-            <div class="round-meta">
-              <span id="roundText">1 / 1</span>
-              <span id="accuracyText">정답률 0%</span>
-            </div>
-
             <div class="prompt-card">
               <strong id="abbreviationText">API</strong>
             </div>
 
             <form class="answer-form" id="answerForm">
-              <label for="answerInputs">Full name</label>
               <div class="answer-row">
                 <div class="answer-inputs" id="answerInputs"></div>
               </div>
+              <button class="primary-button answer-submit" type="submit" form="answerForm">확인</button>
             </form>
 
             <div class="feedback" id="feedbackBox" hidden>
               <div class="feedback__result" id="feedbackResult"></div>
               <div class="feedback__answer" id="feedbackAnswer"></div>
-              <p id="descriptionText"></p>
+              <div class="description-panel">
+                <button class="description-edit-button" id="descriptionEditButton" type="button" aria-label="설명 편집" title="설명 편집" hidden>✎</button>
+                <p id="descriptionText"></p>
+              </div>
             </div>
 
             <div class="quiz-actions">
-              <button class="primary-button" type="submit" form="answerForm">확인</button>
-              <button class="ghost-button" id="hintButton" type="button">힌트</button>
-              <button class="ghost-button" id="skipButton" type="button">건너뛰기</button>
-              <button class="primary-button" id="nextButton" type="button" hidden>다음</button>
+              <div class="round-meta">
+                <span id="roundText">1 / 1</span>
+                <span id="accuracyText">정답률 0%</span>
+              </div>
+              <div class="quiz-actions__controls">
+                <button class="ghost-button" id="skipButton" type="button">건너뛰기</button>
+                <button class="ghost-button" id="hintButton" type="button">힌트</button>
+              </div>
             </div>
           </div>
         </section>
@@ -110,6 +100,22 @@
       </section>
     </main>
 
+    <dialog class="description-dialog" id="descriptionEditDialog">
+      <form class="description-dialog__form" id="descriptionEditForm" method="dialog">
+        <div class="description-dialog__top">
+          <h2>설명 편집</h2>
+          <button class="description-dialog__close" id="descriptionEditCancelButton" type="button" aria-label="닫기">×</button>
+        </div>
+        <textarea id="descriptionEditInput" rows="8" aria-label="설명"></textarea>
+        <p class="description-dialog__message" id="descriptionEditMessage" aria-live="polite"></p>
+        <div class="description-dialog__actions">
+          <button class="ghost-button" type="button" id="descriptionEditCancelAction">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="../shared/confirm-dialog.js"></script>
     <script src="./game.js"></script>
   </body>
 </html>
