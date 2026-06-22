@@ -1,7 +1,3 @@
-const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
-const SUBJECTS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/subjects`;
-const QUIZ_WORDS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/quiz-words`;
-
 let activeModuleId = 'words-quiz';
 let subjects = [];
 let words = [];
@@ -49,6 +45,14 @@ const wordDetailAbbreviation = document.getElementById('wordDetailAbbreviation')
 const wordDetailFullName = document.getElementById('wordDetailFullName');
 const wordDetailDescription = document.getElementById('wordDetailDescription');
 const closeWordDetailButton = document.getElementById('closeWordDetailButton');
+const {
+  fetchSubjects,
+  saveSubject,
+  deleteSubject,
+  fetchQuizWords: fetchWords,
+  saveQuizWord: saveWord,
+  deleteQuizWord: deleteWord,
+} = window.PlaygroundCloudflareApi;
 
 function escapeHtml(value) {
   return String(value)
@@ -57,24 +61,6 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
-}
-
-function toSubject(row) {
-  return {
-    id: Number(row.id),
-    title: String(row.title || '').trim(),
-    description: String(row.description || '').trim(),
-  };
-}
-
-function toWord(row) {
-  return {
-    id: Number(row.id),
-    subjectId: row.subject_id === null || row.subject_id === undefined ? null : Number(row.subject_id),
-    abbreviation: String(row.abbreviation || '').trim(),
-    fullName: String(row.fullName ?? row.full_name ?? '').trim(),
-    description: String(row.description || '').trim(),
-  };
 }
 
 function setStatus(message = '') {
@@ -89,77 +75,6 @@ function setBusy(nextBusy) {
   wordForm.querySelector('[type="submit"]').disabled = isBusy || subjects.length === 0;
   deleteSubjectButton.disabled = isBusy || !subjectIdInput.value;
   confirmDeleteWordButton.disabled = isBusy || pendingDeleteWord === null;
-}
-
-async function requestJson(url, options = {}) {
-  const response = await fetch(url, options);
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(payload.error || `Request failed: ${response.status}`);
-  }
-
-  return payload;
-}
-
-async function fetchSubjects() {
-  const payload = await requestJson(SUBJECTS_API_URL);
-  return Array.isArray(payload.subjects) ? payload.subjects.map(toSubject) : [];
-}
-
-async function fetchWords(subjectId = null) {
-  const url = new URL(QUIZ_WORDS_API_URL);
-
-  if (subjectId !== null) {
-    url.searchParams.set('subjectId', String(subjectId));
-  }
-
-  const payload = await requestJson(url);
-  return Array.isArray(payload.words) ? payload.words.map(toWord) : [];
-}
-
-async function saveSubject(subject) {
-  const payload = await requestJson(SUBJECTS_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(subject),
-  });
-
-  return toSubject(payload.subject);
-}
-
-async function deleteSubject(id) {
-  const url = new URL(SUBJECTS_API_URL);
-  url.searchParams.set('id', String(id));
-  const payload = await requestJson(url, {
-    method: 'DELETE',
-  });
-
-  return toSubject(payload.subject);
-}
-
-async function saveWord(word) {
-  const payload = await requestJson(QUIZ_WORDS_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(word),
-  });
-
-  return toWord(payload.word);
-}
-
-async function deleteWord(id) {
-  const url = new URL(QUIZ_WORDS_API_URL);
-  url.searchParams.set('id', String(id));
-  const payload = await requestJson(url, {
-    method: 'DELETE',
-  });
-
-  return toWord(payload.word);
 }
 
 function getSelectedSubject() {

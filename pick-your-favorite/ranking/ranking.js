@@ -1,7 +1,7 @@
 const MENU_QUERY_PARAM = 'menu';
 const DEFAULT_MENU_VALUE = 'boy-idol';
 const MENU_CONFIG_SOURCE = '../res/menu.json';
-const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
+const { fetchWinnerSummary } = window.PlaygroundCloudflareApi;
 
 const rankingTitle = document.getElementById('rankingTitle');
 const rankingSummary = document.getElementById('rankingSummary');
@@ -137,17 +137,8 @@ async function loadRanking() {
   renderLoading();
 
   try {
-    const url = new URL('/api/winners/summary', CLOUDFLARE_API_BASE_URL);
-    url.searchParams.set('menu', menuValue);
-
-    const response = await window.fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to load ranking: ${response.status}`);
-    }
-
-    const payload = await response.json();
-    renderRanking(payload.summary);
+    const summary = await fetchWinnerSummary(menuValue);
+    renderRanking(summary);
   } catch (error) {
     console.error(error);
     renderEmpty('랭킹을 불러오지 못했습니다.');

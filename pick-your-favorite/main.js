@@ -2,8 +2,8 @@ const FINAL_CARDS_STORAGE_KEY = 'worldcup-final-cards';
 const DEFAULT_MENU_VALUE = 'boy-idol';
 const MENU_QUERY_PARAM = 'menu';
 const MENU_CONFIG_SOURCE = 'res/menu.json';
-const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
 const LANGUAGE_STORAGE_KEY = 'playground-language';
+const { fetchWinnerSummary, saveWinner } = window.PlaygroundCloudflareApi;
 
 let initialCards = [];
 let activePool = [];
@@ -944,22 +944,13 @@ async function loadMenuRanking(menuValue = DEFAULT_MENU_VALUE) {
   renderMenuRankingLoading();
 
   try {
-    const url = new URL('/api/winners/summary', CLOUDFLARE_API_BASE_URL);
-    url.searchParams.set('menu', menuValue || DEFAULT_MENU_VALUE);
-
-    const response = await window.fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to load ranking: ${response.status}`);
-    }
-
-    const payload = await response.json();
+    const summary = await fetchWinnerSummary(menuValue || DEFAULT_MENU_VALUE);
 
     if (rankingRequestId !== activeRankingRequestId) {
       return;
     }
 
-    renderMenuRanking(payload.summary);
+    renderMenuRanking(summary);
   } catch (error) {
     if (rankingRequestId !== activeRankingRequestId) {
       return;
@@ -1030,23 +1021,13 @@ async function persistCloudflareWinner(card) {
   const menuValue = getActiveMenuValue();
 
   try {
-    const response = await window.fetch(`${CLOUDFLARE_API_BASE_URL}/api/winners`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        menu: menuValue,
-        cardId: card.id,
-        cardName: card.name,
-        description: card.description,
-        image: card.image,
-      }),
+    await saveWinner({
+      menu: menuValue,
+      cardId: card.id,
+      cardName: card.name,
+      description: card.description,
+      image: card.image,
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to save Cloudflare winner: ${response.status}`);
-    }
 
     loadMenuRanking(menuValue);
   } catch (error) {

@@ -1,10 +1,8 @@
-const CLOUDFLARE_API_BASE_URL = 'https://playground-api.for1self.workers.dev';
-const QUIZ_WORDS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/quiz-words`;
-const SUBJECTS_API_URL = `${CLOUDFLARE_API_BASE_URL}/api/subjects`;
 const STORAGE_KEY = 'words-quiz-history';
 const SELECTED_SUBJECT_STORAGE_KEY = 'words-quiz-selected-subject';
 const SUBJECT_QUERY_PARAM = 'subjectId';
 const ABBREVIATION_REVEAL_INTERVAL = 500;
+const { fetchSubjects: fetchCloudflareSubjects, fetchQuizWords: fetchCloudflareQuizWords, saveQuizWord } = window.PlaygroundCloudflareApi;
 
 let subjects = [];
 let selectedSubjectId = null;
@@ -91,96 +89,14 @@ function isValidWord(word) {
   return Boolean(word?.abbreviation && word?.fullName);
 }
 
-function toSubject(row) {
-  return {
-    id: Number(row.id),
-    title: String(row.title || '').trim(),
-    description: String(row.description || '').trim(),
-  };
-}
-
-function toQuizWord(row) {
-  return {
-    id: Number(row.id),
-    subjectId: row.subject_id === null || row.subject_id === undefined ? null : Number(row.subject_id),
-    abbreviation: String(row.abbreviation || '')
-      .trim()
-      .toUpperCase(),
-    fullName: String(row.full_name || row.fullName || '').trim(),
-    description: String(row.description || '').trim(),
-  };
-}
-
-function logApiRequest(label, url, options = {}) {
-  console.log('[WordsQuiz API] request', {
-    label,
-    method: options.method || 'GET',
-    url: String(url),
-  });
-}
-
-function logApiResponse(label, response, payload) {
-  console.log('[WordsQuiz API] response', {
-    label,
-    status: response.status,
-    ok: response.ok,
-    payload,
-  });
-}
-
 async function fetchSubjects() {
-  logApiRequest('fetchSubjects', SUBJECTS_API_URL);
-  const response = await window.fetch(SUBJECTS_API_URL);
-  const payload = await response.json();
-  logApiResponse('fetchSubjects', response, payload);
-
-  if (!response.ok) {
-    throw new Error(`Failed to load subjects: ${response.status}`);
-  }
-
-  const rows = Array.isArray(payload.subjects) ? payload.subjects : [];
-  return rows.map(toSubject).filter((subject) => subject.id && subject.title);
+  const loadedSubjects = await fetchCloudflareSubjects();
+  return loadedSubjects.filter((subject) => subject.id && subject.title);
 }
 
 async function fetchQuizWords(subjectId) {
-  const url = new URL(QUIZ_WORDS_API_URL);
-
-  if (subjectId !== null) {
-    url.searchParams.set('subjectId', String(subjectId));
-  }
-
-  logApiRequest('fetchQuizWords', url);
-  const response = await window.fetch(url);
-  const payload = await response.json();
-  logApiResponse('fetchQuizWords', response, payload);
-
-  if (!response.ok) {
-    throw new Error(`Failed to load quiz words: ${response.status}`);
-  }
-
-  const rows = Array.isArray(payload.words) ? payload.words : [];
-  return rows.map(toQuizWord).filter(isValidWord);
-}
-
-async function saveQuizWord(word) {
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(word),
-  };
-
-  logApiRequest('saveQuizWord', QUIZ_WORDS_API_URL, options);
-  const response = await window.fetch(QUIZ_WORDS_API_URL, options);
-  const payload = await response.json();
-  logApiResponse('saveQuizWord', response, payload);
-
-  if (!response.ok) {
-    throw new Error(`Failed to save quiz word: ${response.status}`);
-  }
-
-  return toQuizWord(payload.word);
+  const loadedWords = await fetchCloudflareQuizWords(subjectId);
+  return loadedWords.filter(isValidWord);
 }
 
 function escapeHtml(value) {
