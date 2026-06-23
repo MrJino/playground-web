@@ -6,11 +6,20 @@
     <title>Playground</title>
     <link rel="stylesheet" href="../assets/css/tailwind.css" />
     <link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2370597715066024" crossorigin="anonymous"></script>
     <script src="../assets/components/navigation-dropdown.js" defer></script>
   </head>
   <body>
     <main class="page">
       <div class="page-inner">
+        <header class="home-header fade-in">
+          <a class="brand" href="./" aria-label="Playground 홈">
+            <img src="assets/icons/game.png" alt="" class="brand-icon" aria-hidden="true" />
+            <h1 class="brand-title">Play</h1>
+          </a>
+        </header>
+
         <section class="app-grid" aria-label="앱 메뉴">
           <a class="app-card fade-in delay-1" href="pick-your-favorite/">
             <div>
@@ -18,7 +27,6 @@
               <h2 class="app-card__title">Pick your favorite</h2>
               <p class="app-card__desc">카드를 골라 최종 후보를 만드는 월드컵형 선택 게임입니다.</p>
             </div>
-            <div class="app-card__meta">열기</div>
           </a>
 
           <a class="app-card fade-in delay-2" href="typing-game/">
@@ -27,7 +35,6 @@
               <h2 class="app-card__title">Typing game</h2>
               <p class="app-card__desc">떨어지는 글자와 단어를 입력해 미사일로 격추하는 타자 연습 게임입니다.</p>
             </div>
-            <div class="app-card__meta">열기</div>
           </a>
 
           <a class="app-card fade-in delay-3" href="words-quiz/">
@@ -36,9 +43,12 @@
               <h2 class="app-card__title">Words quiz</h2>
               <p class="app-card__desc">단어의 약자를 보고 전체 단어를 맞추는 퀴즈 게임</p>
             </div>
-            <div class="app-card__meta">열기</div>
           </a>
         </section>
+
+        <footer class="home-footer fade-in delay-1">
+          <p class="footer-text">2026 Gurunun. All rights reserved</p>
+        </footer>
       </div>
     </main>
 
