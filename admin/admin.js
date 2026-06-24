@@ -1,7 +1,7 @@
 let activeModuleId = 'words-quiz';
-let subjects = [];
+let topics = [];
 let words = [];
-let selectedSubjectId = null;
+let selectedTopicId = null;
 let selectedWordId = null;
 let isBusy = false;
 let pendingDeleteWord = null;
@@ -10,16 +10,16 @@ const moduleButtons = document.querySelectorAll('[data-module-id]');
 const modulePanels = document.querySelectorAll('[data-module-panel]');
 const statusLine = document.getElementById('statusLine');
 
-const subjectList = document.getElementById('subjectList');
-const subjectDialog = document.getElementById('subjectDialog');
-const subjectForm = document.getElementById('subjectForm');
-const subjectIdInput = document.getElementById('subjectIdInput');
-const subjectTitleInput = document.getElementById('subjectTitleInput');
-const subjectDescriptionInput = document.getElementById('subjectDescriptionInput');
-const subjectModeText = document.getElementById('subjectModeText');
-const newSubjectButton = document.getElementById('newSubjectButton');
-const deleteSubjectButton = document.getElementById('deleteSubjectButton');
-const cancelSubjectButton = document.getElementById('cancelSubjectButton');
+const topicList = document.getElementById('topicList');
+const topicDialog = document.getElementById('topicDialog');
+const topicForm = document.getElementById('topicForm');
+const topicIdInput = document.getElementById('topicIdInput');
+const topicTitleInput = document.getElementById('topicTitleInput');
+const topicDescriptionInput = document.getElementById('topicDescriptionInput');
+const topicModeText = document.getElementById('topicModeText');
+const newTopicButton = document.getElementById('newTopicButton');
+const deleteTopicButton = document.getElementById('deleteTopicButton');
+const cancelTopicButton = document.getElementById('cancelTopicButton');
 
 const wordList = document.getElementById('wordList');
 const wordListTitle = document.getElementById('wordListTitle');
@@ -27,9 +27,9 @@ const wordCountText = document.getElementById('wordCountText');
 const wordDialog = document.getElementById('wordDialog');
 const wordForm = document.getElementById('wordForm');
 const wordIdInput = document.getElementById('wordIdInput');
-const wordSubjectInput = document.getElementById('wordSubjectInput');
-const wordSubjectSelectButton = document.getElementById('wordSubjectSelectButton');
-const wordSubjectSelectMenu = document.getElementById('wordSubjectSelectMenu');
+const wordTopicInput = document.getElementById('wordTopicInput');
+const wordTopicSelectButton = document.getElementById('wordTopicSelectButton');
+const wordTopicSelectMenu = document.getElementById('wordTopicSelectMenu');
 const abbreviationInput = document.getElementById('abbreviationInput');
 const fullNameInput = document.getElementById('fullNameInput');
 const wordDescriptionInput = document.getElementById('wordDescriptionInput');
@@ -46,21 +46,16 @@ const wordDetailFullName = document.getElementById('wordDetailFullName');
 const wordDetailDescription = document.getElementById('wordDetailDescription');
 const closeWordDetailButton = document.getElementById('closeWordDetailButton');
 const {
-  fetchSubjects,
-  saveSubject,
-  deleteSubject,
+  fetchTopics,
+  saveTopic,
+  deleteTopic,
   fetchQuizWords: fetchWords,
   saveQuizWord: saveWord,
   deleteQuizWord: deleteWord,
 } = window.PlaygroundCloudflareApi;
 
 function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+  return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
 function setStatus(message = '') {
@@ -69,59 +64,59 @@ function setStatus(message = '') {
 
 function setBusy(nextBusy) {
   isBusy = nextBusy;
-  newSubjectButton.disabled = isBusy;
-  newWordButton.disabled = isBusy || selectedSubjectId === null;
-  subjectForm.querySelector('[type="submit"]').disabled = isBusy;
-  wordForm.querySelector('[type="submit"]').disabled = isBusy || subjects.length === 0;
-  deleteSubjectButton.disabled = isBusy || !subjectIdInput.value;
+  newTopicButton.disabled = isBusy;
+  newWordButton.disabled = isBusy || selectedTopicId === null;
+  topicForm.querySelector('[type="submit"]').disabled = isBusy;
+  wordForm.querySelector('[type="submit"]').disabled = isBusy || topics.length === 0;
+  deleteTopicButton.disabled = isBusy || !topicIdInput.value;
   confirmDeleteWordButton.disabled = isBusy || pendingDeleteWord === null;
 }
 
-function getSelectedSubject() {
-  return subjects.find((subject) => subject.id === selectedSubjectId) || null;
+function getSelectedTopic() {
+  return topics.find((topic) => topic.id === selectedTopicId) || null;
 }
 
 function getSelectedWord() {
   return words.find((word) => word.id === selectedWordId) || null;
 }
 
-function resetSubjectForm() {
-  subjectIdInput.value = '';
-  subjectTitleInput.value = '';
-  subjectDescriptionInput.value = '';
-  subjectModeText.textContent = '새 subject';
+function resetTopicForm() {
+  topicIdInput.value = '';
+  topicTitleInput.value = '';
+  topicDescriptionInput.value = '';
+  topicModeText.textContent = '새 topic';
 }
 
-function openSubjectDialog() {
-  subjectDialog.showModal();
-  subjectTitleInput.focus();
+function openTopicDialog() {
+  topicDialog.showModal();
+  topicTitleInput.focus();
 }
 
-function closeSubjectDialog() {
-  subjectDialog.close();
+function closeTopicDialog() {
+  topicDialog.close();
 }
 
-function fillSubjectForm(subject) {
-  subjectIdInput.value = String(subject.id);
-  subjectTitleInput.value = subject.title;
-  subjectDescriptionInput.value = subject.description;
-  subjectModeText.textContent = `#${subject.id} 편집`;
+function fillTopicForm(topic) {
+  topicIdInput.value = String(topic.id);
+  topicTitleInput.value = topic.title;
+  topicDescriptionInput.value = topic.description;
+  topicModeText.textContent = `#${topic.id} 편집`;
 }
 
-function closeWordSubjectMenu() {
-  wordSubjectSelectMenu.hidden = true;
-  wordSubjectSelectButton.setAttribute('aria-expanded', 'false');
+function closeWordTopicMenu() {
+  wordTopicSelectMenu.hidden = true;
+  wordTopicSelectButton.setAttribute('aria-expanded', 'false');
 }
 
-function setWordSubjectValue(subjectId) {
-  const normalizedSubjectId = subjectId === null || subjectId === '' ? '' : String(subjectId);
-  const subject = subjects.find((item) => String(item.id) === normalizedSubjectId);
-  wordSubjectInput.value = normalizedSubjectId;
-  wordSubjectSelectButton.textContent = subject ? subject.title : 'Subject 선택';
+function setWordTopicValue(topicId) {
+  const normalizedTopicId = topicId === null || topicId === '' ? '' : String(topicId);
+  const topic = topics.find((item) => String(item.id) === normalizedTopicId);
+  wordTopicInput.value = normalizedTopicId;
+  wordTopicSelectButton.textContent = topic ? topic.title : 'Topic 선택';
 
-  wordSubjectSelectMenu.querySelectorAll('[data-subject-option]').forEach((button) => {
-    button.classList.toggle('is-selected', button.dataset.subjectOption === normalizedSubjectId);
-    button.setAttribute('aria-selected', button.dataset.subjectOption === normalizedSubjectId ? 'true' : 'false');
+  wordTopicSelectMenu.querySelectorAll('[data-topic-option]').forEach((button) => {
+    button.classList.toggle('is-selected', button.dataset.topicOption === normalizedTopicId);
+    button.setAttribute('aria-selected', button.dataset.topicOption === normalizedTopicId ? 'true' : 'false');
   });
 }
 
@@ -131,7 +126,7 @@ function resetWordForm() {
   abbreviationInput.value = '';
   fullNameInput.value = '';
   wordDescriptionInput.value = '';
-  setWordSubjectValue(selectedSubjectId);
+  setWordTopicValue(selectedTopicId);
   wordModeText.textContent = '새 quiz word';
 }
 
@@ -194,7 +189,7 @@ async function removeWord(word) {
     await deleteWord(word.id);
     selectedWordId = null;
     resetWordForm();
-    words = selectedSubjectId === null ? [] : await fetchWords(selectedSubjectId);
+    words = selectedTopicId === null ? [] : await fetchWords(selectedTopicId);
     renderAll();
     closeWordDialog();
     closeDeleteWordDialog();
@@ -206,23 +201,23 @@ async function removeWord(word) {
   }
 }
 
-async function removeSubject(subject) {
-  if (!subject || !window.confirm(`${subject.title} subject와 하위 quiz words를 삭제할까요?`)) {
+async function removeTopic(topic) {
+  if (!topic || !window.confirm(`${topic.title} topic와 하위 quiz words를 삭제할까요?`)) {
     return;
   }
 
   setBusy(true);
-  setStatus('subject를 삭제 중입니다.');
+  setStatus('topic를 삭제 중입니다.');
 
   try {
-    await deleteSubject(subject.id);
-    selectedSubjectId = null;
+    await deleteTopic(topic.id);
+    selectedTopicId = null;
     selectedWordId = null;
     await loadWordsQuiz();
-    closeSubjectDialog();
-    setStatus(`${subject.title} subject를 삭제했습니다.`);
+    closeTopicDialog();
+    setStatus(`${topic.title} topic를 삭제했습니다.`);
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : 'subject를 삭제하지 못했습니다.');
+    setStatus(error instanceof Error ? error.message : 'topic를 삭제하지 못했습니다.');
   } finally {
     setBusy(false);
   }
@@ -231,61 +226,61 @@ async function removeSubject(subject) {
 function fillWordForm(word) {
   selectedWordId = word.id;
   wordIdInput.value = String(word.id);
-  setWordSubjectValue(word.subjectId);
+  setWordTopicValue(word.topicId);
   abbreviationInput.value = word.abbreviation;
   fullNameInput.value = word.fullName;
   wordDescriptionInput.value = word.description;
   wordModeText.textContent = `#${word.id} 편집`;
 }
 
-function renderSubjectOptions() {
-  wordSubjectSelectMenu.innerHTML = subjects
+function renderTopicOptions() {
+  wordTopicSelectMenu.innerHTML = topics
     .map(
-      (subject) => `
-        <button class="custom-select__option" type="button" role="option" data-subject-option="${subject.id}">
-          ${escapeHtml(subject.title)}
+      (topic) => `
+        <button class="custom-select__option" type="button" role="option" data-topic-option="${topic.id}">
+          ${escapeHtml(topic.title)}
         </button>
       `,
     )
     .join('');
-  setWordSubjectValue(wordSubjectInput.value || selectedSubjectId);
+  setWordTopicValue(wordTopicInput.value || selectedTopicId);
 }
 
-function renderSubjects() {
-  if (subjects.length === 0) {
-    subjectList.innerHTML = '<div class="empty-state">등록된 subject가 없습니다.</div>';
+function renderTopics() {
+  if (topics.length === 0) {
+    topicList.innerHTML = '<div class="empty-state">등록된 topic가 없습니다.</div>';
     wordListTitle.textContent = 'Quiz Words';
     return;
   }
 
-  subjectList.innerHTML = subjects
-    .map((subject) => {
-      const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
+  topicList.innerHTML = topics
+    .map((topic) => {
+      const activeClass = topic.id === selectedTopicId ? ' is-current' : '';
       return `
-        <article class="item-card subject-item${activeClass}" data-subject-id="${subject.id}">
-          <button class="subject-item__content" type="button" data-subject-id="${subject.id}">
-            <strong>${escapeHtml(subject.title)}</strong>
-            <span>${escapeHtml(subject.description || '설명 없음')}</span>
+        <article class="item-card topic-item${activeClass}" data-topic-id="${topic.id}">
+          <button class="topic-item__content" type="button" data-topic-id="${topic.id}">
+            <strong>${escapeHtml(topic.title)}</strong>
+            <span>${escapeHtml(topic.description || '설명 없음')}</span>
           </button>
-          <div class="subject-item__actions">
-            <button class="icon-button" type="button" data-subject-action="edit" data-subject-id="${subject.id}" aria-label="${escapeHtml(subject.title)} 편집" title="편집">✎</button>
-            <button class="icon-button icon-button--danger" type="button" data-subject-action="delete" data-subject-id="${subject.id}" aria-label="${escapeHtml(subject.title)} 삭제" title="삭제">×</button>
+          <div class="topic-item__actions">
+            <button class="icon-button" type="button" data-topic-action="edit" data-topic-id="${topic.id}" aria-label="${escapeHtml(topic.title)} 편집" title="편집">✎</button>
+            <button class="icon-button icon-button--danger" type="button" data-topic-action="delete" data-topic-id="${topic.id}" aria-label="${escapeHtml(topic.title)} 삭제" title="삭제">×</button>
           </div>
         </article>
       `;
     })
     .join('');
 
-  const subject = getSelectedSubject();
-  wordListTitle.textContent = subject ? `${subject.title} Quiz Words` : 'Quiz Words';
+  const topic = getSelectedTopic();
+  wordListTitle.textContent = topic ? `${topic.title} Quiz Words` : 'Quiz Words';
 }
 
 function renderWords() {
-  const subject = getSelectedSubject();
+  const topic = getSelectedTopic();
   wordCountText.textContent = `${words.length}개`;
 
-  if (!subject) {
-    wordList.innerHTML = '<div class="empty-state">subject를 선택하세요.</div>';
+  if (!topic) {
+    wordList.innerHTML = '<div class="empty-state">topic를 선택하세요.</div>';
     return;
   }
 
@@ -314,37 +309,37 @@ function renderWords() {
     .join('');
 }
 
-function updateSubjectSelectionState() {
-  subjectList.querySelectorAll('.subject-item[data-subject-id]').forEach((item) => {
-    item.classList?.toggle('is-current', Number(item.dataset.subjectId) === selectedSubjectId);
+function updateTopicSelectionState() {
+  topicList.querySelectorAll('.topic-item[data-topic-id]').forEach((item) => {
+    item.classList?.toggle('is-current', Number(item.dataset.topicId) === selectedTopicId);
   });
 
-  const subject = getSelectedSubject();
-  wordListTitle.textContent = subject ? `${subject.title} Quiz Words` : 'Quiz Words';
+  const topic = getSelectedTopic();
+  wordListTitle.textContent = topic ? `${topic.title} Quiz Words` : 'Quiz Words';
 }
 
 function renderAll() {
-  renderSubjectOptions();
-  renderSubjects();
+  renderTopicOptions();
+  renderTopics();
   renderWords();
   setBusy(isBusy);
 }
 
-async function selectSubject(subjectId) {
-  selectedSubjectId = subjectId;
+async function selectTopic(topicId) {
+  selectedTopicId = topicId;
   selectedWordId = null;
-  const subject = getSelectedSubject();
+  const topic = getSelectedTopic();
 
-  if (subject) {
-    fillSubjectForm(subject);
+  if (topic) {
+    fillTopicForm(topic);
   } else {
-    resetSubjectForm();
+    resetTopicForm();
   }
 
   resetWordForm();
-  updateSubjectSelectionState();
+  updateTopicSelectionState();
   wordList.innerHTML = '<div class="empty-state">quiz words를 불러오는 중입니다.</div>';
-  words = subject ? await fetchWords(subject.id) : [];
+  words = topic ? await fetchWords(topic.id) : [];
   renderWords();
   setBusy(isBusy);
 }
@@ -352,27 +347,27 @@ async function selectSubject(subjectId) {
 async function loadWordsQuiz() {
   setBusy(true);
   setStatus('데이터를 불러오는 중입니다.');
-  subjectList.innerHTML = '<div class="empty-state">subjects를 불러오는 중입니다.</div>';
+  topicList.innerHTML = '<div class="empty-state">topics를 불러오는 중입니다.</div>';
   wordList.innerHTML = '<div class="empty-state">quiz words를 불러오는 중입니다.</div>';
 
   try {
-    subjects = await fetchSubjects();
-    const selectedStillExists = subjects.some((subject) => subject.id === selectedSubjectId);
-    selectedSubjectId = selectedStillExists ? selectedSubjectId : subjects[0]?.id ?? null;
-    words = selectedSubjectId === null ? [] : await fetchWords(selectedSubjectId);
+    topics = await fetchTopics();
+    const selectedStillExists = topics.some((topic) => topic.id === selectedTopicId);
+    selectedTopicId = selectedStillExists ? selectedTopicId : (topics[0]?.id ?? null);
+    words = selectedTopicId === null ? [] : await fetchWords(selectedTopicId);
 
-    const subject = getSelectedSubject();
-    if (subject) {
-      fillSubjectForm(subject);
+    const topic = getSelectedTopic();
+    if (topic) {
+      fillTopicForm(topic);
     } else {
-      resetSubjectForm();
+      resetTopicForm();
     }
 
     resetWordForm();
     renderAll();
     setStatus('데이터를 불러왔습니다.');
   } catch (error) {
-    subjects = [];
+    topics = [];
     words = [];
     renderAll();
     setStatus(error instanceof Error ? error.message : '데이터를 불러오지 못했습니다.');
@@ -399,10 +394,10 @@ moduleButtons.forEach((button) => {
   });
 });
 
-newSubjectButton.addEventListener('click', () => {
-  resetSubjectForm();
+newTopicButton.addEventListener('click', () => {
+  resetTopicForm();
   setBusy(false);
-  openSubjectDialog();
+  openTopicDialog();
 });
 
 newWordButton.addEventListener('click', () => {
@@ -411,81 +406,81 @@ newWordButton.addEventListener('click', () => {
   openWordDialog();
 });
 
-cancelSubjectButton.addEventListener('click', closeSubjectDialog);
+cancelTopicButton.addEventListener('click', closeTopicDialog);
 cancelWordButton.addEventListener('click', closeWordDialog);
 
-wordSubjectSelectButton.addEventListener('click', () => {
-  const willOpen = wordSubjectSelectMenu.hidden;
-  wordSubjectSelectMenu.hidden = !willOpen;
-  wordSubjectSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+wordTopicSelectButton.addEventListener('click', () => {
+  const willOpen = wordTopicSelectMenu.hidden;
+  wordTopicSelectMenu.hidden = !willOpen;
+  wordTopicSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 });
 
-wordSubjectSelectMenu.addEventListener('click', (event) => {
-  const option = event.target.closest('[data-subject-option]');
+wordTopicSelectMenu.addEventListener('click', (event) => {
+  const option = event.target.closest('[data-topic-option]');
 
   if (!option) {
     return;
   }
 
-  setWordSubjectValue(option.dataset.subjectOption);
-  closeWordSubjectMenu();
-  wordSubjectSelectButton.focus();
+  setWordTopicValue(option.dataset.topicOption);
+  closeWordTopicMenu();
+  wordTopicSelectButton.focus();
 });
 
 document.addEventListener('click', (event) => {
-  if (event.target.closest('#wordSubjectSelect')) {
+  if (event.target.closest('#wordTopicSelect')) {
     return;
   }
 
-  closeWordSubjectMenu();
+  closeWordTopicMenu();
 });
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    closeWordSubjectMenu();
+    closeWordTopicMenu();
   }
 });
 
-subjectList.addEventListener('click', async (event) => {
-  const actionButton = event.target.closest('[data-subject-action]');
+topicList.addEventListener('click', async (event) => {
+  const actionButton = event.target.closest('[data-topic-action]');
 
   if (actionButton) {
-    const subject = subjects.find((item) => item.id === Number(actionButton.dataset.subjectId));
+    const topic = topics.find((item) => item.id === Number(actionButton.dataset.topicId));
 
-    if (!subject) {
+    if (!topic) {
       return;
     }
 
-    if (actionButton.dataset.subjectAction === 'edit') {
-      selectedSubjectId = subject.id;
-      fillSubjectForm(subject);
-      updateSubjectSelectionState();
+    if (actionButton.dataset.topicAction === 'edit') {
+      selectedTopicId = topic.id;
+      fillTopicForm(topic);
+      updateTopicSelectionState();
       setBusy(false);
-      openSubjectDialog();
-      setStatus(`${subject.title} subject를 편집합니다.`);
+      openTopicDialog();
+      setStatus(`${topic.title} topic를 편집합니다.`);
       return;
     }
 
-    if (actionButton.dataset.subjectAction === 'delete') {
-      removeSubject(subject);
+    if (actionButton.dataset.topicAction === 'delete') {
+      removeTopic(topic);
       return;
     }
   }
 
-  const button = event.target.closest('[data-subject-id]');
+  const button = event.target.closest('[data-topic-id]');
 
   if (!button) {
     return;
   }
 
   setBusy(true);
-  setStatus('subject를 선택하는 중입니다.');
+  setStatus('topic를 선택하는 중입니다.');
 
   try {
-    await selectSubject(Number(button.dataset.subjectId));
+    await selectTopic(Number(button.dataset.topicId));
     setStatus('');
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : 'subject를 선택하지 못했습니다.');
+    setStatus(error instanceof Error ? error.message : 'topic를 선택하지 못했습니다.');
   } finally {
     setBusy(false);
   }
@@ -520,32 +515,32 @@ wordList.addEventListener('click', (event) => {
   }
 });
 
-subjectForm.addEventListener('submit', async (event) => {
+topicForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const formData = new FormData(subjectForm);
-  const subject = {
+  const formData = new FormData(topicForm);
+  const topic = {
     id: formData.get('id') ? Number(formData.get('id')) : undefined,
     title: String(formData.get('title') || '').trim(),
     description: String(formData.get('description') || '').trim(),
   };
 
-  if (!subject.title) {
-    setStatus('Subject title을 입력하세요.');
+  if (!topic.title) {
+    setStatus('Topic title을 입력하세요.');
     return;
   }
 
   setBusy(true);
-  setStatus('subject를 저장 중입니다.');
+  setStatus('topic를 저장 중입니다.');
 
   try {
-    const savedSubject = await saveSubject(subject);
-    selectedSubjectId = savedSubject.id;
+    const savedTopic = await saveTopic(topic);
+    selectedTopicId = savedTopic.id;
     await loadWordsQuiz();
-    fillSubjectForm(savedSubject);
-    closeSubjectDialog();
-    setStatus(`${savedSubject.title} subject를 저장했습니다.`);
+    fillTopicForm(savedTopic);
+    closeTopicDialog();
+    setStatus(`${savedTopic.title} topic를 저장했습니다.`);
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : 'subject를 저장하지 못했습니다.');
+    setStatus(error instanceof Error ? error.message : 'topic를 저장하지 못했습니다.');
   } finally {
     setBusy(false);
   }
@@ -556,14 +551,16 @@ wordForm.addEventListener('submit', async (event) => {
   const formData = new FormData(wordForm);
   const word = {
     id: formData.get('id') ? Number(formData.get('id')) : undefined,
-    subjectId: Number(formData.get('subjectId')),
-    abbreviation: String(formData.get('abbreviation') || '').trim().toUpperCase(),
+    topicId: Number(formData.get('topicId')),
+    abbreviation: String(formData.get('abbreviation') || '')
+      .trim()
+      .toUpperCase(),
     fullName: String(formData.get('fullName') || '').trim(),
     description: String(formData.get('description') || '').trim(),
   };
 
-  if (!word.subjectId || !word.abbreviation || !word.fullName) {
-    setStatus('Subject, abbreviation, full name을 모두 입력하세요.');
+  if (!word.topicId || !word.abbreviation || !word.fullName) {
+    setStatus('Topic, abbreviation, full name을 모두 입력하세요.');
     return;
   }
 
@@ -572,8 +569,8 @@ wordForm.addEventListener('submit', async (event) => {
 
   try {
     const savedWord = await saveWord(word);
-    selectedSubjectId = savedWord.subjectId;
-    words = await fetchWords(selectedSubjectId);
+    selectedTopicId = savedWord.topicId;
+    words = await fetchWords(selectedTopicId);
     fillWordForm(savedWord);
     renderAll();
     closeWordDialog();
@@ -585,8 +582,8 @@ wordForm.addEventListener('submit', async (event) => {
   }
 });
 
-deleteSubjectButton.addEventListener('click', () => {
-  removeSubject(getSelectedSubject());
+deleteTopicButton.addEventListener('click', () => {
+  removeTopic(getSelectedTopic());
 });
 
 cancelDeleteWordButton.addEventListener('click', closeDeleteWordDialog);

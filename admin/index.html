@@ -19,7 +19,7 @@
             <div class="module-button is-active" data-module-id="words-quiz">
               <button class="module-button__select" type="button">
                 <strong>Words Quiz</strong>
-                <span>Subjects, quiz words</span>
+                <span>Topics, quiz words</span>
               </button>
               <a class="module-button__link" href="../words-quiz/" aria-label="Words Quiz 페이지로 이동" title="페이지로 이동">→</a>
             </div>
@@ -52,12 +52,12 @@
             <div class="workspace-grid">
               <section class="data-panel">
                 <div class="panel-heading">
-                  <h3>Subjects</h3>
+                  <h3>Topics</h3>
                   <div class="panel-heading__actions">
-                    <button class="icon-button" id="newSubjectButton" type="button" aria-label="새 subject" title="새 subject">＋</button>
+                    <button class="icon-button" id="newTopicButton" type="button" aria-label="새 topic" title="새 topic">＋</button>
                   </div>
                 </div>
-                <div class="item-list" id="subjectList"></div>
+                <div class="item-list" id="topicList"></div>
               </section>
 
               <section class="data-panel words-panel">
@@ -95,24 +95,24 @@
       </section>
     </main>
 
-    <dialog class="editor-dialog" id="subjectDialog">
-      <form class="editor-form" id="subjectForm" method="dialog">
+    <dialog class="editor-dialog" id="topicDialog">
+      <form class="editor-form" id="topicForm" method="dialog">
         <div class="form-title">
-          <h3>Subject 편집</h3>
-          <span id="subjectModeText">새 subject</span>
+          <h3>Topic 편집</h3>
+          <span id="topicModeText">새 topic</span>
         </div>
-        <input id="subjectIdInput" name="id" type="hidden" />
+        <input id="topicIdInput" name="id" type="hidden" />
         <label>
           <span>Title</span>
-          <input id="subjectTitleInput" name="title" type="text" required />
+          <input id="topicTitleInput" name="title" type="text" required />
         </label>
         <label>
           <span>Description</span>
-          <textarea id="subjectDescriptionInput" name="description" rows="3"></textarea>
+          <textarea id="topicDescriptionInput" name="description" rows="3"></textarea>
         </label>
         <div class="form-actions">
-          <button class="danger-button" id="deleteSubjectButton" type="button" disabled>삭제</button>
-          <button class="ghost-button" id="cancelSubjectButton" type="button">취소</button>
+          <button class="danger-button" id="deleteTopicButton" type="button" disabled>삭제</button>
+          <button class="ghost-button" id="cancelTopicButton" type="button">취소</button>
           <button class="primary-button" type="submit">저장</button>
         </div>
       </form>
@@ -126,11 +126,11 @@
         </div>
         <input id="wordIdInput" name="id" type="hidden" />
         <label>
-          <span>Subject</span>
-          <input id="wordSubjectInput" name="subjectId" type="hidden" required />
-          <div class="custom-select" id="wordSubjectSelect">
-            <button class="custom-select__button" id="wordSubjectSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Subject 선택</button>
-            <div class="custom-select__menu" id="wordSubjectSelectMenu" role="listbox" hidden></div>
+          <span>Topic</span>
+          <input id="wordTopicInput" name="topicId" type="hidden" required />
+          <div class="custom-select" id="wordTopicSelect">
+            <button class="custom-select__button" id="wordTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Topic 선택</button>
+            <div class="custom-select__menu" id="wordTopicSelectMenu" role="listbox" hidden></div>
           </div>
         </label>
         <div class="form-row">

@@ -2,7 +2,7 @@ const STORAGE_KEY = 'words-quiz-history';
 const SELECTED_SUBJECT_STORAGE_KEY = 'words-quiz-selected-subject';
 const SUBJECT_QUERY_PARAM = 'subjectId';
 const ABBREVIATION_REVEAL_INTERVAL = 500;
-const { fetchSubjects: fetchCloudflareSubjects, fetchQuizWords: fetchCloudflareQuizWords, saveQuizWord } = window.PlaygroundCloudflareApi;
+const { fetchTopics: fetchCloudflareSubjects, fetchQuizWords: fetchCloudflareQuizWords, saveQuizWord } = window.PlaygroundCloudflareApi;
 
 let subjects = [];
 let selectedSubjectId = null;
@@ -563,7 +563,7 @@ async function saveCurrentDescription() {
   try {
     const savedWord = await saveQuizWord({
       id: word.id,
-      subjectId: word.subjectId,
+      topicId: word.topicId,
       abbreviation: word.abbreviation,
       fullName: word.fullName,
       description,

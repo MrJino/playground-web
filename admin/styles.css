@@ -228,10 +228,19 @@ button:disabled {
 
 .admin-content {
   height: 100%;
+  min-height: 0;
   min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 2px;
+}
+
+.module-panel {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .module-panel.is-hidden {
@@ -262,6 +271,7 @@ button:disabled {
 }
 
 .workspace-grid {
+  flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);
@@ -276,7 +286,7 @@ button:disabled {
 }
 
 .data-panel {
-  min-height: 620px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 14px;
@@ -348,11 +358,11 @@ button:disabled {
   padding-right: 88px;
 }
 
-.subject-item {
+.topic-item {
   padding: 0;
 }
 
-.subject-item__content {
+.topic-item__content {
   width: 100%;
   display: grid;
   gap: 5px;
@@ -374,7 +384,7 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
-.subject-item__actions,
+.topic-item__actions,
 .word-item__actions {
   position: absolute;
   top: 8px;
@@ -386,8 +396,8 @@ button:disabled {
   transition: opacity 0.16s ease;
 }
 
-.subject-item:hover .subject-item__actions,
-.subject-item:focus-within .subject-item__actions,
+.topic-item:hover .topic-item__actions,
+.topic-item:focus-within .topic-item__actions,
 .word-item:hover .word-item__actions,
 .word-item:focus-within .word-item__actions {
   opacity: 1;
@@ -726,6 +736,11 @@ textarea:focus {
 
   .module-nav,
   .admin-content {
+    overflow: visible;
+  }
+
+  .module-panel {
+    height: auto;
     overflow: visible;
   }
 

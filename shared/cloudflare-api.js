@@ -1,6 +1,6 @@
 (function () {
   const BASE_URL = 'https://playground-api.for1self.workers.dev';
-  const SUBJECTS_PATH = '/api/subjects';
+  const TOPICS_PATH = '/api/topics';
   const QUIZ_WORDS_PATH = '/api/quiz-words';
   const WINNERS_PATH = '/api/winners';
   const WINNERS_SUMMARY_PATH = '/api/winners/summary';
@@ -18,8 +18,35 @@
   }
 
   async function requestJson(pathOrUrl, options = {}) {
-    const response = await window.fetch(pathOrUrl, options);
+    const requestUrl = pathOrUrl instanceof URL ? pathOrUrl.toString() : String(pathOrUrl);
+    const requestMethod = options.method || 'GET';
+
+    console.log('[Cloudflare API Request]', {
+      method: requestMethod,
+      url: requestUrl,
+      options,
+    });
+
+    let response;
+
+    try {
+      response = await window.fetch(pathOrUrl, options);
+    } catch (error) {
+      console.error('[Cloudflare API Error]', {
+        method: requestMethod,
+        url: requestUrl,
+        error,
+      });
+      throw error;
+    }
+
     const payload = await response.json().catch(() => ({}));
+
+    console.log('[Cloudflare API Response]', {
+      status: response.status,
+      ok: response.ok,
+      payload,
+    });
 
     if (!response.ok) {
       throw new Error(payload.error || `Request failed: ${response.status}`);
@@ -28,7 +55,7 @@
     return payload;
   }
 
-  function toSubject(row) {
+  function toTopic(row) {
     return {
       id: Number(row.id),
       title: String(row.title || '').trim(),
@@ -37,54 +64,65 @@
   }
 
   function toQuizWord(row) {
+    const topicId = row.topicId ?? row.topic_id;
+
     return {
       id: Number(row.id),
-      subjectId: row.subject_id === null || row.subject_id === undefined ? null : Number(row.subject_id),
-      abbreviation: String(row.abbreviation || '').trim().toUpperCase(),
+      topicId: topicId === null || topicId === undefined ? null : Number(topicId),
+      abbreviation: String(row.abbreviation || '')
+        .trim()
+        .toUpperCase(),
       fullName: String(row.fullName ?? row.full_name ?? '').trim(),
       description: String(row.description || '').trim(),
     };
   }
 
-  async function fetchSubjects() {
-    const payload = await requestJson(buildUrl(SUBJECTS_PATH));
-    const rows = Array.isArray(payload.subjects) ? payload.subjects : [];
-    return rows.map(toSubject);
+  async function fetchTopics() {
+    const payload = await requestJson(buildUrl(TOPICS_PATH));
+    const rows = Array.isArray(payload.topics) ? payload.topics : [];
+    return rows.map(toTopic);
   }
 
-  async function saveSubject(subject) {
-    const payload = await requestJson(buildUrl(SUBJECTS_PATH), {
+  async function saveTopic(topic) {
+    const payload = await requestJson(buildUrl(TOPICS_PATH), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(subject),
+      body: JSON.stringify(topic),
     });
 
-    return toSubject(payload.subject);
+    return toTopic(payload.topic);
   }
 
-  async function deleteSubject(id) {
-    const payload = await requestJson(buildUrl(SUBJECTS_PATH, { id }), {
+  async function deleteTopic(id) {
+    const payload = await requestJson(buildUrl(TOPICS_PATH, { id }), {
       method: 'DELETE',
     });
 
-    return toSubject(payload.subject);
+    return toTopic(payload.topic);
   }
 
-  async function fetchQuizWords(subjectId = null) {
-    const payload = await requestJson(buildUrl(QUIZ_WORDS_PATH, { subjectId }));
+  async function fetchQuizWords(topicId = null) {
+    const payload = await requestJson(buildUrl(QUIZ_WORDS_PATH, { topicId }));
     const rows = Array.isArray(payload.words) ? payload.words : [];
     return rows.map(toQuizWord);
   }
 
   async function saveQuizWord(word) {
+    const topicId = word.topicId ?? word.topic_id;
+    const requestBody = {
+      ...word,
+      topicId,
+      topic_id: topicId,
+    };
+
     const payload = await requestJson(buildUrl(QUIZ_WORDS_PATH), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(word),
+      body: JSON.stringify(requestBody),
     });
 
     return toQuizWord(payload.word);
@@ -117,15 +155,15 @@
     BASE_URL,
     buildUrl,
     requestJson,
-    fetchSubjects,
-    saveSubject,
-    deleteSubject,
+    fetchTopics,
+    saveTopic,
+    deleteTopic,
     fetchQuizWords,
     saveQuizWord,
     deleteQuizWord,
     fetchWinnerSummary,
     saveWinner,
-    toSubject,
+    toTopic,
     toQuizWord,
   };
 })();
