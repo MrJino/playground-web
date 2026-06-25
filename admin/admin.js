@@ -1,10 +1,11 @@
-let activeModuleId = 'words-quiz';
+let activeModuleId = null;
 let topics = [];
 let words = [];
 let selectedTopicId = null;
 let selectedWordId = null;
 let isBusy = false;
 let pendingDeleteWord = null;
+let hasLoadedWordsQuiz = false;
 
 const moduleButtons = document.querySelectorAll('[data-module-id]');
 const modulePanels = document.querySelectorAll('[data-module-panel]');
@@ -353,7 +354,7 @@ async function loadWordsQuiz() {
   try {
     topics = await fetchTopics();
     const selectedStillExists = topics.some((topic) => topic.id === selectedTopicId);
-    selectedTopicId = selectedStillExists ? selectedTopicId : (topics[0]?.id ?? null);
+    selectedTopicId = selectedStillExists ? selectedTopicId : null;
     words = selectedTopicId === null ? [] : await fetchWords(selectedTopicId);
 
     const topic = getSelectedTopic();
@@ -376,7 +377,7 @@ async function loadWordsQuiz() {
   }
 }
 
-function setActiveModule(moduleId) {
+async function setActiveModule(moduleId) {
   activeModuleId = moduleId;
 
   moduleButtons.forEach((button) => {
@@ -386,11 +387,16 @@ function setActiveModule(moduleId) {
   modulePanels.forEach((panel) => {
     panel.classList.toggle('is-hidden', panel.dataset.modulePanel !== activeModuleId);
   });
+
+  if (activeModuleId === 'words-quiz' && !hasLoadedWordsQuiz) {
+    hasLoadedWordsQuiz = true;
+    await loadWordsQuiz();
+  }
 }
 
 moduleButtons.forEach((button) => {
-  button.querySelector('.module-button__select').addEventListener('click', () => {
-    setActiveModule(button.dataset.moduleId);
+  button.querySelector('.module-button__select').addEventListener('click', async () => {
+    await setActiveModule(button.dataset.moduleId);
   });
 });
 
@@ -595,4 +601,3 @@ confirmDeleteWordButton.addEventListener('click', () => {
 closeWordDetailButton.addEventListener('click', closeWordDetailDialog);
 
 setActiveModule(activeModuleId);
-loadWordsQuiz();

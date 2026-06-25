@@ -1,11 +1,12 @@
 const STORAGE_KEY = 'words-quiz-history';
-const SELECTED_SUBJECT_STORAGE_KEY = 'words-quiz-selected-subject';
-const SUBJECT_QUERY_PARAM = 'subjectId';
+const SELECTED_TOPIC_STORAGE_KEY = 'words-quiz-selected-topic';
+const TOPIC_QUERY_PARAM = 'topicId';
+const TOPICS_PATH = './res/topics.json';
 const ABBREVIATION_REVEAL_INTERVAL = 500;
-const { fetchTopics: fetchCloudflareSubjects, fetchQuizWords: fetchCloudflareQuizWords, saveQuizWord } = window.PlaygroundCloudflareApi;
+const { fetchQuizWords: fetchCloudflareQuizWords, saveQuizWord } = window.PlaygroundCloudflareApi;
 
-let subjects = [];
-let selectedSubjectId = null;
+let topics = [];
+let selectedTopicId = null;
 let words = [];
 let currentIndex = 0;
 let score = 0;
@@ -17,12 +18,12 @@ let history = readHistory();
 let abbreviationRevealTimer = null;
 let descriptionDisplayState = null;
 
-const subjectList = document.getElementById('subjectList');
-const openSubjectSearchButton = document.getElementById('openSubjectSearchButton');
+const topicList = document.getElementById('topicList');
+const openTopicSearchButton = document.getElementById('openTopicSearchButton');
 const openAdminConfirmButton = document.getElementById('openAdminConfirmButton');
-const subjectBrowserPanel = document.getElementById('subjectBrowserPanel');
-const subjectSearchInput = document.getElementById('subjectSearchInput');
-const subjectBrowserGrid = document.getElementById('subjectBrowserGrid');
+const topicBrowserPanel = document.getElementById('topicBrowserPanel');
+const topicSearchInput = document.getElementById('topicSearchInput');
+const topicBrowserGrid = document.getElementById('topicBrowserGrid');
 const battlePanel = document.querySelector('.battle-panel');
 const quizIntroPanel = document.getElementById('quizIntroPanel');
 const quizIntroTitle = document.getElementById('quizIntroTitle');
@@ -89,13 +90,19 @@ function isValidWord(word) {
   return Boolean(word?.abbreviation && word?.fullName);
 }
 
-async function fetchSubjects() {
-  const loadedSubjects = await fetchCloudflareSubjects();
-  return loadedSubjects.filter((subject) => subject.id && subject.title);
+async function fetchTopics() {
+  const response = await window.fetch(TOPICS_PATH);
+
+  if (!response.ok) {
+    throw new Error(`Topics load failed: ${response.status}`);
+  }
+
+  const loadedTopics = await response.json();
+  return (Array.isArray(loadedTopics) ? loadedTopics : []).filter((topic) => topic.id && topic.title);
 }
 
-async function fetchQuizWords(subjectId) {
-  const loadedWords = await fetchCloudflareQuizWords(subjectId);
+async function fetchQuizWords(topicId) {
+  const loadedWords = await fetchCloudflareQuizWords(topicId);
   return loadedWords.filter(isValidWord);
 }
 
@@ -164,32 +171,32 @@ function writeHistory() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, 20)));
 }
 
-function writeSelectedSubjectId(subjectId) {
-  localStorage.setItem(SELECTED_SUBJECT_STORAGE_KEY, String(subjectId));
+function writeSelectedTopicId(topicId) {
+  localStorage.setItem(SELECTED_TOPIC_STORAGE_KEY, String(topicId));
 }
 
-function clearSelectedSubjectId() {
-  localStorage.removeItem(SELECTED_SUBJECT_STORAGE_KEY);
+function clearSelectedTopicId() {
+  localStorage.removeItem(SELECTED_TOPIC_STORAGE_KEY);
 }
 
-function hasSubjectQueryParam() {
+function hasTopicQueryParam() {
   const params = new URLSearchParams(window.location.search);
-  return params.has(SUBJECT_QUERY_PARAM);
+  return params.has(TOPIC_QUERY_PARAM);
 }
 
-function getSubjectIdFromUrl() {
+function getTopicIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  const subjectId = Number(params.get(SUBJECT_QUERY_PARAM));
-  return Number.isInteger(subjectId) && subjectId > 0 ? subjectId : null;
+  const topicId = Number(params.get(TOPIC_QUERY_PARAM));
+  return Number.isInteger(topicId) && topicId > 0 ? topicId : null;
 }
 
-function updateSubjectQueryParam(subjectId, shouldReplace = false) {
-  if (!subjectId) {
+function updateTopicQueryParam(topicId, shouldReplace = false) {
+  if (!topicId) {
     return;
   }
 
   const url = new URL(window.location.href);
-  url.searchParams.set(SUBJECT_QUERY_PARAM, String(subjectId));
+  url.searchParams.set(TOPIC_QUERY_PARAM, String(topicId));
 
   if (url.href === window.location.href) {
     return;
@@ -199,13 +206,13 @@ function updateSubjectQueryParam(subjectId, shouldReplace = false) {
   window.history[method]({}, '', url);
 }
 
-function clearSubjectQueryParam(shouldReplace = false) {
-  if (!hasSubjectQueryParam()) {
+function clearTopicQueryParam(shouldReplace = false) {
+  if (!hasTopicQueryParam()) {
     return;
   }
 
   const url = new URL(window.location.href);
-  url.searchParams.delete(SUBJECT_QUERY_PARAM);
+  url.searchParams.delete(TOPIC_QUERY_PARAM);
 
   const method = shouldReplace ? 'replaceState' : 'pushState';
   window.history[method]({}, '', url);
@@ -215,8 +222,8 @@ function getCurrentWord() {
   return words[currentIndex];
 }
 
-function getSelectedSubject() {
-  return subjects.find((subject) => subject.id === selectedSubjectId) || null;
+function getSelectedTopic() {
+  return topics.find((topic) => topic.id === selectedTopicId) || null;
 }
 
 function getFullNameParts(fullName) {
@@ -240,74 +247,74 @@ function updateStats() {
   accuracyText.textContent = `정답률 ${accuracy}%`;
 }
 
-function renderSubjectList() {
-  if (subjects.length === 0) {
-    subjectList.innerHTML = '<div class="empty-state">등록된 subject가 없습니다.</div>';
+function renderTopicList() {
+  if (topics.length === 0) {
+    topicList.innerHTML = '<div class="empty-state">등록된 topic가 없습니다.</div>';
     return;
   }
 
-  subjectList.innerHTML = subjects
-    .map((subject) => {
-      const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
+  topicList.innerHTML = topics
+    .map((topic) => {
+      const activeClass = topic.id === selectedTopicId ? ' is-current' : '';
       return `
-        <button class="subject-chip${activeClass}" type="button" data-subject-id="${subject.id}">
-          <strong>${escapeHtml(subject.title)}</strong>
+        <button class="topic-chip${activeClass}" type="button" data-topic-id="${topic.id}">
+          <strong>${escapeHtml(topic.title)}</strong>
         </button>
       `;
     })
     .join('');
 }
 
-function renderSubjectBrowser(searchTerm = '') {
+function renderTopicBrowser(searchTerm = '') {
   const normalizedSearchTerm = normalizeSearchText(searchTerm);
   const compactTerm = compactSearchText(searchTerm);
-  const filteredSubjects = subjects.filter((subject) => {
-    const searchText = normalizeSearchText(`${subject.title} ${subject.description}`);
-    const compactSearchTextValue = compactSearchText(`${subject.title} ${subject.description}`);
+  const filteredTopics = topics.filter((topic) => {
+    const searchText = normalizeSearchText(`${topic.title} ${topic.description}`);
+    const compactSearchTextValue = compactSearchText(`${topic.title} ${topic.description}`);
     return !normalizedSearchTerm || searchText.includes(normalizedSearchTerm) || compactSearchTextValue.includes(compactTerm);
   });
 
-  if (filteredSubjects.length === 0) {
-    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">검색 결과가 없습니다.</div>';
+  if (filteredTopics.length === 0) {
+    topicBrowserGrid.innerHTML = '<div class="topic-browser-empty">검색 결과가 없습니다.</div>';
     return;
   }
 
-  subjectBrowserGrid.innerHTML = filteredSubjects
-    .map((subject) => {
-      const activeClass = subject.id === selectedSubjectId ? ' is-current' : '';
+  topicBrowserGrid.innerHTML = filteredTopics
+    .map((topic) => {
+      const activeClass = topic.id === selectedTopicId ? ' is-current' : '';
       return `
-        <button class="subject-browser-card${activeClass}" type="button" data-subject-choice="${subject.id}">
-          <strong>${escapeHtml(subject.title)}</strong>
-          ${subject.description ? `<p>${escapeHtml(subject.description)}</p>` : ''}
+        <button class="topic-browser-card${activeClass}" type="button" data-topic-choice="${topic.id}">
+          <strong>${escapeHtml(topic.title)}</strong>
+          ${topic.description ? `<p>${escapeHtml(topic.description)}</p>` : ''}
         </button>
       `;
     })
     .join('');
 }
 
-function showSubjectBrowser({ updateUrl = false, focusSearch = false } = {}) {
-  selectedSubjectId = null;
-  clearSelectedSubjectId();
+function showTopicBrowser({ updateUrl = false, focusSearch = false } = {}) {
+  selectedTopicId = null;
+  clearSelectedTopicId();
   resetQuizState();
-  renderSubjectList();
-  renderSubjectBrowser(subjectSearchInput.value);
-  subjectBrowserPanel.hidden = false;
+  renderTopicList();
+  renderTopicBrowser(topicSearchInput.value);
+  topicBrowserPanel.hidden = false;
   battlePanel.hidden = true;
-  openSubjectSearchButton.disabled = true;
+  openTopicSearchButton.disabled = true;
 
   if (updateUrl) {
-    clearSubjectQueryParam();
+    clearTopicQueryParam();
   }
 
   if (focusSearch) {
-    subjectSearchInput.focus();
+    topicSearchInput.focus();
   }
 }
 
-function hideSubjectBrowser() {
-  subjectBrowserPanel.hidden = true;
+function hideTopicBrowser() {
+  topicBrowserPanel.hidden = true;
   battlePanel.hidden = false;
-  openSubjectSearchButton.disabled = false;
+  openTopicSearchButton.disabled = false;
 }
 
 function resetQuizState() {
@@ -322,20 +329,20 @@ function resetQuizState() {
   updateStats();
 }
 
-function showSubjectIntro() {
-  const subject = getSelectedSubject();
+function showTopicIntro() {
+  const topic = getSelectedTopic();
   resetQuizState();
   quizPlayArea.hidden = true;
   quizIntroPanel.hidden = false;
-  quizStartButton.disabled = !subject;
+  quizStartButton.disabled = !topic;
   quizStartButton.textContent = '퀴즈시작';
 
-  if (!subject) {
-    showSubjectBrowser();
+  if (!topic) {
+    showTopicBrowser();
     return;
   }
 
-  quizIntroTitle.textContent = subject.title;
+  quizIntroTitle.textContent = topic.title;
 }
 
 function showQuizPlayArea() {
@@ -447,7 +454,7 @@ function renderQuestion() {
     feedbackResult.classList.remove('is-correct', 'is-wrong');
     feedbackResult.textContent = '퀴즈 데이터가 없습니다.';
     feedbackAnswer.textContent = '';
-    descriptionText.textContent = selectedSubjectId ? '선택한 subject에 퀴즈 데이터를 등록한 뒤 다시 시도하세요.' : 'subject를 선택하거나 추가하세요.';
+    descriptionText.textContent = selectedTopicId ? '선택한 topic에 퀴즈 데이터를 등록한 뒤 다시 시도하세요.' : 'topic를 선택하거나 추가하세요.';
     setDescriptionEditVisible(false);
     hintButton.disabled = true;
     skipButton.disabled = true;
@@ -586,7 +593,7 @@ function goNext() {
 }
 
 function renderLoading() {
-  renderSubjectList();
+  renderTopicList();
   showQuizPlayArea();
   setAbbreviationText('...');
   answerInputs.innerHTML = '';
@@ -616,15 +623,15 @@ function renderLoadError(error) {
 }
 
 async function loadQuizWords({ reshuffle = true } = {}) {
-  if (selectedSubjectId === null) {
-    showSubjectBrowser({ updateUrl: true, focusSearch: true });
+  if (selectedTopicId === null) {
+    showTopicBrowser({ updateUrl: true, focusSearch: true });
     return;
   }
 
   renderLoading();
 
   try {
-    const loadedWords = await fetchQuizWords(selectedSubjectId);
+    const loadedWords = await fetchQuizWords(selectedTopicId);
     words = reshuffle ? shuffle(loadedWords) : loadedWords;
     currentIndex = 0;
     score = 0;
@@ -638,56 +645,56 @@ async function loadQuizWords({ reshuffle = true } = {}) {
   }
 }
 
-async function loadSubjects() {
-  subjectList.innerHTML = '<div class="empty-state">subject를 불러오는 중입니다.</div>';
+async function loadTopics() {
+  topicList.innerHTML = '<div class="empty-state">topic를 불러오는 중입니다.</div>';
 
-  if (!hasSubjectQueryParam()) {
+  if (!hasTopicQueryParam()) {
     resetQuizState();
-    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">토픽을 불러오는 중입니다.</div>';
-    subjectBrowserPanel.hidden = false;
+    topicBrowserGrid.innerHTML = '<div class="topic-browser-empty">토픽을 불러오는 중입니다.</div>';
+    topicBrowserPanel.hidden = false;
     battlePanel.hidden = true;
   }
 
   try {
-    subjects = await fetchSubjects();
-    selectedSubjectId = null;
+    topics = await fetchTopics();
+    selectedTopicId = null;
 
-    const initialSubjectId = getSubjectIdFromUrl();
-    if (initialSubjectId && selectSubject(initialSubjectId, { replace: true })) {
+    const initialTopicId = getTopicIdFromUrl();
+    if (initialTopicId && selectTopic(initialTopicId, { replace: true })) {
       return;
     }
 
-    clearSelectedSubjectId();
-    if (hasSubjectQueryParam()) {
-      clearSubjectQueryParam(true);
+    clearSelectedTopicId();
+    if (hasTopicQueryParam()) {
+      clearTopicQueryParam(true);
     }
 
-    showSubjectBrowser();
+    showTopicBrowser();
   } catch (error) {
-    subjects = [];
-    selectedSubjectId = null;
-    subjectList.innerHTML = '<div class="empty-state">subject를 불러오지 못했습니다.</div>';
+    topics = [];
+    selectedTopicId = null;
+    topicList.innerHTML = '<div class="empty-state">topic를 불러오지 못했습니다.</div>';
     resetQuizState();
-    subjectBrowserGrid.innerHTML = '<div class="subject-browser-empty">토픽을 불러오지 못했습니다.</div>';
-    subjectBrowserPanel.hidden = false;
+    topicBrowserGrid.innerHTML = '<div class="topic-browser-empty">토픽을 불러오지 못했습니다.</div>';
+    topicBrowserPanel.hidden = false;
     battlePanel.hidden = true;
   }
 }
 
-function selectSubject(subjectId, options = {}) {
-  const nextSubjectId = Number(subjectId);
+function selectTopic(topicId, options = {}) {
+  const nextTopicId = Number(topicId);
 
-  if (!subjects.some((subject) => subject.id === nextSubjectId)) {
+  if (!topics.some((topic) => topic.id === nextTopicId)) {
     return false;
   }
 
-  selectedSubjectId = nextSubjectId;
-  writeSelectedSubjectId(selectedSubjectId);
-  updateSubjectQueryParam(selectedSubjectId, options.replace);
-  renderSubjectList();
-  renderSubjectBrowser(subjectSearchInput.value);
-  hideSubjectBrowser();
-  showSubjectIntro();
+  selectedTopicId = nextTopicId;
+  writeSelectedTopicId(selectedTopicId);
+  updateTopicQueryParam(selectedTopicId, options.replace);
+  renderTopicList();
+  renderTopicBrowser(topicSearchInput.value);
+  hideTopicBrowser();
+  showTopicIntro();
   return true;
 }
 
@@ -724,32 +731,32 @@ descriptionEditForm.addEventListener('submit', (event) => {
 descriptionEditCancelButton.addEventListener('click', closeDescriptionEditor);
 descriptionEditCancelAction.addEventListener('click', closeDescriptionEditor);
 
-subjectList.addEventListener('click', async (event) => {
-  const button = event.target.closest('[data-subject-id]');
+topicList.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-topic-id]');
 
   if (!button) {
     return;
   }
 
-  selectSubject(button.dataset.subjectId);
+  selectTopic(button.dataset.topicId);
 });
 
-openSubjectSearchButton.addEventListener('click', () => {
-  showSubjectBrowser({ updateUrl: true, focusSearch: true });
+openTopicSearchButton.addEventListener('click', () => {
+  showTopicBrowser({ updateUrl: true, focusSearch: true });
 });
 
-subjectSearchInput.addEventListener('input', () => {
-  renderSubjectBrowser(subjectSearchInput.value);
+topicSearchInput.addEventListener('input', () => {
+  renderTopicBrowser(topicSearchInput.value);
 });
 
-subjectBrowserGrid.addEventListener('click', async (event) => {
-  const button = event.target.closest('[data-subject-choice]');
+topicBrowserGrid.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-topic-choice]');
 
   if (!button) {
     return;
   }
 
-  selectSubject(button.dataset.subjectChoice);
+  selectTopic(button.dataset.topicChoice);
 });
 
 quizStartButton.addEventListener('click', () => {
@@ -763,12 +770,12 @@ resetButton.addEventListener('click', () => {
 });
 
 window.addEventListener('popstate', () => {
-  const subjectId = getSubjectIdFromUrl();
+  const topicId = getTopicIdFromUrl();
 
-  if (!subjectId || !selectSubject(subjectId, { replace: true })) {
-    showSubjectBrowser();
+  if (!topicId || !selectTopic(topicId, { replace: true })) {
+    showTopicBrowser();
   }
 });
 
 renderHistory();
-loadSubjects();
+loadTopics();
