@@ -1,9 +1,12 @@
 const FINAL_CARDS_STORAGE_KEY = 'worldcup-final-cards';
 const DEFAULT_MENU_VALUE = 'boy-idol';
 const MENU_QUERY_PARAM = 'menu';
-const MENU_CONFIG_SOURCE = 'res/menu.json';
 const LANGUAGE_STORAGE_KEY = 'playground-language';
-const { fetchWinnerSummary, saveWinner } = window.PlaygroundCloudflareApi;
+const { fetchFavoriteCards, fetchFavoriteTopics, fetchWinnerSummary, saveWinner } = window.PlaygroundCloudflareApi;
+const LOCAL_IMAGE_BASE_PATH_BY_MENU_VALUE = {
+  'boy-idol': 'res/2020/boysgroup',
+  'girl-idol': 'res/2020/girlsgroup',
+};
 
 let initialCards = [];
 let activePool = [];
@@ -74,7 +77,7 @@ const leftSource = document.getElementById('leftSource');
 const rightSource = document.getElementById('rightSource');
 const battleCards = [leftCard, rightCard];
 let menuToggleButtons = [];
-let cardSourceButtons = [];
+let menuItemButtons = [];
 let activeCountryFilter = 'all';
 let activeLanguage = getInitialLanguage();
 const MOBILE_PANEL_MEDIA_QUERY = '(max-width: 768px)';
@@ -95,7 +98,7 @@ function getInitialLanguage() {
 }
 
 function getMenuButtonByValue(menuValue) {
-  return Array.from(cardSourceButtons).find((button) => button.dataset.menuValue === menuValue);
+  return Array.from(menuItemButtons).find((button) => button.dataset.menuValue === menuValue);
 }
 
 function isMobilePanelLayout() {
@@ -169,22 +172,62 @@ function renderMenuError() {
 async function loadMenuConfig() {
   renderMenuLoading();
 
-  const response = await window.fetch(MENU_CONFIG_SOURCE);
+  const topics = await fetchFavoriteTopics();
 
-  if (!response.ok) {
-    throw new Error(`Failed to load menu config: ${response.status}`);
+  if (!Array.isArray(topics)) {
+    throw new Error('Favorite topics response must be an array.');
   }
 
-  const payload = await response.json();
-
-  if (!Array.isArray(payload.groups)) {
-    throw new Error('Menu config must include a groups array.');
-  }
-
-  menuGroups = await hydrateMenuGroupsWithCardMetadata(payload.groups);
+  menuGroups = buildMenuGroupsFromTopics(topics);
   renderMenu(menuGroups, activeCountryFilter);
   renderMenuBrowser(menuGroups, menuSearchInput.value, activeCountryFilter);
   bindMenuEventListeners();
+}
+
+function getEraGroupLabel(era) {
+  return era === null || era === undefined ? '기타' : `${era}년대`;
+}
+
+function getMenuLabelFromTopic(topic) {
+  const eraPrefix = topic.era === null || topic.era === undefined ? '' : `${topic.era}년대 `;
+  return topic.label?.startsWith(eraPrefix) ? topic.label.slice(eraPrefix.length) : topic.label;
+}
+
+function buildMenuGroupsFromTopics(topics) {
+  const groupEntries = [];
+  const groupById = new Map();
+
+  topics.forEach((topic) => {
+    if (!topic.value || !topic.label) {
+      return;
+    }
+
+    const groupId = topic.era === null || topic.era === undefined ? 'etc' : String(topic.era);
+
+    if (!groupById.has(groupId)) {
+      const group = {
+        id: groupId,
+        label: getEraGroupLabel(topic.era),
+        isOpen: groupEntries.length === 0,
+        items: [],
+      };
+
+      groupById.set(groupId, group);
+      groupEntries.push(group);
+    }
+
+    groupById.get(groupId).items.push({
+      id: topic.id,
+      value: topic.value,
+      label: topic.label,
+      menuLabel: getMenuLabelFromTopic(topic),
+      browserLabel: topic.label,
+      country: topic.country,
+      icon: topic.icon,
+    });
+  });
+
+  return groupEntries;
 }
 
 function getMenuItems(groups = menuGroups) {
@@ -196,51 +239,6 @@ function getMenuItems(groups = menuGroups) {
       groupLabel: group.label || '',
     }));
   });
-}
-
-async function getCardSourceMetadata(cardSource) {
-  if (!cardSource) {
-    return {};
-  }
-
-  try {
-    const response = await window.fetch(cardSource);
-
-    if (!response.ok) {
-      return {};
-    }
-
-    const payload = await response.json();
-
-    return {
-      country: payload.country,
-    };
-  } catch {
-    return {};
-  }
-}
-
-async function hydrateMenuGroupsWithCardMetadata(groups) {
-  return Promise.all(
-    groups.map(async (group) => {
-      const items = Array.isArray(group.items) ? group.items : [];
-      const hydratedItems = await Promise.all(
-        items.map(async (item) => {
-          const metadata = await getCardSourceMetadata(item.cardSource);
-
-          return {
-            ...item,
-            country: metadata.country || item.country,
-          };
-        }),
-      );
-
-      return {
-        ...group,
-        items: hydratedItems,
-      };
-    }),
-  );
 }
 
 function getMenuItemMenuLabel(item) {
@@ -345,7 +343,7 @@ function renderMenu(groups = menuGroups, countryFilter = activeCountryFilter) {
                     class="submenu-item"
                     type="button"
                     data-menu-value="${escapeHtml(item.value || '')}"
-                    data-card-source="${escapeHtml(item.cardSource || '')}"
+                    data-topic-id="${escapeHtml(item.id || '')}"
                   >
                     ${item.icon ? `<img class="submenu-item__icon" src="${escapeHtml(item.icon)}" alt="" aria-hidden="true" />` : ''}
                     <span>${escapeHtml(getMenuItemMenuLabel(item))}</span>
@@ -488,7 +486,7 @@ function showMenuBrowser(options = {}) {
   isBattleActive = false;
   battlePanel.classList.remove('is-battle-ready');
   activeMenuValue = DEFAULT_MENU_VALUE;
-  cardSourceButtons.forEach((button) => {
+  menuItemButtons.forEach((button) => {
     button.classList.remove('is-active');
     button.setAttribute('aria-current', 'false');
   });
@@ -566,11 +564,11 @@ function getInitialMenuButton() {
     return null;
   }
 
-  return getMenuButtonByValue(menuValue) || getMenuButtonByValue(DEFAULT_MENU_VALUE) || cardSourceButtons[0];
+  return getMenuButtonByValue(menuValue) || getMenuButtonByValue(DEFAULT_MENU_VALUE) || menuItemButtons[0];
 }
 
 function setActiveMenuButton(activeButton) {
-  cardSourceButtons.forEach((button) => {
+  menuItemButtons.forEach((button) => {
     const isActive = button === activeButton;
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-current', isActive ? 'true' : 'false');
@@ -603,7 +601,7 @@ function updateMenuQueryParam(menuValue, shouldReplace = false) {
 }
 
 function getActiveMenuValue() {
-  const activeButton = document.querySelector('[data-card-source].is-active');
+  const activeButton = document.querySelector('[data-topic-id].is-active');
   return activeButton?.dataset.menuValue || activeMenuValue || DEFAULT_MENU_VALUE;
 }
 
@@ -612,9 +610,9 @@ async function activateMenuButton(button, options = {}) {
     return;
   }
 
-  const cardSource = button.dataset.cardSource;
+  const topicId = Number(button.dataset.topicId);
 
-  if (!cardSource) {
+  if (!Number.isInteger(topicId)) {
     return;
   }
 
@@ -631,7 +629,7 @@ async function activateMenuButton(button, options = {}) {
     updateMenuQueryParam(button.dataset.menuValue, options.replace);
     updateRankingLink(button);
     renderCardsLoadingState();
-    await loadCards(cardSource, loadRequestId);
+    await loadCards(topicId, button.dataset.menuValue, loadRequestId);
   } catch (error) {
     console.error(error);
   }
@@ -660,13 +658,14 @@ function getRoundTarget() {
   return Math.max(1, Math.ceil(currentRoundCards.length / 2));
 }
 
-function normalizeCard(card, index, sourceDirectory) {
+function normalizeCard(card, index, menuValue) {
   const image = card.image || '';
   const isRemoteImage = /^https?:\/\//i.test(image);
-  const normalizedImage = image ? (isRemoteImage ? image : `${sourceDirectory}/${image}`) : '';
+  const localImageBasePath = LOCAL_IMAGE_BASE_PATH_BY_MENU_VALUE[menuValue];
+  const normalizedImage = image ? (isRemoteImage || !localImageBasePath ? image : `${localImageBasePath}/${image}`) : '';
 
   return {
-    id: card.id ?? index + 1,
+    id: card.sourceCardId ?? card.id ?? index + 1,
     name: card.name ?? `Card ${String(index + 1).padStart(2, '0')}`,
     description: card.description ?? '',
     image: normalizedImage,
@@ -674,26 +673,14 @@ function normalizeCard(card, index, sourceDirectory) {
   };
 }
 
-async function loadCards(cardSource, loadRequestId = activeLoadRequestId) {
-  const response = await window.fetch(cardSource);
+async function loadCards(topicId, menuValue, loadRequestId = activeLoadRequestId) {
+  const items = await fetchFavoriteCards(topicId);
 
   if (loadRequestId !== activeLoadRequestId) {
     return;
   }
 
-  if (!response.ok) {
-    throw new Error(`Failed to load cards from ${cardSource}`);
-  }
-
-  const payload = await response.json();
-
-  if (loadRequestId !== activeLoadRequestId) {
-    return;
-  }
-
-  const items = Array.isArray(payload.items) ? payload.items : [];
-  const sourceDirectory = cardSource.split('/').slice(0, -1).join('/');
-  const cards = items.map((card, index) => normalizeCard(card, index, sourceDirectory));
+  const cards = items.map((card, index) => normalizeCard(card, index, menuValue));
 
   if (cards.length < 2) {
     throw new Error('At least two cards are required.');
@@ -1487,7 +1474,7 @@ battleStartButton.addEventListener('click', () => {
 
 function bindMenuEventListeners() {
   menuToggleButtons = Array.from(document.querySelectorAll('[data-menu-toggle]'));
-  cardSourceButtons = Array.from(document.querySelectorAll('[data-card-source]'));
+  menuItemButtons = Array.from(document.querySelectorAll('[data-topic-id]'));
 
   menuToggleButtons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -1500,7 +1487,7 @@ function bindMenuEventListeners() {
     });
   });
 
-  cardSourceButtons.forEach((button) => {
+  menuItemButtons.forEach((button) => {
     button.addEventListener('click', () => {
       activateMenuButton(button);
     });

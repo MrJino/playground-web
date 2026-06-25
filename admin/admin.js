@@ -3,9 +3,15 @@ let topics = [];
 let words = [];
 let selectedTopicId = null;
 let selectedWordId = null;
+let favoriteTopics = [];
+let favoriteCards = [];
+let selectedFavoriteTopicId = null;
+let selectedFavoriteCardId = null;
 let isBusy = false;
 let pendingDeleteWord = null;
+let pendingDeleteFavoriteCard = null;
 let hasLoadedWordsQuiz = false;
+let hasLoadedPickYourFavorite = false;
 
 const moduleButtons = document.querySelectorAll('[data-module-id]');
 const modulePanels = document.querySelectorAll('[data-module-panel]');
@@ -46,6 +52,40 @@ const wordDetailAbbreviation = document.getElementById('wordDetailAbbreviation')
 const wordDetailFullName = document.getElementById('wordDetailFullName');
 const wordDetailDescription = document.getElementById('wordDetailDescription');
 const closeWordDetailButton = document.getElementById('closeWordDetailButton');
+const favoriteStatusLine = document.getElementById('favoriteStatusLine');
+const favoriteTopicList = document.getElementById('favoriteTopicList');
+const favoriteTopicDialog = document.getElementById('favoriteTopicDialog');
+const favoriteTopicForm = document.getElementById('favoriteTopicForm');
+const favoriteTopicIdInput = document.getElementById('favoriteTopicIdInput');
+const favoriteTopicValueInput = document.getElementById('favoriteTopicValueInput');
+const favoriteTopicLabelInput = document.getElementById('favoriteTopicLabelInput');
+const favoriteTopicCountryInput = document.getElementById('favoriteTopicCountryInput');
+const favoriteTopicIconInput = document.getElementById('favoriteTopicIconInput');
+const favoriteTopicEraInput = document.getElementById('favoriteTopicEraInput');
+const favoriteTopicModeText = document.getElementById('favoriteTopicModeText');
+const newFavoriteTopicButton = document.getElementById('newFavoriteTopicButton');
+const deleteFavoriteTopicButton = document.getElementById('deleteFavoriteTopicButton');
+const cancelFavoriteTopicButton = document.getElementById('cancelFavoriteTopicButton');
+const favoriteCardList = document.getElementById('favoriteCardList');
+const favoriteCardListTitle = document.getElementById('favoriteCardListTitle');
+const favoriteCardCountText = document.getElementById('favoriteCardCountText');
+const favoriteCardDialog = document.getElementById('favoriteCardDialog');
+const favoriteCardForm = document.getElementById('favoriteCardForm');
+const favoriteCardIdInput = document.getElementById('favoriteCardIdInput');
+const favoriteCardTopicInput = document.getElementById('favoriteCardTopicInput');
+const favoriteCardTopicSelectButton = document.getElementById('favoriteCardTopicSelectButton');
+const favoriteCardTopicSelectMenu = document.getElementById('favoriteCardTopicSelectMenu');
+const favoriteSourceCardIdInput = document.getElementById('favoriteSourceCardIdInput');
+const favoriteCardNameInput = document.getElementById('favoriteCardNameInput');
+const favoriteCardDescriptionInput = document.getElementById('favoriteCardDescriptionInput');
+const favoriteCardImageInput = document.getElementById('favoriteCardImageInput');
+const favoriteCardModeText = document.getElementById('favoriteCardModeText');
+const newFavoriteCardButton = document.getElementById('newFavoriteCardButton');
+const cancelFavoriteCardButton = document.getElementById('cancelFavoriteCardButton');
+const deleteFavoriteCardDialog = document.getElementById('deleteFavoriteCardDialog');
+const deleteFavoriteCardMessage = document.getElementById('deleteFavoriteCardMessage');
+const cancelDeleteFavoriteCardButton = document.getElementById('cancelDeleteFavoriteCardButton');
+const confirmDeleteFavoriteCardButton = document.getElementById('confirmDeleteFavoriteCardButton');
 const {
   fetchTopics,
   saveTopic,
@@ -53,6 +93,12 @@ const {
   fetchQuizWords: fetchWords,
   saveQuizWord: saveWord,
   deleteQuizWord: deleteWord,
+  fetchFavoriteTopics,
+  saveFavoriteTopic,
+  deleteFavoriteTopic,
+  fetchFavoriteCards,
+  saveFavoriteCard,
+  deleteFavoriteCard,
 } = window.PlaygroundCloudflareApi;
 
 function escapeHtml(value) {
@@ -63,6 +109,10 @@ function setStatus(message = '') {
   statusLine.textContent = message;
 }
 
+function setFavoriteStatus(message = '') {
+  favoriteStatusLine.textContent = message;
+}
+
 function setBusy(nextBusy) {
   isBusy = nextBusy;
   newTopicButton.disabled = isBusy;
@@ -71,6 +121,12 @@ function setBusy(nextBusy) {
   wordForm.querySelector('[type="submit"]').disabled = isBusy || topics.length === 0;
   deleteTopicButton.disabled = isBusy || !topicIdInput.value;
   confirmDeleteWordButton.disabled = isBusy || pendingDeleteWord === null;
+  newFavoriteTopicButton.disabled = isBusy;
+  newFavoriteCardButton.disabled = isBusy || selectedFavoriteTopicId === null;
+  favoriteTopicForm.querySelector('[type="submit"]').disabled = isBusy;
+  favoriteCardForm.querySelector('[type="submit"]').disabled = isBusy || favoriteTopics.length === 0;
+  deleteFavoriteTopicButton.disabled = isBusy || !favoriteTopicIdInput.value;
+  confirmDeleteFavoriteCardButton.disabled = isBusy || pendingDeleteFavoriteCard === null;
 }
 
 function getSelectedTopic() {
@@ -175,6 +231,300 @@ function openWordDetailDialog(word) {
 function closeWordDetailDialog() {
   if (wordDetailDialog.open) {
     wordDetailDialog.close();
+  }
+}
+
+function getSelectedFavoriteTopic() {
+  return favoriteTopics.find((topic) => topic.id === selectedFavoriteTopicId) || null;
+}
+
+function resetFavoriteTopicForm() {
+  favoriteTopicIdInput.value = '';
+  favoriteTopicValueInput.value = '';
+  favoriteTopicLabelInput.value = '';
+  favoriteTopicCountryInput.value = '';
+  favoriteTopicIconInput.value = '';
+  favoriteTopicEraInput.value = '';
+  favoriteTopicModeText.textContent = '새 favorite topic';
+}
+
+function fillFavoriteTopicForm(topic) {
+  favoriteTopicIdInput.value = String(topic.id);
+  favoriteTopicValueInput.value = topic.value;
+  favoriteTopicLabelInput.value = topic.label;
+  favoriteTopicCountryInput.value = topic.country;
+  favoriteTopicIconInput.value = topic.icon;
+  favoriteTopicEraInput.value = topic.era === null ? '' : String(topic.era);
+  favoriteTopicModeText.textContent = `#${topic.id} 편집`;
+}
+
+function openFavoriteTopicDialog() {
+  favoriteTopicDialog.showModal();
+  favoriteTopicValueInput.focus();
+}
+
+function closeFavoriteTopicDialog() {
+  if (favoriteTopicDialog.open) {
+    favoriteTopicDialog.close();
+  }
+}
+
+function closeFavoriteCardTopicMenu() {
+  favoriteCardTopicSelectMenu.hidden = true;
+  favoriteCardTopicSelectButton.setAttribute('aria-expanded', 'false');
+}
+
+function setFavoriteCardTopicValue(topicId) {
+  const normalizedTopicId = topicId === null || topicId === '' ? '' : String(topicId);
+  const topic = favoriteTopics.find((item) => String(item.id) === normalizedTopicId);
+  favoriteCardTopicInput.value = normalizedTopicId;
+  favoriteCardTopicSelectButton.textContent = topic ? topic.label : 'Topic 선택';
+
+  favoriteCardTopicSelectMenu.querySelectorAll('[data-favorite-topic-option]').forEach((button) => {
+    button.classList.toggle('is-selected', button.dataset.favoriteTopicOption === normalizedTopicId);
+    button.setAttribute('aria-selected', button.dataset.favoriteTopicOption === normalizedTopicId ? 'true' : 'false');
+  });
+}
+
+function resetFavoriteCardForm() {
+  selectedFavoriteCardId = null;
+  favoriteCardIdInput.value = '';
+  favoriteSourceCardIdInput.value = '';
+  favoriteCardNameInput.value = '';
+  favoriteCardDescriptionInput.value = '';
+  favoriteCardImageInput.value = '';
+  setFavoriteCardTopicValue(selectedFavoriteTopicId);
+  favoriteCardModeText.textContent = '새 favorite card';
+}
+
+function fillFavoriteCardForm(card) {
+  selectedFavoriteCardId = card.id;
+  favoriteCardIdInput.value = String(card.id);
+  setFavoriteCardTopicValue(card.topicId);
+  favoriteSourceCardIdInput.value = card.sourceCardId === null ? '' : String(card.sourceCardId);
+  favoriteCardNameInput.value = card.name;
+  favoriteCardDescriptionInput.value = card.description;
+  favoriteCardImageInput.value = card.image;
+  favoriteCardModeText.textContent = `#${card.id} 편집`;
+}
+
+function openFavoriteCardDialog() {
+  favoriteCardDialog.showModal();
+  favoriteSourceCardIdInput.focus();
+}
+
+function closeFavoriteCardDialog() {
+  if (favoriteCardDialog.open) {
+    favoriteCardDialog.close();
+  }
+}
+
+function openDeleteFavoriteCardDialog(card) {
+  if (!card) {
+    return;
+  }
+
+  pendingDeleteFavoriteCard = card;
+  deleteFavoriteCardMessage.textContent = `${card.name} favorite card를 삭제할까요?`;
+  setBusy(isBusy);
+  deleteFavoriteCardDialog.showModal();
+}
+
+function closeDeleteFavoriteCardDialog() {
+  if (deleteFavoriteCardDialog.open) {
+    deleteFavoriteCardDialog.close();
+  }
+  pendingDeleteFavoriteCard = null;
+  setBusy(isBusy);
+}
+
+function renderFavoriteTopicOptions() {
+  favoriteCardTopicSelectMenu.innerHTML = favoriteTopics
+    .map(
+      (topic) => `
+        <button class="custom-select__option" type="button" role="option" data-favorite-topic-option="${topic.id}">
+          ${escapeHtml(topic.label)}
+        </button>
+      `,
+    )
+    .join('');
+  setFavoriteCardTopicValue(favoriteCardTopicInput.value || selectedFavoriteTopicId);
+}
+
+function renderFavoriteTopics() {
+  if (favoriteTopics.length === 0) {
+    favoriteTopicList.innerHTML = '<div class="empty-state">등록된 favorite topic이 없습니다.</div>';
+    favoriteCardListTitle.textContent = 'Favorite Cards';
+    return;
+  }
+
+  favoriteTopicList.innerHTML = favoriteTopics
+    .map((topic) => {
+      const activeClass = topic.id === selectedFavoriteTopicId ? ' is-current' : '';
+      const details = [topic.value, topic.era === null ? null : `${topic.era}`, topic.country].filter(Boolean).join(' · ');
+      return `
+        <article class="item-card topic-item${activeClass}" data-favorite-topic-id="${topic.id}">
+          <button class="topic-item__content" type="button" data-favorite-topic-id="${topic.id}">
+            <strong>${escapeHtml(topic.label)}</strong>
+            <span>${escapeHtml(details || '추가 정보 없음')}</span>
+          </button>
+          <div class="topic-item__actions">
+            <button class="icon-button" type="button" data-favorite-topic-action="edit" data-favorite-topic-id="${topic.id}" aria-label="${escapeHtml(topic.label)} 편집" title="편집">✎</button>
+            <button class="icon-button icon-button--danger" type="button" data-favorite-topic-action="delete" data-favorite-topic-id="${topic.id}" aria-label="${escapeHtml(topic.label)} 삭제" title="삭제">×</button>
+          </div>
+        </article>
+      `;
+    })
+    .join('');
+
+  const topic = getSelectedFavoriteTopic();
+  favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'Favorite Cards';
+}
+
+function renderFavoriteCards() {
+  const topic = getSelectedFavoriteTopic();
+  favoriteCardCountText.textContent = `${favoriteCards.length}개`;
+
+  if (!topic) {
+    favoriteCardList.innerHTML = '<div class="empty-state">favorite topic을 선택하세요.</div>';
+    return;
+  }
+
+  if (favoriteCards.length === 0) {
+    favoriteCardList.innerHTML = '<div class="empty-state">등록된 favorite card가 없습니다.</div>';
+    return;
+  }
+
+  favoriteCardList.innerHTML = favoriteCards
+    .map((card) => {
+      const activeClass = card.id === selectedFavoriteCardId ? ' is-current' : '';
+      return `
+        <article class="item-card word-item favorite-card-item${activeClass}" data-favorite-card-id="${card.id}">
+          <div class="word-item__content">
+            <strong>#${escapeHtml(card.sourceCardId)}</strong>
+            <span>${escapeHtml(card.name)}</span>
+            <p>${escapeHtml(card.description || card.image || '설명 없음')}</p>
+          </div>
+          <div class="word-item__actions">
+            <button class="icon-button" type="button" data-favorite-card-action="edit" data-favorite-card-id="${card.id}" aria-label="${escapeHtml(card.name)} 편집" title="편집">✎</button>
+            <button class="icon-button icon-button--danger" type="button" data-favorite-card-action="delete" data-favorite-card-id="${card.id}" aria-label="${escapeHtml(card.name)} 삭제" title="삭제">×</button>
+          </div>
+        </article>
+      `;
+    })
+    .join('');
+}
+
+function renderFavoriteAll() {
+  renderFavoriteTopicOptions();
+  renderFavoriteTopics();
+  renderFavoriteCards();
+  setBusy(isBusy);
+}
+
+function updateFavoriteTopicSelectionState() {
+  favoriteTopicList.querySelectorAll('.topic-item[data-favorite-topic-id]').forEach((item) => {
+    item.classList?.toggle('is-current', Number(item.dataset.favoriteTopicId) === selectedFavoriteTopicId);
+  });
+
+  const topic = getSelectedFavoriteTopic();
+  favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'Favorite Cards';
+}
+
+async function selectFavoriteTopic(topicId) {
+  selectedFavoriteTopicId = topicId;
+  selectedFavoriteCardId = null;
+  const topic = getSelectedFavoriteTopic();
+
+  if (topic) {
+    fillFavoriteTopicForm(topic);
+  } else {
+    resetFavoriteTopicForm();
+  }
+
+  resetFavoriteCardForm();
+  updateFavoriteTopicSelectionState();
+  favoriteCardList.innerHTML = '<div class="empty-state">favorite cards를 불러오는 중입니다.</div>';
+  favoriteCards = topic ? await fetchFavoriteCards(topic.id) : [];
+  renderFavoriteCards();
+  setBusy(isBusy);
+}
+
+async function loadPickYourFavorite() {
+  setBusy(true);
+  setFavoriteStatus('데이터를 불러오는 중입니다.');
+  favoriteTopicList.innerHTML = '<div class="empty-state">favorite topics를 불러오는 중입니다.</div>';
+  favoriteCardList.innerHTML = '<div class="empty-state">favorite cards를 불러오는 중입니다.</div>';
+
+  try {
+    favoriteTopics = await fetchFavoriteTopics();
+    const selectedStillExists = favoriteTopics.some((topic) => topic.id === selectedFavoriteTopicId);
+    selectedFavoriteTopicId = selectedStillExists ? selectedFavoriteTopicId : null;
+    favoriteCards = selectedFavoriteTopicId === null ? [] : await fetchFavoriteCards(selectedFavoriteTopicId);
+
+    const topic = getSelectedFavoriteTopic();
+    if (topic) {
+      fillFavoriteTopicForm(topic);
+    } else {
+      resetFavoriteTopicForm();
+    }
+
+    resetFavoriteCardForm();
+    renderFavoriteAll();
+    setFavoriteStatus('데이터를 불러왔습니다.');
+  } catch (error) {
+    favoriteTopics = [];
+    favoriteCards = [];
+    renderFavoriteAll();
+    setFavoriteStatus(error instanceof Error ? error.message : '데이터를 불러오지 못했습니다.');
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function removeFavoriteTopic(topic) {
+  if (!topic || !window.confirm(`${topic.label} topic과 하위 favorite cards를 삭제할까요?`)) {
+    return;
+  }
+
+  setBusy(true);
+  setFavoriteStatus('favorite topic을 삭제 중입니다.');
+
+  try {
+    await deleteFavoriteTopic(topic.id);
+    selectedFavoriteTopicId = null;
+    selectedFavoriteCardId = null;
+    await loadPickYourFavorite();
+    closeFavoriteTopicDialog();
+    setFavoriteStatus(`${topic.label} favorite topic을 삭제했습니다.`);
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite topic을 삭제하지 못했습니다.');
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function removeFavoriteCard(card) {
+  if (!card) {
+    return;
+  }
+
+  setBusy(true);
+  setFavoriteStatus('favorite card를 삭제 중입니다.');
+
+  try {
+    await deleteFavoriteCard(card.id);
+    selectedFavoriteCardId = null;
+    resetFavoriteCardForm();
+    favoriteCards = selectedFavoriteTopicId === null ? [] : await fetchFavoriteCards(selectedFavoriteTopicId);
+    renderFavoriteAll();
+    closeFavoriteCardDialog();
+    closeDeleteFavoriteCardDialog();
+    setFavoriteStatus(`${card.name} favorite card를 삭제했습니다.`);
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite card를 삭제하지 못했습니다.');
+  } finally {
+    setBusy(false);
   }
 }
 
@@ -392,6 +742,11 @@ async function setActiveModule(moduleId) {
     hasLoadedWordsQuiz = true;
     await loadWordsQuiz();
   }
+
+  if (activeModuleId === 'pick-your-favorite' && !hasLoadedPickYourFavorite) {
+    hasLoadedPickYourFavorite = true;
+    await loadPickYourFavorite();
+  }
 }
 
 moduleButtons.forEach((button) => {
@@ -412,13 +767,33 @@ newWordButton.addEventListener('click', () => {
   openWordDialog();
 });
 
+newFavoriteTopicButton.addEventListener('click', () => {
+  resetFavoriteTopicForm();
+  setBusy(false);
+  openFavoriteTopicDialog();
+});
+
+newFavoriteCardButton.addEventListener('click', () => {
+  resetFavoriteCardForm();
+  setBusy(false);
+  openFavoriteCardDialog();
+});
+
 cancelTopicButton.addEventListener('click', closeTopicDialog);
 cancelWordButton.addEventListener('click', closeWordDialog);
+cancelFavoriteTopicButton.addEventListener('click', closeFavoriteTopicDialog);
+cancelFavoriteCardButton.addEventListener('click', closeFavoriteCardDialog);
 
 wordTopicSelectButton.addEventListener('click', () => {
   const willOpen = wordTopicSelectMenu.hidden;
   wordTopicSelectMenu.hidden = !willOpen;
   wordTopicSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+});
+
+favoriteCardTopicSelectButton.addEventListener('click', () => {
+  const willOpen = favoriteCardTopicSelectMenu.hidden;
+  favoriteCardTopicSelectMenu.hidden = !willOpen;
+  favoriteCardTopicSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 });
 
 wordTopicSelectMenu.addEventListener('click', (event) => {
@@ -433,17 +808,36 @@ wordTopicSelectMenu.addEventListener('click', (event) => {
   wordTopicSelectButton.focus();
 });
 
+favoriteCardTopicSelectMenu.addEventListener('click', (event) => {
+  const option = event.target.closest('[data-favorite-topic-option]');
+
+  if (!option) {
+    return;
+  }
+
+  setFavoriteCardTopicValue(option.dataset.favoriteTopicOption);
+  closeFavoriteCardTopicMenu();
+  favoriteCardTopicSelectButton.focus();
+});
+
 document.addEventListener('click', (event) => {
   if (event.target.closest('#wordTopicSelect')) {
     return;
   }
 
   closeWordTopicMenu();
+
+  if (event.target.closest('#favoriteCardTopicSelect')) {
+    return;
+  }
+
+  closeFavoriteCardTopicMenu();
 });
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeWordTopicMenu();
+    closeFavoriteCardTopicMenu();
   }
 });
 
@@ -521,6 +915,74 @@ wordList.addEventListener('click', (event) => {
   }
 });
 
+favoriteTopicList.addEventListener('click', async (event) => {
+  const actionButton = event.target.closest('[data-favorite-topic-action]');
+
+  if (actionButton) {
+    const topic = favoriteTopics.find((item) => item.id === Number(actionButton.dataset.favoriteTopicId));
+
+    if (!topic) {
+      return;
+    }
+
+    if (actionButton.dataset.favoriteTopicAction === 'edit') {
+      selectedFavoriteTopicId = topic.id;
+      fillFavoriteTopicForm(topic);
+      updateFavoriteTopicSelectionState();
+      setBusy(false);
+      openFavoriteTopicDialog();
+      setFavoriteStatus(`${topic.label} favorite topic을 편집합니다.`);
+      return;
+    }
+
+    if (actionButton.dataset.favoriteTopicAction === 'delete') {
+      removeFavoriteTopic(topic);
+      return;
+    }
+  }
+
+  const button = event.target.closest('[data-favorite-topic-id]');
+
+  if (!button) {
+    return;
+  }
+
+  setBusy(true);
+  setFavoriteStatus('favorite topic을 선택하는 중입니다.');
+
+  try {
+    await selectFavoriteTopic(Number(button.dataset.favoriteTopicId));
+    setFavoriteStatus('');
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite topic을 선택하지 못했습니다.');
+  } finally {
+    setBusy(false);
+  }
+});
+
+favoriteCardList.addEventListener('click', (event) => {
+  const actionButton = event.target.closest('[data-favorite-card-action]');
+  const cardId = actionButton?.dataset.favoriteCardId || event.target.closest('[data-favorite-card-id]')?.dataset.favoriteCardId;
+  const card = favoriteCards.find((item) => item.id === Number(cardId));
+
+  if (!card || !actionButton) {
+    return;
+  }
+
+  if (actionButton.dataset.favoriteCardAction === 'edit') {
+    fillFavoriteCardForm(card);
+    renderFavoriteCards();
+    setBusy(false);
+    setFavoriteStatus(`${card.name} 편집 중입니다.`);
+    openFavoriteCardDialog();
+    return;
+  }
+
+  if (actionButton.dataset.favoriteCardAction === 'delete') {
+    openDeleteFavoriteCardDialog(card);
+  }
+});
+
 topicForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(topicForm);
@@ -588,14 +1050,98 @@ wordForm.addEventListener('submit', async (event) => {
   }
 });
 
+favoriteTopicForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = new FormData(favoriteTopicForm);
+  const eraValue = String(formData.get('era') || '').trim();
+  const topic = {
+    id: formData.get('id') ? Number(formData.get('id')) : undefined,
+    value: String(formData.get('value') || '').trim(),
+    label: String(formData.get('label') || '').trim(),
+    country: String(formData.get('country') || '').trim(),
+    icon: String(formData.get('icon') || '').trim(),
+    era: eraValue ? Number(eraValue) : null,
+  };
+
+  if (!topic.value || !topic.label) {
+    setFavoriteStatus('Value, label을 모두 입력하세요.');
+    return;
+  }
+
+  if (eraValue && !Number.isInteger(topic.era)) {
+    setFavoriteStatus('Era는 숫자로 입력하세요.');
+    return;
+  }
+
+  setBusy(true);
+  setFavoriteStatus('favorite topic을 저장 중입니다.');
+
+  try {
+    const savedTopic = await saveFavoriteTopic(topic);
+    selectedFavoriteTopicId = savedTopic.id;
+    await loadPickYourFavorite();
+    fillFavoriteTopicForm(savedTopic);
+    closeFavoriteTopicDialog();
+    setFavoriteStatus(`${savedTopic.label} favorite topic을 저장했습니다.`);
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite topic을 저장하지 못했습니다.');
+  } finally {
+    setBusy(false);
+  }
+});
+
+favoriteCardForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = new FormData(favoriteCardForm);
+  const card = {
+    id: formData.get('id') ? Number(formData.get('id')) : undefined,
+    topicId: Number(formData.get('topicId')),
+    sourceCardId: Number(formData.get('sourceCardId')),
+    name: String(formData.get('name') || '').trim(),
+    description: String(formData.get('description') || '').trim(),
+    image: String(formData.get('image') || '').trim(),
+  };
+
+  if (!card.topicId || !card.sourceCardId || !card.name) {
+    setFavoriteStatus('Topic, source card ID, name을 모두 입력하세요.');
+    return;
+  }
+
+  setBusy(true);
+  setFavoriteStatus('favorite card를 저장 중입니다.');
+
+  try {
+    const savedCard = await saveFavoriteCard(card);
+    selectedFavoriteTopicId = savedCard.topicId;
+    favoriteCards = await fetchFavoriteCards(selectedFavoriteTopicId);
+    fillFavoriteCardForm(savedCard);
+    renderFavoriteAll();
+    closeFavoriteCardDialog();
+    setFavoriteStatus(`${savedCard.name} favorite card를 저장했습니다.`);
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite card를 저장하지 못했습니다.');
+  } finally {
+    setBusy(false);
+  }
+});
+
 deleteTopicButton.addEventListener('click', () => {
   removeTopic(getSelectedTopic());
 });
 
+deleteFavoriteTopicButton.addEventListener('click', () => {
+  removeFavoriteTopic(getSelectedFavoriteTopic());
+});
+
 cancelDeleteWordButton.addEventListener('click', closeDeleteWordDialog);
+cancelDeleteFavoriteCardButton.addEventListener('click', closeDeleteFavoriteCardDialog);
 
 confirmDeleteWordButton.addEventListener('click', () => {
   removeWord(pendingDeleteWord);
+});
+
+confirmDeleteFavoriteCardButton.addEventListener('click', () => {
+  removeFavoriteCard(pendingDeleteFavoriteCard);
 });
 
 closeWordDetailButton.addEventListener('click', closeWordDetailDialog);

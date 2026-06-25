@@ -2,6 +2,8 @@
   const BASE_URL = 'https://playground-api.for1self.workers.dev';
   const TOPICS_PATH = '/api/topics';
   const QUIZ_WORDS_PATH = '/api/quiz-words';
+  const FAVORITE_TOPICS_PATH = '/api/favorite-topics';
+  const FAVORITE_CARDS_PATH = '/api/favorite-cards';
   const WINNERS_PATH = '/api/winners';
   const WINNERS_SUMMARY_PATH = '/api/winners/summary';
 
@@ -77,6 +79,33 @@
     };
   }
 
+  function toFavoriteTopic(row) {
+    const era = row.era;
+
+    return {
+      id: Number(row.id),
+      value: String(row.value || '').trim(),
+      label: String(row.label || '').trim(),
+      country: String(row.country || '').trim(),
+      icon: String(row.icon || '').trim(),
+      era: era === null || era === undefined || era === '' ? null : Number(era),
+    };
+  }
+
+  function toFavoriteCard(row) {
+    const topicId = row.topicId ?? row.topic_id;
+    const sourceCardId = row.sourceCardId ?? row.source_card_id;
+
+    return {
+      id: Number(row.id),
+      topicId: topicId === null || topicId === undefined ? null : Number(topicId),
+      sourceCardId: sourceCardId === null || sourceCardId === undefined ? null : Number(sourceCardId),
+      name: String(row.name || '').trim(),
+      description: String(row.description || '').trim(),
+      image: String(row.image || '').trim(),
+    };
+  }
+
   async function fetchTopics() {
     const payload = await requestJson(buildUrl(TOPICS_PATH));
     const rows = Array.isArray(payload.topics) ? payload.topics : [];
@@ -136,6 +165,68 @@
     return toQuizWord(payload.word);
   }
 
+  async function fetchFavoriteTopics() {
+    const payload = await requestJson(buildUrl(FAVORITE_TOPICS_PATH));
+    const rows = Array.isArray(payload.topics) ? payload.topics : [];
+    return rows.map(toFavoriteTopic);
+  }
+
+  async function saveFavoriteTopic(topic) {
+    const payload = await requestJson(buildUrl(FAVORITE_TOPICS_PATH), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(topic),
+    });
+
+    return toFavoriteTopic(payload.topic);
+  }
+
+  async function deleteFavoriteTopic(id) {
+    const payload = await requestJson(buildUrl(FAVORITE_TOPICS_PATH, { id }), {
+      method: 'DELETE',
+    });
+
+    return toFavoriteTopic(payload.topic);
+  }
+
+  async function fetchFavoriteCards(topicId = null) {
+    const payload = await requestJson(buildUrl(FAVORITE_CARDS_PATH, { topicId }));
+    const rows = Array.isArray(payload.cards) ? payload.cards : [];
+    return rows.map(toFavoriteCard);
+  }
+
+  async function saveFavoriteCard(card) {
+    const topicId = card.topicId ?? card.topic_id;
+    const sourceCardId = card.sourceCardId ?? card.source_card_id;
+    const requestBody = {
+      ...card,
+      topicId,
+      topic_id: topicId,
+      sourceCardId,
+      source_card_id: sourceCardId,
+    };
+
+    const payload = await requestJson(buildUrl(FAVORITE_CARDS_PATH), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    return toFavoriteCard(payload.card);
+  }
+
+  async function deleteFavoriteCard(id) {
+    const payload = await requestJson(buildUrl(FAVORITE_CARDS_PATH, { id }), {
+      method: 'DELETE',
+    });
+
+    return toFavoriteCard(payload.card);
+  }
+
   async function fetchWinnerSummary(menu) {
     const payload = await requestJson(buildUrl(WINNERS_SUMMARY_PATH, { menu }));
     return Array.isArray(payload.summary) ? payload.summary : [];
@@ -161,9 +252,17 @@
     fetchQuizWords,
     saveQuizWord,
     deleteQuizWord,
+    fetchFavoriteTopics,
+    saveFavoriteTopic,
+    deleteFavoriteTopic,
+    fetchFavoriteCards,
+    saveFavoriteCard,
+    deleteFavoriteCard,
     fetchWinnerSummary,
     saveWinner,
     toTopic,
     toQuizWord,
+    toFavoriteTopic,
+    toFavoriteCard,
   };
 })();

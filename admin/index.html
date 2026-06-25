@@ -26,7 +26,7 @@
             <div class="module-button" data-module-id="pick-your-favorite">
               <button class="module-button__select" type="button">
                 <strong>Pick Your Favorite</strong>
-                <span>서버 저장 전환 시 연결</span>
+                <span>Topics, cards</span>
               </button>
               <a class="module-button__link" href="../pick-your-favorite/" aria-label="Pick Your Favorite 페이지로 이동" title="페이지로 이동">→</a>
             </div>
@@ -75,14 +75,38 @@
             <p class="status-line" id="statusLine" aria-live="polite"></p>
           </section>
 
-          <section class="module-panel is-hidden" data-module-panel="pick-your-favorite">
-            <div class="empty-module">
-              <h2>Pick Your Favorite</h2>
-              <p>
-                현재는 JSON/클라이언트 데이터 중심 구조입니다. 서버 저장 방식으로 전환되면 이 admin 모듈에 항목 추가, 편집, 삭제 화면을 연결할 수 있도록 영역을
-                예약했습니다.
-              </p>
+          <section class="module-panel is-hidden" id="favoritePanel" data-module-panel="pick-your-favorite">
+            <div class="panel-top">
+              <div class="panel-title">
+                <span class="panel-title__icon" aria-hidden="true">PF</span>
+                <h2>Pick Your Favorite</h2>
+              </div>
             </div>
+
+            <div class="workspace-grid">
+              <section class="data-panel">
+                <div class="panel-heading">
+                  <h3>Favorite Topics</h3>
+                  <div class="panel-heading__actions">
+                    <button class="icon-button" id="newFavoriteTopicButton" type="button" aria-label="새 favorite topic" title="새 favorite topic">＋</button>
+                  </div>
+                </div>
+                <div class="item-list" id="favoriteTopicList"></div>
+              </section>
+
+              <section class="data-panel words-panel">
+                <div class="panel-heading">
+                  <h3 id="favoriteCardListTitle">Favorite Cards</h3>
+                  <div class="panel-heading__actions">
+                    <span class="count-pill" id="favoriteCardCountText">0개</span>
+                    <button class="icon-button" id="newFavoriteCardButton" type="button" aria-label="새 favorite card" title="새 favorite card">＋</button>
+                  </div>
+                </div>
+                <div class="item-list word-list" id="favoriteCardList"></div>
+              </section>
+            </div>
+
+            <p class="status-line" id="favoriteStatusLine" aria-live="polite"></p>
           </section>
 
           <section class="module-panel is-hidden" data-module-panel="typing-game">
@@ -152,6 +176,96 @@
           <button class="primary-button" type="submit">저장</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="favoriteTopicDialog">
+      <form class="editor-form" id="favoriteTopicForm" method="dialog">
+        <div class="form-title">
+          <h3>Favorite Topic 편집</h3>
+          <span id="favoriteTopicModeText">새 favorite topic</span>
+        </div>
+        <input id="favoriteTopicIdInput" name="id" type="hidden" />
+        <div class="form-row">
+          <label>
+            <span>Value</span>
+            <input id="favoriteTopicValueInput" name="value" type="text" required />
+          </label>
+          <label>
+            <span>Era</span>
+            <input id="favoriteTopicEraInput" name="era" type="number" inputmode="numeric" />
+          </label>
+        </div>
+        <label>
+          <span>Label</span>
+          <input id="favoriteTopicLabelInput" name="label" type="text" required />
+        </label>
+        <div class="form-row">
+          <label>
+            <span>Country</span>
+            <input id="favoriteTopicCountryInput" name="country" type="text" />
+          </label>
+          <label>
+            <span>Icon</span>
+            <input id="favoriteTopicIconInput" name="icon" type="text" />
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="danger-button" id="deleteFavoriteTopicButton" type="button" disabled>삭제</button>
+          <button class="ghost-button" id="cancelFavoriteTopicButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="favoriteCardDialog">
+      <form class="editor-form" id="favoriteCardForm" method="dialog">
+        <div class="form-title">
+          <h3>Favorite Card 편집</h3>
+          <span id="favoriteCardModeText">새 favorite card</span>
+        </div>
+        <input id="favoriteCardIdInput" name="id" type="hidden" />
+        <label>
+          <span>Topic</span>
+          <input id="favoriteCardTopicInput" name="topicId" type="hidden" required />
+          <div class="custom-select" id="favoriteCardTopicSelect">
+            <button class="custom-select__button" id="favoriteCardTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Topic 선택</button>
+            <div class="custom-select__menu" id="favoriteCardTopicSelectMenu" role="listbox" hidden></div>
+          </div>
+        </label>
+        <div class="form-row">
+          <label>
+            <span>Source card ID</span>
+            <input id="favoriteSourceCardIdInput" name="sourceCardId" type="number" inputmode="numeric" required />
+          </label>
+          <label>
+            <span>Name</span>
+            <input id="favoriteCardNameInput" name="name" type="text" required />
+          </label>
+        </div>
+        <label>
+          <span>Description</span>
+          <textarea id="favoriteCardDescriptionInput" name="description" rows="3"></textarea>
+        </label>
+        <label>
+          <span>Image</span>
+          <input id="favoriteCardImageInput" name="image" type="text" />
+        </label>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelFavoriteCardButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="deleteFavoriteCardDialog">
+      <div class="confirm-dialog__content">
+        <h3>Favorite Card 삭제</h3>
+        <p id="deleteFavoriteCardMessage">선택한 favorite card를 삭제할까요?</p>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelDeleteFavoriteCardButton" type="button">취소</button>
+          <button class="danger-button" id="confirmDeleteFavoriteCardButton" type="button">삭제</button>
+        </div>
+      </div>
     </dialog>
 
     <dialog class="confirm-dialog" id="deleteWordDialog">

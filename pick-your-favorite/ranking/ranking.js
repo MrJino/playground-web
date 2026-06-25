@@ -1,7 +1,6 @@
 const MENU_QUERY_PARAM = 'menu';
 const DEFAULT_MENU_VALUE = 'boy-idol';
-const MENU_CONFIG_SOURCE = '../res/menu.json';
-const { fetchWinnerSummary } = window.PlaygroundCloudflareApi;
+const { fetchFavoriteTopics, fetchWinnerSummary } = window.PlaygroundCloudflareApi;
 
 const rankingTitle = document.getElementById('rankingTitle');
 const rankingSummary = document.getElementById('rankingSummary');
@@ -27,23 +26,13 @@ function getMenuValue() {
 }
 
 async function loadMenuLabels() {
-  const response = await window.fetch(MENU_CONFIG_SOURCE);
-
-  if (!response.ok) {
-    throw new Error(`Failed to load menu config: ${response.status}`);
-  }
-
-  const payload = await response.json();
-  const groups = Array.isArray(payload.groups) ? payload.groups : [];
+  const topics = await fetchFavoriteTopics();
   const labels = new Map();
 
-  groups.forEach((group) => {
-    const items = Array.isArray(group.items) ? group.items : [];
-    items.forEach((item) => {
-      if (item.value && item.label) {
-        labels.set(item.value, item.label);
-      }
-    });
+  topics.forEach((topic) => {
+    if (topic.value && topic.label) {
+      labels.set(topic.value, topic.label);
+    }
   });
 
   return labels;
