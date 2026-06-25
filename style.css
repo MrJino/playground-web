@@ -205,8 +205,17 @@ body {
 
 .footer-text {
   color: #6b7280;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1rem;
+}
+
+.footer-text a {
+  color: #38aeea;
+  text-decoration: none;
+}
+
+.footer-text a:hover {
+  color: #082063;
+  text-decoration: underline;
 }
 
 @keyframes fadeIn {

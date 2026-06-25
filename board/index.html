@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <title>게시판</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="board-page">
+      <section class="board-admin-shell">
+        <aside class="board-sidebar">
+          <header class="board-header">
+            <h1>게시판</h1>
+          </header>
+
+          <nav class="board-nav" aria-label="게시판 메뉴">
+            <div class="board-nav-card is-active">
+              <div class="board-nav-card__content">
+                <strong>질문게시판</strong>
+                <span>Questions, answers</span>
+              </div>
+              <a class="board-nav-card__link" id="backLink" href="../" aria-label="이전 앱으로 돌아가기" title="돌아가기">←</a>
+            </div>
+          </nav>
+        </aside>
+
+        <section class="board-content">
+          <section class="board-panel">
+            <div class="panel-top">
+              <div class="panel-title">
+                <span class="panel-title__icon" aria-hidden="true">QB</span>
+                <h2>질문게시판</h2>
+              </div>
+              <button class="primary-button" id="newQuestionButton" type="button">새 질문</button>
+            </div>
+
+            <div class="board-workspace">
+              <section class="data-panel question-list-panel" aria-label="질문 목록">
+                <div class="panel-heading">
+                  <h3>질문 목록</h3>
+                  <span class="count-pill" id="questionCountText">0개</span>
+                </div>
+                <div class="item-list question-list" id="questionList"></div>
+              </section>
+
+              <section class="data-panel question-detail-panel" aria-label="질문 상세">
+                <div class="empty-state" id="emptyState">
+                  <h3>등록된 질문이 없습니다</h3>
+                  <p>첫 질문을 작성하면 이곳에 내용과 답변이 표시됩니다.</p>
+                  <button class="primary-button" id="emptyNewQuestionButton" type="button">질문 작성</button>
+                </div>
+
+                <article class="question-detail" id="questionDetail" hidden>
+                  <div class="detail-top">
+                    <div>
+                      <p class="meta-line" id="questionMeta"></p>
+                      <h3 id="questionTitle"></h3>
+                    </div>
+                    <button class="danger-button" id="deleteQuestionButton" type="button">삭제</button>
+                  </div>
+                  <p class="question-body" id="questionBody"></p>
+
+                  <div class="answers-header">
+                    <h3>답변</h3>
+                    <span class="count-pill" id="answerCountText">0개</span>
+                  </div>
+                  <div class="answer-list" id="answerList"></div>
+
+                  <form class="answer-form" id="answerForm">
+                    <label>
+                      <span>작성자</span>
+                      <input id="answerAuthorInput" name="author" type="text" maxlength="30" placeholder="익명" />
+                    </label>
+                    <label>
+                      <span>답변</span>
+                      <textarea id="answerBodyInput" name="body" rows="4" required placeholder="답변을 입력하세요"></textarea>
+                    </label>
+                    <div class="form-actions">
+                      <button class="primary-button" type="submit">답변 등록</button>
+                    </div>
+                  </form>
+                </article>
+              </section>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <dialog class="editor-dialog" id="questionDialog">
+      <form class="editor-form" id="questionForm" method="dialog">
+        <div class="form-title">
+          <h3>질문 작성</h3>
+          <span>질문게시판</span>
+        </div>
+        <label>
+          <span>제목</span>
+          <input id="questionTitleInput" name="title" type="text" maxlength="80" required placeholder="질문 제목" />
+        </label>
+        <label>
+          <span>작성자</span>
+          <input id="questionAuthorInput" name="author" type="text" maxlength="30" placeholder="익명" />
+        </label>
+        <label>
+          <span>내용</span>
+          <textarea id="questionBodyInput" name="body" rows="8" required placeholder="질문 내용을 입력하세요"></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelQuestionButton" type="button">취소</button>
+          <button class="primary-button" type="submit">등록</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./board.js"></script>
+  </body>
+</html>

@@ -102,6 +102,39 @@ input {
   outline-offset: 3px;
 }
 
+.hero-placeholder__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-action-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid rgba(23, 34, 48, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--menu-text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero-action-button:hover {
+  background: rgba(48, 120, 239, 0.14);
+}
+
 .hero-language {
   position: relative;
   z-index: 30;
@@ -699,6 +732,17 @@ body:not(.is-playing) .input-catcher {
     width: auto;
     height: 100%;
     max-height: none;
+  }
+
+  .hero-actions {
+    gap: 6px;
+  }
+
+  .hero-action-button {
+    min-height: 32px;
+    padding: 5px 9px;
+    border-radius: 10px;
+    font-size: 0.76rem;
   }
 
   .hero-language {
