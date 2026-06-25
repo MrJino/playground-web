@@ -665,7 +665,7 @@ function normalizeCard(card, index, menuValue) {
   const normalizedImage = image ? (isRemoteImage || !localImageBasePath ? image : `${localImageBasePath}/${image}`) : '';
 
   return {
-    id: card.sourceCardId ?? card.id ?? index + 1,
+    id: card.id ?? index + 1,
     name: card.name ?? `Card ${String(index + 1).padStart(2, '0')}`,
     description: card.description ?? '',
     image: normalizedImage,
@@ -1011,9 +1011,6 @@ async function persistCloudflareWinner(card) {
     await saveWinner({
       menu: menuValue,
       cardId: card.id,
-      cardName: card.name,
-      description: card.description,
-      image: card.image,
     });
 
     loadMenuRanking(menuValue);

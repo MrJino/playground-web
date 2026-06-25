@@ -94,12 +94,10 @@
 
   function toFavoriteCard(row) {
     const topicId = row.topicId ?? row.topic_id;
-    const sourceCardId = row.sourceCardId ?? row.source_card_id;
 
     return {
       id: Number(row.id),
       topicId: topicId === null || topicId === undefined ? null : Number(topicId),
-      sourceCardId: sourceCardId === null || sourceCardId === undefined ? null : Number(sourceCardId),
       name: String(row.name || '').trim(),
       description: String(row.description || '').trim(),
       image: String(row.image || '').trim(),
@@ -199,13 +197,10 @@
 
   async function saveFavoriteCard(card) {
     const topicId = card.topicId ?? card.topic_id;
-    const sourceCardId = card.sourceCardId ?? card.source_card_id;
     const requestBody = {
       ...card,
       topicId,
       topic_id: topicId,
-      sourceCardId,
-      source_card_id: sourceCardId,
     };
 
     const payload = await requestJson(buildUrl(FAVORITE_CARDS_PATH), {

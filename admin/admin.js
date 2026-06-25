@@ -75,7 +75,6 @@ const favoriteCardIdInput = document.getElementById('favoriteCardIdInput');
 const favoriteCardTopicInput = document.getElementById('favoriteCardTopicInput');
 const favoriteCardTopicSelectButton = document.getElementById('favoriteCardTopicSelectButton');
 const favoriteCardTopicSelectMenu = document.getElementById('favoriteCardTopicSelectMenu');
-const favoriteSourceCardIdInput = document.getElementById('favoriteSourceCardIdInput');
 const favoriteCardNameInput = document.getElementById('favoriteCardNameInput');
 const favoriteCardDescriptionInput = document.getElementById('favoriteCardDescriptionInput');
 const favoriteCardImageInput = document.getElementById('favoriteCardImageInput');
@@ -289,7 +288,6 @@ function setFavoriteCardTopicValue(topicId) {
 function resetFavoriteCardForm() {
   selectedFavoriteCardId = null;
   favoriteCardIdInput.value = '';
-  favoriteSourceCardIdInput.value = '';
   favoriteCardNameInput.value = '';
   favoriteCardDescriptionInput.value = '';
   favoriteCardImageInput.value = '';
@@ -301,7 +299,6 @@ function fillFavoriteCardForm(card) {
   selectedFavoriteCardId = card.id;
   favoriteCardIdInput.value = String(card.id);
   setFavoriteCardTopicValue(card.topicId);
-  favoriteSourceCardIdInput.value = card.sourceCardId === null ? '' : String(card.sourceCardId);
   favoriteCardNameInput.value = card.name;
   favoriteCardDescriptionInput.value = card.description;
   favoriteCardImageInput.value = card.image;
@@ -310,7 +307,7 @@ function fillFavoriteCardForm(card) {
 
 function openFavoriteCardDialog() {
   favoriteCardDialog.showModal();
-  favoriteSourceCardIdInput.focus();
+  favoriteCardNameInput.focus();
 }
 
 function closeFavoriteCardDialog() {
@@ -401,7 +398,7 @@ function renderFavoriteCards() {
       return `
         <article class="item-card word-item favorite-card-item${activeClass}" data-favorite-card-id="${card.id}">
           <div class="word-item__content">
-            <strong>#${escapeHtml(card.sourceCardId)}</strong>
+            <strong>#${escapeHtml(card.id)}</strong>
             <span>${escapeHtml(card.name)}</span>
             <p>${escapeHtml(card.description || card.image || '설명 없음')}</p>
           </div>
@@ -1096,14 +1093,13 @@ favoriteCardForm.addEventListener('submit', async (event) => {
   const card = {
     id: formData.get('id') ? Number(formData.get('id')) : undefined,
     topicId: Number(formData.get('topicId')),
-    sourceCardId: Number(formData.get('sourceCardId')),
     name: String(formData.get('name') || '').trim(),
     description: String(formData.get('description') || '').trim(),
     image: String(formData.get('image') || '').trim(),
   };
 
-  if (!card.topicId || !card.sourceCardId || !card.name) {
-    setFavoriteStatus('Topic, source card ID, name을 모두 입력하세요.');
+  if (!card.topicId || !card.name) {
+    setFavoriteStatus('Topic, name을 모두 입력하세요.');
     return;
   }
 
