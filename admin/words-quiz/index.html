@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
+    <title>Words Quiz Admin</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body data-admin-module="words-quiz">
+    <main class="admin-page">
+      <section class="admin-shell">
+        <section class="admin-content">
+          <section class="module-panel" id="wordsQuizPanel" data-module-panel="words-quiz">
+            <div class="panel-top">
+              <a class="panel-title" href="../" aria-label="Admin 홈으로 이동">
+                <img class="panel-title__icon" src="../../assets/icons/admin_icon.png" alt="" aria-hidden="true" />
+                <h2>Words Quiz</h2>
+              </a>
+            </div>
+
+            <div class="workspace-grid">
+              <section class="data-panel">
+                <div class="panel-heading">
+                  <h3>토픽목록</h3>
+                  <div class="panel-heading__actions">
+                    <label class="panel-filter">
+                      <span>Topic filter</span>
+                      <input id="topicFilterInput" type="search" placeholder="토픽 검색" autocomplete="off" />
+                    </label>
+                    <button class="icon-button" id="newTopicButton" type="button" aria-label="새 topic" title="새 topic">＋</button>
+                  </div>
+                </div>
+                <div class="item-list" id="topicList"></div>
+              </section>
+
+              <section class="data-panel words-panel">
+                <div class="panel-heading">
+                  <div class="panel-heading__title">
+                    <h3 id="wordListTitle">Quiz Words</h3>
+                    <span class="count-pill" id="wordCountText">0개</span>
+                  </div>
+                  <div class="panel-heading__actions">
+                    <label class="panel-filter">
+                      <span>Quiz filter</span>
+                      <input id="wordFilterInput" type="search" placeholder="퀴즈 검색" autocomplete="off" />
+                    </label>
+                    <button class="icon-button" id="newWordButton" type="button" aria-label="새 quiz word" title="새 quiz word">＋</button>
+                  </div>
+                </div>
+                <div class="item-list word-list" id="wordList"></div>
+              </section>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <dialog class="editor-dialog" id="topicDialog">
+      <form class="editor-form" id="topicForm" method="dialog">
+        <div class="form-title">
+          <h3>Topic 편집</h3>
+          <span id="topicModeText">새 topic</span>
+        </div>
+        <input id="topicIdInput" name="id" type="hidden" />
+        <label>
+          <span>Title</span>
+          <input id="topicTitleInput" name="title" type="text" required />
+        </label>
+        <label>
+          <span>Description</span>
+          <textarea id="topicDescriptionInput" name="description" rows="3"></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="danger-button" id="deleteTopicButton" type="button" disabled>삭제</button>
+          <button class="ghost-button" id="cancelTopicButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="wordDialog">
+      <form class="editor-form" id="wordForm" method="dialog">
+        <div class="form-title">
+          <h3>Quiz Word 편집</h3>
+          <span id="wordModeText">새 quiz word</span>
+        </div>
+        <input id="wordIdInput" name="id" type="hidden" />
+        <label>
+          <span>Topic</span>
+          <input id="wordTopicInput" name="topicId" type="hidden" required />
+          <div class="custom-select" id="wordTopicSelect">
+            <button class="custom-select__button" id="wordTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Topic 선택</button>
+            <div class="custom-select__menu" id="wordTopicSelectMenu" role="listbox" hidden></div>
+          </div>
+        </label>
+        <div class="form-row">
+          <label>
+            <span>Abbreviation</span>
+            <input id="abbreviationInput" name="abbreviation" type="text" required />
+          </label>
+          <label>
+            <span>Full name</span>
+            <input id="fullNameInput" name="fullName" type="text" required />
+          </label>
+        </div>
+        <label>
+          <span>Description</span>
+          <textarea id="wordDescriptionInput" name="description" rows="5"></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelWordButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="deleteWordDialog">
+      <div class="confirm-dialog__content">
+        <h3>Quiz Word 삭제</h3>
+        <p id="deleteWordMessage">선택한 quiz word를 삭제할까요?</p>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelDeleteWordButton" type="button">취소</button>
+          <button class="danger-button" id="confirmDeleteWordButton" type="button">삭제</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="detail-dialog" id="wordDetailDialog">
+      <div class="detail-dialog__content">
+        <div class="detail-dialog__top">
+          <div>
+            <h3 id="wordDetailAbbreviation">Quiz Word</h3>
+          </div>
+          <button class="icon-button" id="closeWordDetailButton" type="button" aria-label="닫기" title="닫기">×</button>
+        </div>
+        <dl class="detail-list">
+          <div>
+            <dt>Full name</dt>
+            <dd id="wordDetailFullName"></dd>
+          </div>
+          <div>
+            <dt>Description</dt>
+            <dd id="wordDetailDescription"></dd>
+          </div>
+        </dl>
+      </div>
+    </dialog>
+
+    <script src="../../shared/cloudflare-api.js"></script>
+    <script src="../admin.js"></script>
+  </body>
+</html>

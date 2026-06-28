@@ -20,7 +20,6 @@ let descriptionDisplayState = null;
 
 const topicList = document.getElementById('topicList');
 const openTopicSearchButton = document.getElementById('openTopicSearchButton');
-const openAdminConfirmButton = document.getElementById('openAdminConfirmButton');
 const topicBrowserPanel = document.getElementById('topicBrowserPanel');
 const topicSearchInput = document.getElementById('topicSearchInput');
 const topicBrowserGrid = document.getElementById('topicBrowserGrid');
@@ -707,18 +706,6 @@ hintButton.addEventListener('click', showHint);
 
 skipButton.addEventListener('click', () => {
   goNext();
-});
-
-openAdminConfirmButton.addEventListener('click', () => {
-  window.ConfirmDialog.show({
-    title: 'Admin 페이지로 이동하시겠습니까?',
-    message: '현재 퀴즈 화면을 떠나 관리자 페이지로 이동합니다.',
-    confirmText: '네',
-    cancelText: '아니오',
-    onConfirm: () => {
-      window.location.href = '../admin/';
-    },
-  });
 });
 
 descriptionEditButton.addEventListener('click', openDescriptionEditor);

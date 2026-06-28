@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
+    <title>Pick Your Favorite Admin</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body data-admin-module="pick-your-favorite">
+    <main class="admin-page">
+      <section class="admin-shell">
+        <section class="admin-content">
+          <section class="module-panel" id="favoritePanel" data-module-panel="pick-your-favorite">
+            <div class="panel-top">
+              <a class="panel-title" href="../" aria-label="Admin 홈으로 이동">
+                <img class="panel-title__icon" src="../../assets/icons/admin_icon.png" alt="" aria-hidden="true" />
+                <h2>Pick Your Favorite</h2>
+              </a>
+            </div>
+
+            <div class="workspace-grid">
+              <section class="data-panel">
+                <div class="panel-heading">
+                  <h3>토픽목록</h3>
+                  <div class="panel-heading__actions">
+                    <label class="panel-filter">
+                      <span>Topic filter</span>
+                      <input id="favoriteTopicFilterInput" type="search" placeholder="토픽 검색" autocomplete="off" />
+                    </label>
+                    <button class="icon-button" id="newFavoriteTopicButton" type="button" aria-label="새 favorite topic" title="새 favorite topic">＋</button>
+                  </div>
+                </div>
+                <div class="item-list" id="favoriteTopicList"></div>
+              </section>
+
+              <section class="data-panel words-panel">
+                <div class="panel-heading">
+                  <div class="panel-heading__title">
+                    <h3 id="favoriteCardListTitle">Favorite Cards</h3>
+                    <span class="count-pill" id="favoriteCardCountText">0개</span>
+                  </div>
+                  <div class="panel-heading__actions">
+                    <button class="icon-button" id="newFavoriteCardButton" type="button" aria-label="새 favorite card" title="새 favorite card">＋</button>
+                  </div>
+                </div>
+                <div class="item-list favorite-card-grid" id="favoriteCardList"></div>
+              </section>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <dialog class="editor-dialog" id="favoriteTopicDialog">
+      <form class="editor-form" id="favoriteTopicForm" method="dialog">
+        <div class="form-title">
+          <h3>Favorite Topic 편집</h3>
+          <span id="favoriteTopicModeText">새 favorite topic</span>
+        </div>
+        <input id="favoriteTopicIdInput" name="id" type="hidden" />
+        <div class="form-row">
+          <label>
+            <span>Value</span>
+            <input id="favoriteTopicValueInput" name="value" type="text" required />
+          </label>
+          <label>
+            <span>Era</span>
+            <input id="favoriteTopicEraInput" name="era" type="number" inputmode="numeric" />
+          </label>
+        </div>
+        <label>
+          <span>Label</span>
+          <input id="favoriteTopicLabelInput" name="label" type="text" required />
+        </label>
+        <div class="form-row">
+          <label>
+            <span>Country</span>
+            <input id="favoriteTopicCountryInput" name="country" type="text" />
+          </label>
+          <label>
+            <span>Icon</span>
+            <input id="favoriteTopicIconInput" name="icon" type="text" />
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="danger-button" id="deleteFavoriteTopicButton" type="button" disabled>삭제</button>
+          <button class="ghost-button" id="cancelFavoriteTopicButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="favoriteCardDialog">
+      <form class="editor-form" id="favoriteCardForm" method="dialog">
+        <div class="form-title">
+          <h3>Favorite Card 편집</h3>
+          <span id="favoriteCardModeText">새 favorite card</span>
+        </div>
+        <input id="favoriteCardIdInput" name="id" type="hidden" />
+        <label>
+          <span>Topic</span>
+          <input id="favoriteCardTopicInput" name="topicId" type="hidden" required />
+          <div class="custom-select" id="favoriteCardTopicSelect">
+            <button class="custom-select__button" id="favoriteCardTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+              Topic 선택
+            </button>
+            <div class="custom-select__menu" id="favoriteCardTopicSelectMenu" role="listbox" hidden></div>
+          </div>
+        </label>
+        <label>
+          <span>Name</span>
+          <input id="favoriteCardNameInput" name="name" type="text" required />
+        </label>
+        <label>
+          <span>Description</span>
+          <textarea id="favoriteCardDescriptionInput" name="description" rows="3"></textarea>
+        </label>
+        <label>
+          <span>Image</span>
+          <input id="favoriteCardImageInput" name="image" type="text" />
+        </label>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelFavoriteCardButton" type="button">취소</button>
+          <button class="primary-button" type="submit">저장</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="deleteFavoriteCardDialog">
+      <div class="confirm-dialog__content">
+        <h3>Favorite Card 삭제</h3>
+        <p id="deleteFavoriteCardMessage">선택한 favorite card를 삭제할까요?</p>
+        <div class="form-actions">
+          <button class="ghost-button" id="cancelDeleteFavoriteCardButton" type="button">취소</button>
+          <button class="danger-button" id="confirmDeleteFavoriteCardButton" type="button">삭제</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="favorite-preview-dialog" id="favoriteCardPreviewDialog">
+      <article class="favorite-preview-card">
+        <button class="icon-button favorite-preview-close" id="closeFavoriteCardPreviewButton" type="button" aria-label="닫기" title="닫기">×</button>
+        <div class="favorite-preview-media" id="favoriteCardPreviewMedia"></div>
+        <div class="favorite-preview-content">
+          <h3 id="favoriteCardPreviewName"></h3>
+          <p id="favoriteCardPreviewDescription"></p>
+        </div>
+      </article>
+    </dialog>
+
+    <script src="../../shared/cloudflare-api.js"></script>
+    <script src="../admin.js"></script>
+  </body>
+</html>

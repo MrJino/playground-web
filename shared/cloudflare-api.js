@@ -44,7 +44,7 @@
 
     const payload = await response.json().catch(() => ({}));
 
-    console.log('[Cloudflare API Response]', {
+    console.log({
       status: response.status,
       ok: response.ok,
       payload,
@@ -130,8 +130,15 @@
     return toTopic(payload.topic);
   }
 
-  async function fetchQuizWords(topicId = null) {
-    const payload = await requestJson(buildUrl(QUIZ_WORDS_PATH, { topicId }));
+  async function fetchQuizWords(topicId = null, options = {}) {
+    const payload = await requestJson(
+      buildUrl(QUIZ_WORDS_PATH, {
+        topicId,
+        q: options.q,
+        limit: options.limit,
+        offset: options.offset,
+      }),
+    );
     const rows = Array.isArray(payload.words) ? payload.words : [];
     return rows.map(toQuizWord);
   }
@@ -189,8 +196,14 @@
     return toFavoriteTopic(payload.topic);
   }
 
-  async function fetchFavoriteCards(topicId = null) {
-    const payload = await requestJson(buildUrl(FAVORITE_CARDS_PATH, { topicId }));
+  async function fetchFavoriteCards(topicId = null, options = {}) {
+    const payload = await requestJson(
+      buildUrl(FAVORITE_CARDS_PATH, {
+        topicId,
+        limit: options.limit,
+        offset: options.offset,
+      }),
+    );
     const rows = Array.isArray(payload.cards) ? payload.cards : [];
     return rows.map(toFavoriteCard);
   }

@@ -1,12 +1,24 @@
-let activeModuleId = null;
+let activeModuleId = document.body.dataset.adminModule || null;
 let topics = [];
 let words = [];
 let selectedTopicId = null;
 let selectedWordId = null;
+let topicFilterText = '';
+let wordFilterText = '';
+let wordPageOffset = 0;
+let hasMoreWords = false;
+let isLoadingMoreWords = false;
+let wordRequestSerial = 0;
+const WORD_PAGE_SIZE = 10;
 let favoriteTopics = [];
 let favoriteCards = [];
 let selectedFavoriteTopicId = null;
 let selectedFavoriteCardId = null;
+let favoriteTopicFilterText = '';
+let favoriteCardPageOffset = 0;
+let hasMoreFavoriteCards = false;
+let isLoadingMoreFavoriteCards = false;
+const FAVORITE_CARD_PAGE_SIZE = 50;
 let isBusy = false;
 let pendingDeleteWord = null;
 let pendingDeleteFavoriteCard = null;
@@ -15,6 +27,8 @@ let hasLoadedPickYourFavorite = false;
 
 const moduleButtons = document.querySelectorAll('[data-module-id]');
 const modulePanels = document.querySelectorAll('[data-module-panel]');
+const wordsQuizPanel = document.getElementById('wordsQuizPanel');
+const favoritePanel = document.getElementById('favoritePanel');
 const statusLine = document.getElementById('statusLine');
 
 const topicList = document.getElementById('topicList');
@@ -27,10 +41,12 @@ const topicModeText = document.getElementById('topicModeText');
 const newTopicButton = document.getElementById('newTopicButton');
 const deleteTopicButton = document.getElementById('deleteTopicButton');
 const cancelTopicButton = document.getElementById('cancelTopicButton');
+const topicFilterInput = document.getElementById('topicFilterInput');
 
 const wordList = document.getElementById('wordList');
 const wordListTitle = document.getElementById('wordListTitle');
 const wordCountText = document.getElementById('wordCountText');
+const wordFilterInput = document.getElementById('wordFilterInput');
 const wordDialog = document.getElementById('wordDialog');
 const wordForm = document.getElementById('wordForm');
 const wordIdInput = document.getElementById('wordIdInput');
@@ -66,6 +82,7 @@ const favoriteTopicModeText = document.getElementById('favoriteTopicModeText');
 const newFavoriteTopicButton = document.getElementById('newFavoriteTopicButton');
 const deleteFavoriteTopicButton = document.getElementById('deleteFavoriteTopicButton');
 const cancelFavoriteTopicButton = document.getElementById('cancelFavoriteTopicButton');
+const favoriteTopicFilterInput = document.getElementById('favoriteTopicFilterInput');
 const favoriteCardList = document.getElementById('favoriteCardList');
 const favoriteCardListTitle = document.getElementById('favoriteCardListTitle');
 const favoriteCardCountText = document.getElementById('favoriteCardCountText');
@@ -85,6 +102,11 @@ const deleteFavoriteCardDialog = document.getElementById('deleteFavoriteCardDial
 const deleteFavoriteCardMessage = document.getElementById('deleteFavoriteCardMessage');
 const cancelDeleteFavoriteCardButton = document.getElementById('cancelDeleteFavoriteCardButton');
 const confirmDeleteFavoriteCardButton = document.getElementById('confirmDeleteFavoriteCardButton');
+const favoriteCardPreviewDialog = document.getElementById('favoriteCardPreviewDialog');
+const favoriteCardPreviewMedia = document.getElementById('favoriteCardPreviewMedia');
+const favoriteCardPreviewName = document.getElementById('favoriteCardPreviewName');
+const favoriteCardPreviewDescription = document.getElementById('favoriteCardPreviewDescription');
+const closeFavoriteCardPreviewButton = document.getElementById('closeFavoriteCardPreviewButton');
 const {
   fetchTopics,
   saveTopic,
@@ -100,32 +122,73 @@ const {
   deleteFavoriteCard,
 } = window.PlaygroundCloudflareApi;
 
+function on(element, eventName, handler) {
+  element?.addEventListener(eventName, handler);
+}
+
+function setDisabled(element, disabled) {
+  if (element) {
+    element.disabled = disabled;
+  }
+}
+
 function escapeHtml(value) {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
+const KOREAN_INITIALS = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+
+function getKoreanInitials(value) {
+  return String(value)
+    .split('')
+    .map((character) => {
+      const code = character.charCodeAt(0);
+
+      if (code < 0xac00 || code > 0xd7a3) {
+        return character;
+      }
+
+      return KOREAN_INITIALS[Math.floor((code - 0xac00) / 588)];
+    })
+    .join('');
+}
+
+function getTopicSearchText(topic) {
+  const text = `${topic.title} ${topic.description || ''}`.toLowerCase();
+  return `${text} ${getKoreanInitials(text)}`;
+}
+
+function getFavoriteTopicSearchText(topic) {
+  const text = `${topic.label} ${topic.value} ${topic.country || ''} ${topic.era ?? ''}`.toLowerCase();
+  return `${text} ${getKoreanInitials(text)}`;
+}
+
 function setStatus(message = '') {
-  statusLine.textContent = message;
+  if (statusLine) {
+    statusLine.textContent = message;
+  }
 }
 
 function setFavoriteStatus(message = '') {
-  favoriteStatusLine.textContent = message;
+  if (favoriteStatusLine) {
+    favoriteStatusLine.textContent = message;
+  }
 }
 
 function setBusy(nextBusy) {
   isBusy = nextBusy;
-  newTopicButton.disabled = isBusy;
-  newWordButton.disabled = isBusy || selectedTopicId === null;
-  topicForm.querySelector('[type="submit"]').disabled = isBusy;
-  wordForm.querySelector('[type="submit"]').disabled = isBusy || topics.length === 0;
-  deleteTopicButton.disabled = isBusy || !topicIdInput.value;
-  confirmDeleteWordButton.disabled = isBusy || pendingDeleteWord === null;
-  newFavoriteTopicButton.disabled = isBusy;
-  newFavoriteCardButton.disabled = isBusy || selectedFavoriteTopicId === null;
-  favoriteTopicForm.querySelector('[type="submit"]').disabled = isBusy;
-  favoriteCardForm.querySelector('[type="submit"]').disabled = isBusy || favoriteTopics.length === 0;
-  deleteFavoriteTopicButton.disabled = isBusy || !favoriteTopicIdInput.value;
-  confirmDeleteFavoriteCardButton.disabled = isBusy || pendingDeleteFavoriteCard === null;
+  setDisabled(newTopicButton, isBusy);
+  setDisabled(newWordButton, isBusy || selectedTopicId === null);
+  setDisabled(topicForm?.querySelector('[type="submit"]'), isBusy);
+  setDisabled(wordForm?.querySelector('[type="submit"]'), isBusy || topics.length === 0);
+  setDisabled(deleteTopicButton, isBusy || !topicIdInput?.value);
+  setDisabled(confirmDeleteWordButton, isBusy || pendingDeleteWord === null);
+  setDisabled(newFavoriteTopicButton, isBusy);
+  setDisabled(newFavoriteCardButton, isBusy || selectedFavoriteTopicId === null);
+  setDisabled(favoriteTopicForm?.querySelector('[type="submit"]'), isBusy);
+  setDisabled(favoriteCardForm?.querySelector('[type="submit"]'), isBusy || favoriteTopics.length === 0);
+  setDisabled(deleteFavoriteTopicButton, isBusy || !favoriteTopicIdInput?.value);
+  setDisabled(confirmDeleteFavoriteCardButton, isBusy || pendingDeleteFavoriteCard === null);
 }
 
 function getSelectedTopic() {
@@ -160,6 +223,10 @@ function fillTopicForm(topic) {
 }
 
 function closeWordTopicMenu() {
+  if (!wordTopicSelectMenu || !wordTopicSelectButton) {
+    return;
+  }
+
   wordTopicSelectMenu.hidden = true;
   wordTopicSelectButton.setAttribute('aria-expanded', 'false');
 }
@@ -269,6 +336,10 @@ function closeFavoriteTopicDialog() {
 }
 
 function closeFavoriteCardTopicMenu() {
+  if (!favoriteCardTopicSelectMenu || !favoriteCardTopicSelectButton) {
+    return;
+  }
+
   favoriteCardTopicSelectMenu.hidden = true;
   favoriteCardTopicSelectButton.setAttribute('aria-expanded', 'false');
 }
@@ -335,6 +406,25 @@ function closeDeleteFavoriteCardDialog() {
   setBusy(isBusy);
 }
 
+function openFavoriteCardPreview(card) {
+  if (!card || !favoriteCardPreviewDialog) {
+    return;
+  }
+
+  favoriteCardPreviewMedia.innerHTML = card.image
+    ? `<img src="${escapeHtml(card.image)}" alt="" />`
+    : `<div class="favorite-preview-placeholder" aria-hidden="true">${escapeHtml(card.name.slice(0, 1) || '?')}</div>`;
+  favoriteCardPreviewName.textContent = card.name;
+  favoriteCardPreviewDescription.textContent = card.description || '설명 없음';
+  favoriteCardPreviewDialog.showModal();
+}
+
+function closeFavoriteCardPreview() {
+  if (favoriteCardPreviewDialog?.open) {
+    favoriteCardPreviewDialog.close();
+  }
+}
+
 function renderFavoriteTopicOptions() {
   favoriteCardTopicSelectMenu.innerHTML = favoriteTopics
     .map(
@@ -351,11 +441,23 @@ function renderFavoriteTopicOptions() {
 function renderFavoriteTopics() {
   if (favoriteTopics.length === 0) {
     favoriteTopicList.innerHTML = '<div class="empty-state">등록된 favorite topic이 없습니다.</div>';
-    favoriteCardListTitle.textContent = 'Favorite Cards';
+    favoriteCardListTitle.textContent = 'All Favorite Cards';
     return;
   }
 
-  favoriteTopicList.innerHTML = favoriteTopics
+  const normalizedFilter = favoriteTopicFilterText.trim().toLowerCase();
+  const visibleTopics = normalizedFilter
+    ? favoriteTopics.filter((topic) => getFavoriteTopicSearchText(topic).includes(normalizedFilter))
+    : favoriteTopics;
+
+  if (visibleTopics.length === 0) {
+    favoriteTopicList.innerHTML = '<div class="empty-state">필터와 일치하는 favorite topic이 없습니다.</div>';
+    const topic = getSelectedFavoriteTopic();
+    favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'All Favorite Cards';
+    return;
+  }
+
+  favoriteTopicList.innerHTML = visibleTopics
     .map((topic) => {
       const activeClass = topic.id === selectedFavoriteTopicId ? ' is-current' : '';
       const details = [topic.value, topic.era === null ? null : `${topic.era}`, topic.country].filter(Boolean).join(' · ');
@@ -380,12 +482,8 @@ function renderFavoriteTopics() {
 
 function renderFavoriteCards() {
   const topic = getSelectedFavoriteTopic();
-  favoriteCardCountText.textContent = `${favoriteCards.length}개`;
-
-  if (!topic) {
-    favoriteCardList.innerHTML = '<div class="empty-state">favorite topic을 선택하세요.</div>';
-    return;
-  }
+  favoriteCardCountText.textContent = hasMoreFavoriteCards ? `${favoriteCards.length}+개` : `${favoriteCards.length}개`;
+  favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'All Favorite Cards';
 
   if (favoriteCards.length === 0) {
     favoriteCardList.innerHTML = '<div class="empty-state">등록된 favorite card가 없습니다.</div>';
@@ -395,14 +493,19 @@ function renderFavoriteCards() {
   favoriteCardList.innerHTML = favoriteCards
     .map((card) => {
       const activeClass = card.id === selectedFavoriteCardId ? ' is-current' : '';
+      const thumbMarkup = card.image
+        ? `<img class="favorite-card-thumb" src="${escapeHtml(card.image)}" alt="" loading="lazy" />`
+        : `<div class="favorite-card-thumb favorite-card-thumb--empty" aria-hidden="true">${escapeHtml(card.name.slice(0, 1) || '?')}</div>`;
       return `
-        <article class="item-card word-item favorite-card-item${activeClass}" data-favorite-card-id="${card.id}">
-          <div class="word-item__content">
-            <strong>#${escapeHtml(card.id)}</strong>
-            <span>${escapeHtml(card.name)}</span>
-            <p>${escapeHtml(card.description || card.image || '설명 없음')}</p>
+        <article class="item-card favorite-card-item${activeClass}" data-favorite-card-id="${card.id}">
+          <button class="favorite-card-thumb-button" type="button" data-favorite-card-action="preview" data-favorite-card-id="${card.id}" aria-label="${escapeHtml(card.name)} 미리보기">
+            ${thumbMarkup}
+          </button>
+          <div class="favorite-card-content">
+            <strong>${escapeHtml(card.name)}</strong>
+            <p>${escapeHtml(card.description || '설명 없음')}</p>
           </div>
-          <div class="word-item__actions">
+          <div class="word-item__actions favorite-card-actions">
             <button class="icon-button" type="button" data-favorite-card-action="edit" data-favorite-card-id="${card.id}" aria-label="${escapeHtml(card.name)} 편집" title="편집">✎</button>
             <button class="icon-button icon-button--danger" type="button" data-favorite-card-action="delete" data-favorite-card-id="${card.id}" aria-label="${escapeHtml(card.name)} 삭제" title="삭제">×</button>
           </div>
@@ -410,6 +513,10 @@ function renderFavoriteCards() {
       `;
     })
     .join('');
+
+  if (isLoadingMoreFavoriteCards) {
+    favoriteCardList.insertAdjacentHTML('beforeend', '<div class="empty-state">favorite cards를 더 불러오는 중입니다.</div>');
+  }
 }
 
 function renderFavoriteAll() {
@@ -425,12 +532,14 @@ function updateFavoriteTopicSelectionState() {
   });
 
   const topic = getSelectedFavoriteTopic();
-  favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'Favorite Cards';
+  favoriteCardListTitle.textContent = topic ? `${topic.label} Cards` : 'All Favorite Cards';
 }
 
 async function selectFavoriteTopic(topicId) {
   selectedFavoriteTopicId = topicId;
   selectedFavoriteCardId = null;
+  favoriteCardPageOffset = 0;
+  hasMoreFavoriteCards = false;
   const topic = getSelectedFavoriteTopic();
 
   if (topic) {
@@ -442,9 +551,35 @@ async function selectFavoriteTopic(topicId) {
   resetFavoriteCardForm();
   updateFavoriteTopicSelectionState();
   favoriteCardList.innerHTML = '<div class="empty-state">favorite cards를 불러오는 중입니다.</div>';
-  favoriteCards = topic ? await fetchFavoriteCards(topic.id) : [];
+  favoriteCards = topic
+    ? await fetchFavoriteCards(topic.id)
+    : await fetchFavoriteCards(null, { limit: FAVORITE_CARD_PAGE_SIZE, offset: 0 });
+  hasMoreFavoriteCards = !topic && favoriteCards.length === FAVORITE_CARD_PAGE_SIZE;
+  favoriteCardPageOffset = favoriteCards.length;
   renderFavoriteCards();
   setBusy(isBusy);
+}
+
+async function loadMoreFavoriteCardsIfNeeded() {
+  if (selectedFavoriteTopicId !== null || !hasMoreFavoriteCards || isLoadingMoreFavoriteCards || isBusy) {
+    return;
+  }
+
+  isLoadingMoreFavoriteCards = true;
+  const previousScrollTop = favoriteCardList.scrollTop;
+
+  try {
+    const nextCards = await fetchFavoriteCards(null, { limit: FAVORITE_CARD_PAGE_SIZE, offset: favoriteCardPageOffset });
+    favoriteCards = [...favoriteCards, ...nextCards];
+    favoriteCardPageOffset += nextCards.length;
+    hasMoreFavoriteCards = nextCards.length === FAVORITE_CARD_PAGE_SIZE;
+  } catch (error) {
+    setFavoriteStatus(error instanceof Error ? error.message : 'favorite cards를 더 불러오지 못했습니다.');
+  } finally {
+    isLoadingMoreFavoriteCards = false;
+    renderFavoriteCards();
+    favoriteCardList.scrollTop = previousScrollTop;
+  }
 }
 
 async function loadPickYourFavorite() {
@@ -457,7 +592,12 @@ async function loadPickYourFavorite() {
     favoriteTopics = await fetchFavoriteTopics();
     const selectedStillExists = favoriteTopics.some((topic) => topic.id === selectedFavoriteTopicId);
     selectedFavoriteTopicId = selectedStillExists ? selectedFavoriteTopicId : null;
-    favoriteCards = selectedFavoriteTopicId === null ? [] : await fetchFavoriteCards(selectedFavoriteTopicId);
+    favoriteCards =
+      selectedFavoriteTopicId === null
+        ? await fetchFavoriteCards(null, { limit: FAVORITE_CARD_PAGE_SIZE, offset: 0 })
+        : await fetchFavoriteCards(selectedFavoriteTopicId);
+    hasMoreFavoriteCards = selectedFavoriteTopicId === null && favoriteCards.length === FAVORITE_CARD_PAGE_SIZE;
+    favoriteCardPageOffset = favoriteCards.length;
 
     const topic = getSelectedFavoriteTopic();
     if (topic) {
@@ -513,7 +653,12 @@ async function removeFavoriteCard(card) {
     await deleteFavoriteCard(card.id);
     selectedFavoriteCardId = null;
     resetFavoriteCardForm();
-    favoriteCards = selectedFavoriteTopicId === null ? [] : await fetchFavoriteCards(selectedFavoriteTopicId);
+    favoriteCards =
+      selectedFavoriteTopicId === null
+        ? await fetchFavoriteCards(null, { limit: FAVORITE_CARD_PAGE_SIZE, offset: 0 })
+        : await fetchFavoriteCards(selectedFavoriteTopicId);
+    hasMoreFavoriteCards = selectedFavoriteTopicId === null && favoriteCards.length === FAVORITE_CARD_PAGE_SIZE;
+    favoriteCardPageOffset = favoriteCards.length;
     renderFavoriteAll();
     closeFavoriteCardDialog();
     closeDeleteFavoriteCardDialog();
@@ -537,7 +682,7 @@ async function removeWord(word) {
     await deleteWord(word.id);
     selectedWordId = null;
     resetWordForm();
-    words = selectedTopicId === null ? [] : await fetchWords(selectedTopicId);
+    await reloadWords();
     renderAll();
     closeWordDialog();
     closeDeleteWordDialog();
@@ -601,7 +746,17 @@ function renderTopics() {
     return;
   }
 
-  topicList.innerHTML = topics
+  const normalizedFilter = topicFilterText.trim().toLowerCase();
+  const visibleTopics = normalizedFilter ? topics.filter((topic) => getTopicSearchText(topic).includes(normalizedFilter)) : topics;
+
+  if (visibleTopics.length === 0) {
+    topicList.innerHTML = '<div class="empty-state">필터와 일치하는 topic이 없습니다.</div>';
+    const topic = getSelectedTopic();
+    wordListTitle.textContent = topic ? `${topic.title}` : 'All';
+    return;
+  }
+
+  topicList.innerHTML = visibleTopics
     .map((topic) => {
       const activeClass = topic.id === selectedTopicId ? ' is-current' : '';
       return `
@@ -620,20 +775,18 @@ function renderTopics() {
     .join('');
 
   const topic = getSelectedTopic();
-  wordListTitle.textContent = topic ? `${topic.title} Quiz Words` : 'Quiz Words';
+  wordListTitle.textContent = topic ? `${topic.title}` : 'All';
 }
 
 function renderWords() {
   const topic = getSelectedTopic();
-  wordCountText.textContent = `${words.length}개`;
-
-  if (!topic) {
-    wordList.innerHTML = '<div class="empty-state">topic를 선택하세요.</div>';
-    return;
-  }
+  wordCountText.textContent = hasMoreWords ? `${words.length}+개` : `${words.length}개`;
+  wordListTitle.textContent = topic ? `${topic.title}` : 'All ';
 
   if (words.length === 0) {
-    wordList.innerHTML = '<div class="empty-state">등록된 quiz word가 없습니다.</div>';
+    wordList.innerHTML = wordFilterText.trim()
+      ? '<div class="empty-state">검색어와 일치하는 quiz word가 없습니다.</div>'
+      : '<div class="empty-state">등록된 quiz word가 없습니다.</div>';
     return;
   }
 
@@ -655,6 +808,10 @@ function renderWords() {
       `;
     })
     .join('');
+
+  if (isLoadingMoreWords) {
+    wordList.insertAdjacentHTML('beforeend', '<div class="empty-state">quiz words를 더 불러오는 중입니다.</div>');
+  }
 }
 
 function updateTopicSelectionState() {
@@ -663,12 +820,40 @@ function updateTopicSelectionState() {
   });
 
   const topic = getSelectedTopic();
-  wordListTitle.textContent = topic ? `${topic.title} Quiz Words` : 'Quiz Words';
+  wordListTitle.textContent = topic ? `${topic.title}` : 'All';
 }
 
 function renderAll() {
   renderTopicOptions();
   renderTopics();
+  renderWords();
+  setBusy(isBusy);
+}
+
+function getWordFetchOptions(offset = 0) {
+  return {
+    q: wordFilterText.trim(),
+    limit: WORD_PAGE_SIZE,
+    offset,
+  };
+}
+
+async function reloadWords() {
+  const requestSerial = ++wordRequestSerial;
+  wordPageOffset = 0;
+  hasMoreWords = false;
+  words = [];
+  wordList.innerHTML = '<div class="empty-state">quiz words를 불러오는 중입니다.</div>';
+
+  const nextWords = await fetchWords(selectedTopicId, getWordFetchOptions(0));
+
+  if (requestSerial !== wordRequestSerial) {
+    return;
+  }
+
+  words = nextWords;
+  hasMoreWords = nextWords.length === WORD_PAGE_SIZE;
+  wordPageOffset = nextWords.length;
   renderWords();
   setBusy(isBusy);
 }
@@ -686,10 +871,29 @@ async function selectTopic(topicId) {
 
   resetWordForm();
   updateTopicSelectionState();
-  wordList.innerHTML = '<div class="empty-state">quiz words를 불러오는 중입니다.</div>';
-  words = topic ? await fetchWords(topic.id) : [];
-  renderWords();
-  setBusy(isBusy);
+  await reloadWords();
+}
+
+async function loadMoreWordsIfNeeded() {
+  if (!hasMoreWords || isLoadingMoreWords || isBusy) {
+    return;
+  }
+
+  isLoadingMoreWords = true;
+  const previousScrollTop = wordList.scrollTop;
+
+  try {
+    const nextWords = await fetchWords(selectedTopicId, getWordFetchOptions(wordPageOffset));
+    words = [...words, ...nextWords];
+    wordPageOffset += nextWords.length;
+    hasMoreWords = nextWords.length === WORD_PAGE_SIZE;
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : 'quiz words를 더 불러오지 못했습니다.');
+  } finally {
+    isLoadingMoreWords = false;
+    renderWords();
+    wordList.scrollTop = previousScrollTop;
+  }
 }
 
 async function loadWordsQuiz() {
@@ -702,7 +906,9 @@ async function loadWordsQuiz() {
     topics = await fetchTopics();
     const selectedStillExists = topics.some((topic) => topic.id === selectedTopicId);
     selectedTopicId = selectedStillExists ? selectedTopicId : null;
-    words = selectedTopicId === null ? [] : await fetchWords(selectedTopicId);
+    words = await fetchWords(selectedTopicId, getWordFetchOptions(0));
+    hasMoreWords = words.length === WORD_PAGE_SIZE;
+    wordPageOffset = words.length;
 
     const topic = getSelectedTopic();
     if (topic) {
@@ -725,7 +931,7 @@ async function loadWordsQuiz() {
 }
 
 async function setActiveModule(moduleId) {
-  activeModuleId = moduleId;
+  activeModuleId = moduleId || activeModuleId || moduleButtons[0]?.dataset.moduleId || null;
 
   moduleButtons.forEach((button) => {
     button.classList.toggle('is-active', button.dataset.moduleId === activeModuleId);
@@ -735,65 +941,65 @@ async function setActiveModule(moduleId) {
     panel.classList.toggle('is-hidden', panel.dataset.modulePanel !== activeModuleId);
   });
 
-  if (activeModuleId === 'words-quiz' && !hasLoadedWordsQuiz) {
+  if (activeModuleId === 'words-quiz' && wordsQuizPanel && !hasLoadedWordsQuiz) {
     hasLoadedWordsQuiz = true;
     await loadWordsQuiz();
   }
 
-  if (activeModuleId === 'pick-your-favorite' && !hasLoadedPickYourFavorite) {
+  if (activeModuleId === 'pick-your-favorite' && favoritePanel && !hasLoadedPickYourFavorite) {
     hasLoadedPickYourFavorite = true;
     await loadPickYourFavorite();
   }
 }
 
 moduleButtons.forEach((button) => {
-  button.querySelector('.module-button__select').addEventListener('click', async () => {
+  on(button.querySelector('.module-button__select'), 'click', async () => {
     await setActiveModule(button.dataset.moduleId);
   });
 });
 
-newTopicButton.addEventListener('click', () => {
+on(newTopicButton, 'click', () => {
   resetTopicForm();
   setBusy(false);
   openTopicDialog();
 });
 
-newWordButton.addEventListener('click', () => {
+on(newWordButton, 'click', () => {
   resetWordForm();
   setBusy(false);
   openWordDialog();
 });
 
-newFavoriteTopicButton.addEventListener('click', () => {
+on(newFavoriteTopicButton, 'click', () => {
   resetFavoriteTopicForm();
   setBusy(false);
   openFavoriteTopicDialog();
 });
 
-newFavoriteCardButton.addEventListener('click', () => {
+on(newFavoriteCardButton, 'click', () => {
   resetFavoriteCardForm();
   setBusy(false);
   openFavoriteCardDialog();
 });
 
-cancelTopicButton.addEventListener('click', closeTopicDialog);
-cancelWordButton.addEventListener('click', closeWordDialog);
-cancelFavoriteTopicButton.addEventListener('click', closeFavoriteTopicDialog);
-cancelFavoriteCardButton.addEventListener('click', closeFavoriteCardDialog);
+on(cancelTopicButton, 'click', closeTopicDialog);
+on(cancelWordButton, 'click', closeWordDialog);
+on(cancelFavoriteTopicButton, 'click', closeFavoriteTopicDialog);
+on(cancelFavoriteCardButton, 'click', closeFavoriteCardDialog);
 
-wordTopicSelectButton.addEventListener('click', () => {
+on(wordTopicSelectButton, 'click', () => {
   const willOpen = wordTopicSelectMenu.hidden;
   wordTopicSelectMenu.hidden = !willOpen;
   wordTopicSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 });
 
-favoriteCardTopicSelectButton.addEventListener('click', () => {
+on(favoriteCardTopicSelectButton, 'click', () => {
   const willOpen = favoriteCardTopicSelectMenu.hidden;
   favoriteCardTopicSelectMenu.hidden = !willOpen;
   favoriteCardTopicSelectButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 });
 
-wordTopicSelectMenu.addEventListener('click', (event) => {
+on(wordTopicSelectMenu, 'click', (event) => {
   const option = event.target.closest('[data-topic-option]');
 
   if (!option) {
@@ -805,7 +1011,7 @@ wordTopicSelectMenu.addEventListener('click', (event) => {
   wordTopicSelectButton.focus();
 });
 
-favoriteCardTopicSelectMenu.addEventListener('click', (event) => {
+on(favoriteCardTopicSelectMenu, 'click', (event) => {
   const option = event.target.closest('[data-favorite-topic-option]');
 
   if (!option) {
@@ -838,7 +1044,7 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-topicList.addEventListener('click', async (event) => {
+on(topicList, 'click', async (event) => {
   const actionButton = event.target.closest('[data-topic-action]');
 
   if (actionButton) {
@@ -883,7 +1089,7 @@ topicList.addEventListener('click', async (event) => {
   }
 });
 
-wordList.addEventListener('click', (event) => {
+on(wordList, 'click', (event) => {
   const actionButton = event.target.closest('[data-word-action]');
 
   const wordId = actionButton?.dataset.wordId || event.target.closest('[data-word-id]')?.dataset.wordId;
@@ -912,7 +1118,41 @@ wordList.addEventListener('click', (event) => {
   }
 });
 
-favoriteTopicList.addEventListener('click', async (event) => {
+on(wordList, 'scroll', () => {
+  const threshold = 24;
+  const isNearBottom = wordList.scrollTop + wordList.clientHeight >= wordList.scrollHeight - threshold;
+
+  if (isNearBottom) {
+    loadMoreWordsIfNeeded();
+  }
+});
+
+on(topicFilterInput, 'input', () => {
+  topicFilterText = topicFilterInput.value;
+  renderTopics();
+});
+
+on(wordFilterInput, 'keydown', async (event) => {
+  if (event.key !== 'Enter') {
+    return;
+  }
+
+  event.preventDefault();
+  wordFilterText = wordFilterInput.value;
+
+  try {
+    await reloadWords();
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : 'quiz words를 검색하지 못했습니다.');
+  }
+});
+
+on(favoriteTopicFilterInput, 'input', () => {
+  favoriteTopicFilterText = favoriteTopicFilterInput.value;
+  renderFavoriteTopics();
+});
+
+on(favoriteTopicList, 'click', async (event) => {
   const actionButton = event.target.closest('[data-favorite-topic-action]');
 
   if (actionButton) {
@@ -957,12 +1197,17 @@ favoriteTopicList.addEventListener('click', async (event) => {
   }
 });
 
-favoriteCardList.addEventListener('click', (event) => {
+on(favoriteCardList, 'click', (event) => {
   const actionButton = event.target.closest('[data-favorite-card-action]');
   const cardId = actionButton?.dataset.favoriteCardId || event.target.closest('[data-favorite-card-id]')?.dataset.favoriteCardId;
   const card = favoriteCards.find((item) => item.id === Number(cardId));
 
   if (!card || !actionButton) {
+    return;
+  }
+
+  if (actionButton.dataset.favoriteCardAction === 'preview') {
+    openFavoriteCardPreview(card);
     return;
   }
 
@@ -980,7 +1225,16 @@ favoriteCardList.addEventListener('click', (event) => {
   }
 });
 
-topicForm.addEventListener('submit', async (event) => {
+on(favoriteCardList, 'scroll', () => {
+  const threshold = 32;
+  const isNearBottom = favoriteCardList.scrollTop + favoriteCardList.clientHeight >= favoriteCardList.scrollHeight - threshold;
+
+  if (isNearBottom) {
+    loadMoreFavoriteCardsIfNeeded();
+  }
+});
+
+on(topicForm, 'submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(topicForm);
   const topic = {
@@ -1011,7 +1265,7 @@ topicForm.addEventListener('submit', async (event) => {
   }
 });
 
-wordForm.addEventListener('submit', async (event) => {
+on(wordForm, 'submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(wordForm);
   const word = {
@@ -1047,7 +1301,7 @@ wordForm.addEventListener('submit', async (event) => {
   }
 });
 
-favoriteTopicForm.addEventListener('submit', async (event) => {
+on(favoriteTopicForm, 'submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(favoriteTopicForm);
   const eraValue = String(formData.get('era') || '').trim();
@@ -1087,7 +1341,7 @@ favoriteTopicForm.addEventListener('submit', async (event) => {
   }
 });
 
-favoriteCardForm.addEventListener('submit', async (event) => {
+on(favoriteCardForm, 'submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(favoriteCardForm);
   const card = {
@@ -1121,25 +1375,26 @@ favoriteCardForm.addEventListener('submit', async (event) => {
   }
 });
 
-deleteTopicButton.addEventListener('click', () => {
+on(deleteTopicButton, 'click', () => {
   removeTopic(getSelectedTopic());
 });
 
-deleteFavoriteTopicButton.addEventListener('click', () => {
+on(deleteFavoriteTopicButton, 'click', () => {
   removeFavoriteTopic(getSelectedFavoriteTopic());
 });
 
-cancelDeleteWordButton.addEventListener('click', closeDeleteWordDialog);
-cancelDeleteFavoriteCardButton.addEventListener('click', closeDeleteFavoriteCardDialog);
+on(cancelDeleteWordButton, 'click', closeDeleteWordDialog);
+on(cancelDeleteFavoriteCardButton, 'click', closeDeleteFavoriteCardDialog);
+on(closeFavoriteCardPreviewButton, 'click', closeFavoriteCardPreview);
 
-confirmDeleteWordButton.addEventListener('click', () => {
+on(confirmDeleteWordButton, 'click', () => {
   removeWord(pendingDeleteWord);
 });
 
-confirmDeleteFavoriteCardButton.addEventListener('click', () => {
+on(confirmDeleteFavoriteCardButton, 'click', () => {
   removeFavoriteCard(pendingDeleteFavoriteCard);
 });
 
-closeWordDetailButton.addEventListener('click', closeWordDetailDialog);
+on(closeWordDetailButton, 'click', closeWordDetailDialog);
 
 setActiveModule(activeModuleId);

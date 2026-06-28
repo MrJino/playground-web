@@ -7,294 +7,44 @@
     <title>Playground Admin</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
-    <main class="admin-page">
-      <section class="admin-shell">
-        <aside class="admin-sidebar">
-          <header class="admin-header">
-            <h1>관리자 페이지</h1>
-          </header>
+  <body class="admin-home-body">
+    <main class="admin-home-page">
+      <div class="admin-home-inner">
+        <header class="admin-home-header fade-in">
+          <div class="admin-brand">
+            <img src="../assets/icons/admin_icon.png" alt="" class="admin-brand__icon" aria-hidden="true" />
+            <span class="admin-brand__text">
+              <strong>Admin</strong>
+            </span>
+          </div>
+        </header>
 
-          <nav class="module-nav" aria-label="관리 모듈">
-            <div class="module-button" data-module-id="words-quiz">
-              <button class="module-button__select" type="button">
-                <strong>Words Quiz</strong>
-                <span>Topics, quiz words</span>
-              </button>
-              <a class="module-button__link" href="../words-quiz/" aria-label="Words Quiz 페이지로 이동" title="페이지로 이동">→</a>
-            </div>
-            <div class="module-button" data-module-id="pick-your-favorite">
-              <button class="module-button__select" type="button">
-                <strong>Pick Your Favorite</strong>
-                <span>Topics, cards</span>
-              </button>
-              <a class="module-button__link" href="../pick-your-favorite/" aria-label="Pick Your Favorite 페이지로 이동" title="페이지로 이동">→</a>
-            </div>
-            <div class="module-button" data-module-id="typing-game">
-              <button class="module-button__select" type="button">
-                <strong>Typing Game</strong>
-                <span>서버 저장 전환 시 연결</span>
-              </button>
-              <a class="module-button__link" href="../typing-game/" aria-label="Typing Game 페이지로 이동" title="페이지로 이동">→</a>
-            </div>
-          </nav>
-        </aside>
+        <section class="admin-app-grid" aria-label="관리 페이지 메뉴">
+          <a class="admin-app-card fade-in delay-1" href="./pick-your-favorite/">
+            <div class="admin-app-card__icon">P</div>
+            <h2>Pick Your Favorite</h2>
+            <p>Favorite topics와 cards 데이터를 관리합니다.</p>
+          </a>
 
-        <section class="admin-content">
-          <section class="module-panel is-hidden" id="wordsQuizPanel" data-module-panel="words-quiz">
-            <div class="panel-top">
-              <div class="panel-title">
-                <span class="panel-title__icon" aria-hidden="true">WQ</span>
-                <h2>Words Quiz</h2>
-              </div>
-            </div>
+          <a class="admin-app-card fade-in delay-2" href="./typing-game/">
+            <div class="admin-app-card__icon">T</div>
+            <h2>Typing Game</h2>
+            <p>타자 게임 데이터 관리 페이지입니다.</p>
+          </a>
 
-            <div class="workspace-grid">
-              <section class="data-panel">
-                <div class="panel-heading">
-                  <h3>Topics</h3>
-                  <div class="panel-heading__actions">
-                    <button class="icon-button" id="newTopicButton" type="button" aria-label="새 topic" title="새 topic">＋</button>
-                  </div>
-                </div>
-                <div class="item-list" id="topicList"></div>
-              </section>
-
-              <section class="data-panel words-panel">
-                <div class="panel-heading">
-                  <h3 id="wordListTitle">Quiz Words</h3>
-                  <div class="panel-heading__actions">
-                    <span class="count-pill" id="wordCountText">0개</span>
-                    <button class="icon-button" id="newWordButton" type="button" aria-label="새 quiz word" title="새 quiz word">＋</button>
-                  </div>
-                </div>
-                <div class="item-list word-list" id="wordList"></div>
-              </section>
-            </div>
-
-            <p class="status-line" id="statusLine" aria-live="polite"></p>
-          </section>
-
-          <section class="module-panel is-hidden" id="favoritePanel" data-module-panel="pick-your-favorite">
-            <div class="panel-top">
-              <div class="panel-title">
-                <span class="panel-title__icon" aria-hidden="true">PF</span>
-                <h2>Pick Your Favorite</h2>
-              </div>
-            </div>
-
-            <div class="workspace-grid">
-              <section class="data-panel">
-                <div class="panel-heading">
-                  <h3>Favorite Topics</h3>
-                  <div class="panel-heading__actions">
-                    <button class="icon-button" id="newFavoriteTopicButton" type="button" aria-label="새 favorite topic" title="새 favorite topic">＋</button>
-                  </div>
-                </div>
-                <div class="item-list" id="favoriteTopicList"></div>
-              </section>
-
-              <section class="data-panel words-panel">
-                <div class="panel-heading">
-                  <h3 id="favoriteCardListTitle">Favorite Cards</h3>
-                  <div class="panel-heading__actions">
-                    <span class="count-pill" id="favoriteCardCountText">0개</span>
-                    <button class="icon-button" id="newFavoriteCardButton" type="button" aria-label="새 favorite card" title="새 favorite card">＋</button>
-                  </div>
-                </div>
-                <div class="item-list word-list" id="favoriteCardList"></div>
-              </section>
-            </div>
-
-            <p class="status-line" id="favoriteStatusLine" aria-live="polite"></p>
-          </section>
-
-          <section class="module-panel is-hidden" data-module-panel="typing-game">
-            <div class="empty-module">
-              <h2>Typing Game</h2>
-              <p>문장 또는 단어 데이터가 API로 이동하면 동일한 admin 패턴으로 CRUD 기능을 추가할 수 있습니다.</p>
-            </div>
-          </section>
+          <a class="admin-app-card fade-in delay-3" href="./words-quiz/">
+            <div class="admin-app-card__icon">W</div>
+            <h2>Words Quiz</h2>
+            <p>Topics와 quiz words 데이터를 관리합니다.</p>
+          </a>
         </section>
-      </section>
+
+        <footer class="admin-home-footer fade-in delay-1">
+          <p class="admin-footer-text">
+            <a href="../">Playground</a> by <a href="https://mrjino.github.io/" target="_blank" rel="noopener noreferrer">MrJino</a>. All rights reserved
+          </p>
+        </footer>
+      </div>
     </main>
-
-    <dialog class="editor-dialog" id="topicDialog">
-      <form class="editor-form" id="topicForm" method="dialog">
-        <div class="form-title">
-          <h3>Topic 편집</h3>
-          <span id="topicModeText">새 topic</span>
-        </div>
-        <input id="topicIdInput" name="id" type="hidden" />
-        <label>
-          <span>Title</span>
-          <input id="topicTitleInput" name="title" type="text" required />
-        </label>
-        <label>
-          <span>Description</span>
-          <textarea id="topicDescriptionInput" name="description" rows="3"></textarea>
-        </label>
-        <div class="form-actions">
-          <button class="danger-button" id="deleteTopicButton" type="button" disabled>삭제</button>
-          <button class="ghost-button" id="cancelTopicButton" type="button">취소</button>
-          <button class="primary-button" type="submit">저장</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="editor-dialog" id="wordDialog">
-      <form class="editor-form" id="wordForm" method="dialog">
-        <div class="form-title">
-          <h3>Quiz Word 편집</h3>
-          <span id="wordModeText">새 quiz word</span>
-        </div>
-        <input id="wordIdInput" name="id" type="hidden" />
-        <label>
-          <span>Topic</span>
-          <input id="wordTopicInput" name="topicId" type="hidden" required />
-          <div class="custom-select" id="wordTopicSelect">
-            <button class="custom-select__button" id="wordTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Topic 선택</button>
-            <div class="custom-select__menu" id="wordTopicSelectMenu" role="listbox" hidden></div>
-          </div>
-        </label>
-        <div class="form-row">
-          <label>
-            <span>Abbreviation</span>
-            <input id="abbreviationInput" name="abbreviation" type="text" required />
-          </label>
-          <label>
-            <span>Full name</span>
-            <input id="fullNameInput" name="fullName" type="text" required />
-          </label>
-        </div>
-        <label>
-          <span>Description</span>
-          <textarea id="wordDescriptionInput" name="description" rows="5"></textarea>
-        </label>
-        <div class="form-actions">
-          <button class="ghost-button" id="cancelWordButton" type="button">취소</button>
-          <button class="primary-button" type="submit">저장</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="editor-dialog" id="favoriteTopicDialog">
-      <form class="editor-form" id="favoriteTopicForm" method="dialog">
-        <div class="form-title">
-          <h3>Favorite Topic 편집</h3>
-          <span id="favoriteTopicModeText">새 favorite topic</span>
-        </div>
-        <input id="favoriteTopicIdInput" name="id" type="hidden" />
-        <div class="form-row">
-          <label>
-            <span>Value</span>
-            <input id="favoriteTopicValueInput" name="value" type="text" required />
-          </label>
-          <label>
-            <span>Era</span>
-            <input id="favoriteTopicEraInput" name="era" type="number" inputmode="numeric" />
-          </label>
-        </div>
-        <label>
-          <span>Label</span>
-          <input id="favoriteTopicLabelInput" name="label" type="text" required />
-        </label>
-        <div class="form-row">
-          <label>
-            <span>Country</span>
-            <input id="favoriteTopicCountryInput" name="country" type="text" />
-          </label>
-          <label>
-            <span>Icon</span>
-            <input id="favoriteTopicIconInput" name="icon" type="text" />
-          </label>
-        </div>
-        <div class="form-actions">
-          <button class="danger-button" id="deleteFavoriteTopicButton" type="button" disabled>삭제</button>
-          <button class="ghost-button" id="cancelFavoriteTopicButton" type="button">취소</button>
-          <button class="primary-button" type="submit">저장</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="editor-dialog" id="favoriteCardDialog">
-      <form class="editor-form" id="favoriteCardForm" method="dialog">
-        <div class="form-title">
-          <h3>Favorite Card 편집</h3>
-          <span id="favoriteCardModeText">새 favorite card</span>
-        </div>
-        <input id="favoriteCardIdInput" name="id" type="hidden" />
-        <label>
-          <span>Topic</span>
-          <input id="favoriteCardTopicInput" name="topicId" type="hidden" required />
-          <div class="custom-select" id="favoriteCardTopicSelect">
-            <button class="custom-select__button" id="favoriteCardTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">Topic 선택</button>
-            <div class="custom-select__menu" id="favoriteCardTopicSelectMenu" role="listbox" hidden></div>
-          </div>
-        </label>
-        <label>
-          <span>Name</span>
-          <input id="favoriteCardNameInput" name="name" type="text" required />
-        </label>
-        <label>
-          <span>Description</span>
-          <textarea id="favoriteCardDescriptionInput" name="description" rows="3"></textarea>
-        </label>
-        <label>
-          <span>Image</span>
-          <input id="favoriteCardImageInput" name="image" type="text" />
-        </label>
-        <div class="form-actions">
-          <button class="ghost-button" id="cancelFavoriteCardButton" type="button">취소</button>
-          <button class="primary-button" type="submit">저장</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="confirm-dialog" id="deleteFavoriteCardDialog">
-      <div class="confirm-dialog__content">
-        <h3>Favorite Card 삭제</h3>
-        <p id="deleteFavoriteCardMessage">선택한 favorite card를 삭제할까요?</p>
-        <div class="form-actions">
-          <button class="ghost-button" id="cancelDeleteFavoriteCardButton" type="button">취소</button>
-          <button class="danger-button" id="confirmDeleteFavoriteCardButton" type="button">삭제</button>
-        </div>
-      </div>
-    </dialog>
-
-    <dialog class="confirm-dialog" id="deleteWordDialog">
-      <div class="confirm-dialog__content">
-        <h3>Quiz Word 삭제</h3>
-        <p id="deleteWordMessage">선택한 quiz word를 삭제할까요?</p>
-        <div class="form-actions">
-          <button class="ghost-button" id="cancelDeleteWordButton" type="button">취소</button>
-          <button class="danger-button" id="confirmDeleteWordButton" type="button">삭제</button>
-        </div>
-      </div>
-    </dialog>
-
-    <dialog class="detail-dialog" id="wordDetailDialog">
-      <div class="detail-dialog__content">
-        <div class="detail-dialog__top">
-          <div>
-            <h3 id="wordDetailAbbreviation">Quiz Word</h3>
-          </div>
-          <button class="icon-button" id="closeWordDetailButton" type="button" aria-label="닫기" title="닫기">×</button>
-        </div>
-        <dl class="detail-list">
-          <div>
-            <dt>Full name</dt>
-            <dd id="wordDetailFullName"></dd>
-          </div>
-          <div>
-            <dt>Description</dt>
-            <dd id="wordDetailDescription"></dd>
-          </div>
-        </dl>
-      </div>
-    </dialog>
-
-    <script src="../shared/cloudflare-api.js"></script>
-    <script src="./admin.js"></script>
   </body>
 </html>
