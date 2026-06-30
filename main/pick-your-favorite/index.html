@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
     <title>Pick your favorite</title>
+    <link rel="stylesheet" href="../../shared/favorite-card-preview.css" />
     <link rel="stylesheet" href="./styles.css" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2370597715066024" crossorigin="anonymous"></script>
   </head>
@@ -12,11 +13,11 @@
     <main class="page">
       <header class="hero">
         <div class="hero-placeholder" id="heroPlaceholder" hidden>
-          <a class="hero-placeholder__link" href="../" aria-label="홈으로 이동">
-            <img class="hero-placeholder__image" src="../assets/icons/game.png" alt="Pick your favorite" />
+          <a class="hero-placeholder__link" href="../../" aria-label="홈으로 이동">
+            <img class="hero-placeholder__image" src="../../assets/icons/game.png" alt="Pick your favorite" />
           </a>
           <div class="hero-placeholder__content"></div>
-          <a class="hero-action-button" href="../board/?from=pick-your-favorite">게시판</a>
+          <a class="hero-action-button" href="../../board/?from=pick-your-favorite">게시판</a>
           <fieldset class="country-filter" data-country-dropdown aria-label="국가 선택">
             <legend>국가</legend>
             <button class="country-filter__trigger" id="countryDropdownButton" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -122,10 +123,6 @@
       </section>
 
       <nav class="mobile-nav" aria-label="모바일 패널 메뉴">
-        <button class="mobile-nav__button" id="openMobileSearchButton" type="button" aria-controls="menuBrowserPanel">
-          <span class="mobile-nav__icon mobile-nav__icon--search"></span>
-          <span>검색</span>
-        </button>
         <button class="mobile-nav__button" id="openMobileMenuButton" type="button" aria-controls="menuPanel" aria-expanded="false">
           <span class="mobile-nav__icon mobile-nav__icon--menu"></span>
           <span>메뉴</span>
@@ -151,7 +148,8 @@
       </div>
     </div>
 
-    <script src="../shared/cloudflare-api.js"></script>
+    <script src="../../shared/cloudflare-api.js"></script>
+    <script src="../../shared/favorite-card-preview.js"></script>
     <script src="./main.js"></script>
   </body>
 </html>

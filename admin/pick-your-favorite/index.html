@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
     <title>Pick Your Favorite Admin</title>
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../../shared/favorite-card-preview.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body data-admin-module="pick-your-favorite">
     <main class="admin-page">
@@ -73,6 +74,10 @@
           <span>Label</span>
           <input id="favoriteTopicLabelInput" name="label" type="text" required />
         </label>
+        <label>
+          <span>Category</span>
+          <input id="favoriteTopicCategoryInput" name="category" type="text" />
+        </label>
         <div class="form-row">
           <label>
             <span>Country</span>
@@ -94,35 +99,43 @@
     <dialog class="editor-dialog" id="favoriteCardDialog">
       <form class="editor-form" id="favoriteCardForm" method="dialog">
         <div class="form-title">
-          <h3>Favorite Card 편집</h3>
-          <span id="favoriteCardModeText">새 favorite card</span>
+          <h3>Favorite 카드편집</h3>
         </div>
         <input id="favoriteCardIdInput" name="id" type="hidden" />
-        <label>
-          <span>Topic</span>
-          <input id="favoriteCardTopicInput" name="topicId" type="hidden" required />
-          <div class="custom-select" id="favoriteCardTopicSelect">
-            <button class="custom-select__button" id="favoriteCardTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">
-              Topic 선택
-            </button>
-            <div class="custom-select__menu" id="favoriteCardTopicSelectMenu" role="listbox" hidden></div>
+        <div class="favorite-card-editor-layout">
+          <div class="favorite-card-image-preview" id="favoriteCardImagePreview" aria-hidden="true"></div>
+          <div class="favorite-card-editor-fields">
+            <label>
+              <span>Topic</span>
+              <input id="favoriteCardTopicInput" name="topicId" type="hidden" required />
+              <div class="custom-select" id="favoriteCardTopicSelect">
+                <button class="custom-select__button" id="favoriteCardTopicSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  Topic 선택
+                </button>
+                <div class="custom-select__menu" id="favoriteCardTopicSelectMenu" role="listbox" hidden></div>
+              </div>
+            </label>
+            <label>
+              <span>Name</span>
+              <input id="favoriteCardNameInput" name="name" type="text" required />
+            </label>
+            <label>
+              <span>Description</span>
+              <textarea id="favoriteCardDescriptionInput" name="description" rows="2"></textarea>
+            </label>
+            <label>
+              <span>Profile</span>
+              <textarea id="favoriteCardProfileInput" name="profile" rows="4"></textarea>
+            </label>
+            <label>
+              <span>Image</span>
+              <textarea id="favoriteCardImageInput" name="image" rows="2"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="ghost-button" id="cancelFavoriteCardButton" type="button">취소</button>
+              <button class="primary-button" type="submit">저장</button>
+            </div>
           </div>
-        </label>
-        <label>
-          <span>Name</span>
-          <input id="favoriteCardNameInput" name="name" type="text" required />
-        </label>
-        <label>
-          <span>Description</span>
-          <textarea id="favoriteCardDescriptionInput" name="description" rows="3"></textarea>
-        </label>
-        <label>
-          <span>Image</span>
-          <input id="favoriteCardImageInput" name="image" type="text" />
-        </label>
-        <div class="form-actions">
-          <button class="ghost-button" id="cancelFavoriteCardButton" type="button">취소</button>
-          <button class="primary-button" type="submit">저장</button>
         </div>
       </form>
     </dialog>
@@ -138,18 +151,8 @@
       </div>
     </dialog>
 
-    <dialog class="favorite-preview-dialog" id="favoriteCardPreviewDialog">
-      <article class="favorite-preview-card">
-        <button class="icon-button favorite-preview-close" id="closeFavoriteCardPreviewButton" type="button" aria-label="닫기" title="닫기">×</button>
-        <div class="favorite-preview-media" id="favoriteCardPreviewMedia"></div>
-        <div class="favorite-preview-content">
-          <h3 id="favoriteCardPreviewName"></h3>
-          <p id="favoriteCardPreviewDescription"></p>
-        </div>
-      </article>
-    </dialog>
-
     <script src="../../shared/cloudflare-api.js"></script>
-    <script src="../admin.js"></script>
+    <script src="../../shared/favorite-card-preview.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>

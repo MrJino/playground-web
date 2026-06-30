@@ -86,6 +86,7 @@
       id: Number(row.id),
       value: String(row.value || '').trim(),
       label: String(row.label || '').trim(),
+      category: String(row.category || '').trim(),
       country: String(row.country || '').trim(),
       icon: String(row.icon || '').trim(),
       era: era === null || era === undefined || era === '' ? null : Number(era),
@@ -101,6 +102,7 @@
       name: String(row.name || '').trim(),
       description: String(row.description || '').trim(),
       image: String(row.image || '').trim(),
+      profile: String(row.profile || '').trim(),
     };
   }
 

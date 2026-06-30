@@ -1,9 +1,9 @@
 const STORAGE_KEY = 'playground-question-board';
 
 const RETURN_PATHS = {
-  'pick-your-favorite': '../pick-your-favorite/',
-  'typing-game': '../typing-game/',
-  'words-quiz': '../words-quiz/',
+  'pick-your-favorite': '../main/pick-your-favorite/',
+  'typing-game': '../main/typing-game/',
+  'words-quiz': '../main/words-quiz/',
 };
 
 const params = new URLSearchParams(window.location.search);

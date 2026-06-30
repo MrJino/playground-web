@@ -19,9 +19,11 @@ let lastWinnerIndex = 0;
 let activeLoadRequestId = 0;
 let activeRankingRequestId = 0;
 let activeMenuValue = DEFAULT_MENU_VALUE;
+let activeTopicId = null;
 let menuGroups = [];
 let hasShownInitialBattlePair = false;
 let isBattleActive = false;
+let hasStartedBattle = false;
 
 const poolGrid = document.getElementById('poolGrid');
 const poolScroll = document.getElementById('poolScroll');
@@ -52,7 +54,6 @@ const rankingButton = document.getElementById('rankingButton');
 const menuRankingList = document.getElementById('menuRankingList');
 const mobilePanelBackdrop = document.getElementById('mobilePanelBackdrop');
 const openMobileMenuButton = document.getElementById('openMobileMenuButton');
-const openMobileSearchButton = document.getElementById('openMobileSearchButton');
 const openMobileHistoryButton = document.getElementById('openMobileHistoryButton');
 const confirmModal = document.getElementById('confirmModal');
 const confirmModalMessage = document.getElementById('confirmModalMessage');
@@ -80,7 +81,7 @@ let menuToggleButtons = [];
 let menuItemButtons = [];
 let activeCountryFilter = 'all';
 let activeLanguage = getInitialLanguage();
-const MOBILE_PANEL_MEDIA_QUERY = '(max-width: 768px)';
+const MOBILE_PANEL_MEDIA_QUERY = '(max-width: 1279px)';
 const ROUND_TRANSITION_DURATION = 1800;
 const CARD_SELECTION_DURATION = 1100;
 const FINAL_CARD_SELECTION_DURATION = 1400;
@@ -107,12 +108,10 @@ function isMobilePanelLayout() {
 
 function setMobileNavState(activePanel) {
   const isMenuOpen = activePanel === 'menu';
-  const isSearchOpen = activePanel === 'search';
   const isHistoryOpen = activePanel === 'history';
 
   openMobileMenuButton?.classList.toggle('is-active', isMenuOpen);
   openMobileMenuButton?.setAttribute('aria-expanded', String(isMenuOpen));
-  openMobileSearchButton?.classList.toggle('is-active', isSearchOpen);
   openMobileHistoryButton?.classList.toggle('is-active', isHistoryOpen);
   openMobileHistoryButton?.setAttribute('aria-expanded', String(isHistoryOpen));
 }
@@ -222,6 +221,7 @@ function buildMenuGroupsFromTopics(topics) {
       label: topic.label,
       menuLabel: getMenuLabelFromTopic(topic),
       browserLabel: topic.label,
+      category: topic.category,
       country: topic.country,
       icon: topic.icon,
     });
@@ -455,10 +455,11 @@ function setLanguageDropdownOpen(isOpen) {
 }
 
 function syncHeroControlsVisibility() {
-  const shouldHideHeroControls = isBattleActive || !poolScroll.hidden;
+  const shouldShowHeroPlaceholder = !hasStartedBattle;
+  const shouldHideHeroControls = hasStartedBattle;
 
   if (heroPlaceholder) {
-    heroPlaceholder.hidden = shouldHideHeroControls;
+    heroPlaceholder.hidden = !shouldShowHeroPlaceholder;
   }
 
   if (countryDropdown) {
@@ -484,7 +485,9 @@ function showMenuBrowser(options = {}) {
   activeLoadRequestId += 1;
   isTransitioning = false;
   isBattleActive = false;
+  hasStartedBattle = false;
   battlePanel.classList.remove('is-battle-ready');
+  activeTopicId = null;
   activeMenuValue = DEFAULT_MENU_VALUE;
   menuItemButtons.forEach((button) => {
     button.classList.remove('is-active');
@@ -492,12 +495,12 @@ function showMenuBrowser(options = {}) {
   });
   heroPlaceholder.hidden = false;
   poolScroll.hidden = true;
-  syncHeroControlsVisibility();
   poolGrid.innerHTML = '';
   progressText.textContent = '';
   battlePanel.hidden = true;
   battleIntroPanel.hidden = true;
   battleGrid.hidden = true;
+  syncHeroControlsVisibility();
   menuBrowserPanel.hidden = false;
   openMenuSearchButton.disabled = true;
   hideMenuRanking();
@@ -625,11 +628,19 @@ async function activateMenuButton(button, options = {}) {
     openMenuSearchButton.disabled = false;
     closeMobilePanels();
     setActiveMenuButton(button);
+    activeTopicId = topicId;
     activeMenuValue = button.dataset.menuValue || DEFAULT_MENU_VALUE;
     updateMenuQueryParam(button.dataset.menuValue, options.replace);
     updateRankingLink(button);
-    renderCardsLoadingState();
-    await loadCards(topicId, button.dataset.menuValue, loadRequestId);
+    initialCards = [];
+    activePool = [];
+    currentRoundCards = [];
+    selectedCards = [];
+    currentPair = [];
+    hasStoredFinalWinner = false;
+    hasShownInitialBattlePair = false;
+    poolGrid.innerHTML = '';
+    renderBattleIntro();
   } catch (error) {
     console.error(error);
   }
@@ -658,17 +669,34 @@ function getRoundTarget() {
   return Math.max(1, Math.ceil(currentRoundCards.length / 2));
 }
 
+function withCloudflareImageVariant(imageUrl, variant) {
+  if (!imageUrl.startsWith('https://imagedelivery.net')) {
+    return imageUrl;
+  }
+
+  if (imageUrl.endsWith(`/${variant}`)) {
+    return imageUrl;
+  }
+
+  return imageUrl.replace(/\/?$/, `/${variant}`);
+}
+
 function normalizeCard(card, index, menuValue) {
   const image = card.image || '';
   const isRemoteImage = /^https?:\/\//i.test(image);
   const localImageBasePath = LOCAL_IMAGE_BASE_PATH_BY_MENU_VALUE[menuValue];
   const normalizedImage = image ? (isRemoteImage || !localImageBasePath ? image : `${localImageBasePath}/${image}`) : '';
+  const displayImage = normalizedImage ? withCloudflareImageVariant(normalizedImage, 'small') : '';
+  const previewImage = normalizedImage ? withCloudflareImageVariant(normalizedImage, 'public') : '';
 
   return {
     id: card.id ?? index + 1,
     name: card.name ?? `Card ${String(index + 1).padStart(2, '0')}`,
     description: card.description ?? '',
-    image: normalizedImage,
+    image: displayImage,
+    previewImage,
+    profile: card.profile ?? '',
+    topicId: card.topicId ?? activeTopicId,
     imageSource: card.imageSource || card.source || card.credit || '',
   };
 }
@@ -677,7 +705,7 @@ async function loadCards(topicId, menuValue, loadRequestId = activeLoadRequestId
   const items = await fetchFavoriteCards(topicId);
 
   if (loadRequestId !== activeLoadRequestId) {
-    return;
+    return false;
   }
 
   const cards = items.map((card, index) => normalizeCard(card, index, menuValue));
@@ -696,7 +724,7 @@ async function loadCards(topicId, menuValue, loadRequestId = activeLoadRequestId
   hasShownInitialBattlePair = false;
 
   renderPool();
-  renderBattleIntro();
+  return true;
 }
 
 function setBattleCardLoading(cardEl, imageEl, titleEl, textEl, sourceEl) {
@@ -714,9 +742,10 @@ function setBattleCardLoading(cardEl, imageEl, titleEl, textEl, sourceEl) {
 function renderCardsLoadingState() {
   isTransitioning = true;
   isBattleActive = false;
+  hasStartedBattle = false;
   battlePanel.classList.remove('is-battle-ready');
-  heroPlaceholder.hidden = true;
-  poolScroll.hidden = false;
+  heroPlaceholder.hidden = false;
+  poolScroll.hidden = true;
   syncHeroControlsVisibility();
   initialCards = [];
   activePool = [];
@@ -740,10 +769,11 @@ function renderBattleIntro() {
 
   isTransitioning = false;
   isBattleActive = false;
+  hasStartedBattle = false;
   battlePanel.classList.add('is-battle-ready');
   currentPair = [];
-  heroPlaceholder.hidden = true;
-  poolScroll.hidden = false;
+  heroPlaceholder.hidden = false;
+  poolScroll.hidden = true;
   syncHeroControlsVisibility();
   battleGrid.hidden = true;
   battleIntroPanel.hidden = false;
@@ -757,15 +787,44 @@ function renderBattleIntro() {
     battleIntroCardCount.textContent = `${initialCards.length}장`;
   }
   battleStartButton.hidden = false;
+  battleStartButton.disabled = false;
   battleStartButton.focus();
 }
 
-function startBattle() {
+async function startBattle() {
+  if (!Number.isInteger(activeTopicId)) {
+    return;
+  }
+
   isBattleActive = true;
+  hasStartedBattle = true;
   heroPlaceholder.hidden = true;
   poolScroll.hidden = false;
   syncHeroControlsVisibility();
-  renderBattle();
+  battleStartButton.disabled = true;
+  battleIntroPanel.hidden = true;
+  battleGrid.hidden = true;
+  battleTitle.textContent = '';
+  progressText.textContent = '';
+  poolGrid.innerHTML = Array.from({ length: 16 }, () => '<article class="pool-card pool-card--loading"></article>').join('');
+
+  try {
+    const didLoadCards = await loadCards(activeTopicId, activeMenuValue, activeLoadRequestId);
+    if (!didLoadCards) {
+      return;
+    }
+    renderBattle();
+  } catch (error) {
+    console.error(error);
+    isBattleActive = false;
+    hasStartedBattle = false;
+    poolScroll.hidden = true;
+    syncHeroControlsVisibility();
+    battleIntroPanel.hidden = false;
+    battleIntroTitle.textContent = '카드를 불러오지 못했습니다.';
+  } finally {
+    battleStartButton.disabled = false;
+  }
 }
 
 function readFinalCards() {
@@ -1070,15 +1129,27 @@ function renderPool() {
       const stateClasses = [isSelected ? 'selected' : isAlive ? '' : 'eliminated', isCurrentRound ? 'is-current-round' : ''].filter(Boolean).join(' ');
 
       return `
-        <article class="pool-card ${stateClasses}" data-name="${card.name}">
-          ${card.image ? `<img class="pool-card__image" src="${card.image}" alt="${card.name}" />` : ''}
+        <article class="pool-card ${stateClasses}" data-card-id="${card.id}" data-name="${escapeHtml(card.name)}" role="button" tabindex="0" aria-label="${escapeHtml(card.name)} 상세보기">
+          ${card.image ? `<img class="pool-card__image" src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}" />` : ''}
           <div class="pool-card__overlay">
-            <span class="pool-card__overlay-name">${card.name}</span>
+            <span class="pool-card__overlay-name">${escapeHtml(card.name)}</span>
           </div>
         </article>
       `;
     })
     .join('');
+}
+
+function openPoolCardPreview(card) {
+  if (!card) {
+    return;
+  }
+
+  const activeMenuButton = getMenuButtonByValue(activeMenuValue);
+
+  window.PlaygroundFavoriteCardPreview?.open(card, {
+    topicLabel: getMenuLabel(activeMenuButton) || 'Topic 정보 없음',
+  });
 }
 
 function getImageSourceLabel(card) {
@@ -1469,6 +1540,33 @@ battleStartButton.addEventListener('click', () => {
   startBattle();
 });
 
+poolGrid.addEventListener('click', (event) => {
+  const poolCard = event.target.closest('[data-card-id]');
+
+  if (!poolCard) {
+    return;
+  }
+
+  const card = initialCards.find((item) => item.id === Number(poolCard.dataset.cardId));
+  openPoolCardPreview(card);
+});
+
+poolGrid.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') {
+    return;
+  }
+
+  const poolCard = event.target.closest('[data-card-id]');
+
+  if (!poolCard) {
+    return;
+  }
+
+  event.preventDefault();
+  const card = initialCards.find((item) => item.id === Number(poolCard.dataset.cardId));
+  openPoolCardPreview(card);
+});
+
 function bindMenuEventListeners() {
   menuToggleButtons = Array.from(document.querySelectorAll('[data-menu-toggle]'));
   menuItemButtons = Array.from(document.querySelectorAll('[data-topic-id]'));
@@ -1583,12 +1681,6 @@ clearHistoryButton.addEventListener('click', () => {
 
 openMobileMenuButton?.addEventListener('click', () => {
   openMobilePanel('menu');
-});
-
-openMobileSearchButton?.addEventListener('click', () => {
-  closeMobilePanels();
-  showMenuBrowser({ updateUrl: true, focusSearch: true });
-  setMobileNavState('search');
 });
 
 openMobileHistoryButton?.addEventListener('click', () => {
